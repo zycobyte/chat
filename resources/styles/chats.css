@@ -1,0 +1,63 @@
+body{
+	background-color: #404040;
+	color: #FFFFFF;
+	font-family: "Times New Roman", Times, serif;
+	position: relative;
+}
+div{
+	position: absolute;
+}
+.messages{
+	background-color: #505050;
+	right: 0;
+	top: 5px;
+	width: 75%;
+	height: 500px;
+    border-style: solid;
+    border-width: 1px;
+	border-color: black;
+}
+
+.users{
+	background-color: #454545;
+	left: 0%;
+	top: 5px;
+	width: 24%;
+	height: 500px;
+    border-style: solid;
+    border-width: 1px;
+	border-color: black;
+}
+
+.type{
+	background-color: #454545;
+	top: 510px;
+	width: 100%;
+	height: 20px;
+    border-style: solid;
+    border-width: 1px;
+	border-color: black;
+	position: absolute;
+}
+
+.settings{
+	background-color: #454545;
+	right: 0;
+	top: 540px;
+	width: 24%;
+	height: 100px;
+	border-style: solid;
+    border-width: 1px;
+	border-color: black;
+}
+
+.chats{
+	background-color: #303030;
+	left: 0;
+	top: 540px;
+	width: 75%;
+	height: 100px;
+    border-style: solid;
+    border-width: 1px;
+	border-color: black;
+}
