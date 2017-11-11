@@ -32,7 +32,7 @@ div{
 .type{
 	background-color: #454545;
 	top: 510px;
-	width: 95%;
+	width: 94.5%;
 	height: 20px;
     border-style: solid;
     border-width: 1px;
@@ -42,8 +42,9 @@ div{
 .send{
 	background-color: #454545;
 	top: 510px;
-	width: 50%;
-	height: 20px;
+	right: 0;
+	width: 5%;
+	height: 23px;
     border-style: solid;
     border-width: 1px;
 	border-color: black;

@@ -11,6 +11,7 @@
 <script>
 if(readCookie("oAuth") == null){
 	window.location.href="login.html";
+	//alert("add in oAuth code");
 }
 </script>
 
@@ -18,8 +19,11 @@ if(readCookie("oAuth") == null){
 <div class = "chats">Select chat room</div>
 <div class = "users">Users in the chat</div>
 <input class = "type" placeholder = "Type Message Here" id = "messageArea"></input>
-<input class = "send" type = "button" id = "send" onclick = "sendMessage(document.getElementById('messageArea').value)"></input>
+<input class = "send" type = "button" id = "send" onclick = "onSend(document.getElementById('messageArea'))"></input>
 <div class = "settings">Settings</div>
 
+<script>
+addListener("messageArea", "send");
+</script>
 </body>
 </html>
