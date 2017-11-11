@@ -3,8 +3,14 @@
 <head>
 	<title>Page Title</title>
 	<link rel="stylesheet" type="text/css" href="resources/styles/chats.css"></head>
+	<script type="text/javascript" src = "resources/scripts/cookies.js"></script>
 </head>
 <body>
+<script>
+if(readCookie("oAuth") == null){
+	window.location.href="login.html";
+}
+</script>
 
 <div class = "messages">No Messages</div>
 <div class = "chats">Select chat room</div>
