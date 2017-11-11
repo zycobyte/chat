@@ -32,14 +32,23 @@ div{
 .type{
 	background-color: #454545;
 	top: 510px;
-	width: 100%;
+	width: 95%;
 	height: 20px;
     border-style: solid;
     border-width: 1px;
 	border-color: black;
 	position: absolute;
 }
-
+.send{
+	background-color: #454545;
+	top: 510px;
+	width: 50%;
+	height: 20px;
+    border-style: solid;
+    border-width: 1px;
+	border-color: black;
+	position: absolute;
+}
 .settings{
 	background-color: #454545;
 	right: 0;

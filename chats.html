@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Page Title</title>
+	<title>Chats</title>
 	<link rel="stylesheet" type="text/css" href="resources/styles/chats.css"></head>
 	<script type="text/javascript" src = "resources/scripts/cookies.js"></script>
+	<script type="text/javascript" src = "resources/scripts/chats.js"></script>
 </head>
 
 <body>
@@ -16,7 +17,8 @@ if(readCookie("oAuth") == null){
 <div class = "messages">No Messages</div>
 <div class = "chats">Select chat room</div>
 <div class = "users">Users in the chat</div>
-<input class = "type" placeholder = "Type Message Here"></input>
+<input class = "type" placeholder = "Type Message Here" id = "messageArea"></input>
+<input class = "send" type = "button" id = "send" onclick = "sendMessage(document.getElementById('messageArea').value)"></input>
 <div class = "settings">Settings</div>
 
 </body>
