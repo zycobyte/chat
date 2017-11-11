@@ -6,10 +6,17 @@
 	<script type="text/javascript" src = "resources/scripts/cookies.js"></script>
 	<link rel="stylesheet" type="text/css" href="resources/styles/login.css"></head>
 <body>
+<script>
+if(readCookie("oAuth") != null){
+	window.location.href="chats.html";
+}
+</script>
 
-<input id = "name"></input>
-<input id = "pass"></input>
-<button onclick="sendRequest()">submit</button>
+THIS WILL BE IMPLEMENTED SOON<br><br>
+
+<input id = "name" class = "type">Username:</input><br><br>
+<input id = "pass" class = "type">Password:</input>
+<button onclick="sendRequest()" id = "login">Login</button>
 
 </body>
 </html>

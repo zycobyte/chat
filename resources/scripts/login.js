@@ -7,7 +7,7 @@ function sendRequest(){
 	
 	message = "login " + name + " " + hash(pass);
 	
-	alert(message + " ###TODO LOGIN SCRIPTS HERE");
+	console.log(message + " ###TODO LOGIN SCRIPTS HERE");
 	valid = true;
 	
 	if(valid){
