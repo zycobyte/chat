@@ -27,8 +27,13 @@ div{
 	top: 67px;
 	left: 80px;
 }
+#signup{
+    top: 100px;
+    left: 10px;
+    position: absolute;
+}
 #login{
-	top: 110px;
+	top: 100px;
 	left: 80px;
 	position: absolute;
 }

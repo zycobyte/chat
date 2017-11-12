@@ -2,28 +2,41 @@
 <html>
 <head>
 	<title>Chats</title>
-	<link rel="stylesheet" type="text/css" href="resources/styles/chats.css"></head>
+	<link rel="stylesheet" type="text/css" href="resources/styles/chats.css"></link>	
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
 	<script type="text/javascript" src = "resources/scripts/cookies.js"></script>
+	<script type="text/javascript" src = "resources/scripts/utils.js"></script>
 	<script type="text/javascript" src = "resources/scripts/chats.js"></script>
+	<script type="text/javascript" src = "resources/scripts/login.js"></script>
 </head>
 
 <body>
 <script>
-if(readCookie("oAuth") == null){
-	window.location.href="login.html";
-	//alert("add in oAuth code");
-}
+isValid(true);
 </script>
 
-<div class = "messages">No Messages</div>
-<div class = "chats">Select chat room</div>
-<div class = "users">Users in the chat</div>
-<input class = "type" placeholder = "Type Message Here" id = "messageArea"></input>
-<input class = "send" type = "button" id = "send" onclick = "onSend(document.getElementById('messageArea'))"></input>
-<div class = "settings">Settings</div>
+<div disabled class = "messages scrollBar" id = "messageBox" placeholder = "No Messages"></div>
+<div class = "chats">Select chat room -- Comming soon!</div>
+<div disabled class = "scrollBar users" id = "members">Users in the chat</div>
+<textarea class = "type  scrollBar" placeholder = "Type Message Here" id = "messageArea"></textarea>
+<div class = "send" type = "button" id = "send" onclick = "onSend(document.getElementById('messageArea'))">Send</div>
+<div class = "settings">Setting -- Comming soon!s</div>
+
+<div class = "hide" id = "alert">
+	<b>Invalid Auth Key. </b>Please login so we can validate it is you.<br><br>
+	<input id = "name" class = "loginForm">Username:</input><br><br>
+	<input id = "pass" class = "loginForm" type="password">Password:</input><br>
+	<button id = "signup" onclick="red = confirm('redirecting to login page to sign up'); if(red){window.location.href = 'login.html'}">Sign-up</button>
+	<button onclick="sendRequest(true)" id = "login">Login</button><br><br>
+	<div id = "info" style = "color:red;text-align:center;"></div>
+</div>
 
 <script>
 addListener("messageArea", "send");
+retriveMsgs();
+setTimeout(function(){
+	updateScroll();
+	}, 1000);
 </script>
 </body>
 </html>

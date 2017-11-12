@@ -7,18 +7,54 @@ body{
 div{
 	position: absolute;
 }
+
+bar{
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+	border-bottom-color: #202020;
+	width: 100%;
+	height: 10px;
+}
+
+#alert{
+	width: 100%;
+	height: 650px;
+	background-color: #555555;
+	position: absolute;
+}
+
+.hide{
+	display: none;
+}
+
+.show{
+	display: block;
+}
+
+.scrollBar{
+    font-size: 82%;
+    overflow:auto;
+	resize: none;
+	word-wrap: break-word;
+}
+
 .messages{
+	position: absolute;
 	background-color: #505050;
 	right: 0;
 	top: 5px;
 	width: 75%;
 	height: 500px;
+	color: black;
+    font-family: Verdana, Tahoma, Arial, Helvetica, sans-serif;
     border-style: solid;
     border-width: 1px;
 	border-color: black;
 }
 
 .users{
+	color: #FFFFFF;
+	font-family: "Times New Roman", Times, serif;
 	background-color: #454545;
 	left: 0%;
 	top: 5px;
@@ -49,6 +85,7 @@ div{
     border-width: 1px;
 	border-color: black;
 	position: absolute;
+	text-align: center;
 }
 .settings{
 	background-color: #454545;
@@ -70,4 +107,34 @@ div{
     border-style: solid;
     border-width: 1px;
 	border-color: black;
+}
+
+
+.loginForm{
+	background-color: #454545;
+	width: 100px;
+	height: 20px;
+    border-style: solid;
+    border-width: 1px;
+	border-color: black;
+	position: absolute;
+}
+
+#name{
+	top: 37px;
+	left: 80px;
+}
+#pass{
+	top: 67px;
+	left: 80px;
+}
+#signup{
+    top: 100px;
+    left: 10px;
+    position: absolute;
+}
+#login{
+	top: 100px;
+	left: 80px;
+	position: absolute;
 }

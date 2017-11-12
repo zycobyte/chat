@@ -4,19 +4,21 @@
 	<title>Login</title>
 	<script type="text/javascript" src = "resources/scripts/login.js"></script>
 	<script type="text/javascript" src = "resources/scripts/cookies.js"></script>
+	<script type="text/javascript" src = "resources/scripts/utils.js"></script>
 	<link rel="stylesheet" type="text/css" href="resources/styles/login.css"></head>
 <body>
 <script>
-if(readCookie("oAuth") != null){
-	window.location.href="chats.html";
-}
+isValid(true);
 </script>
 
-THIS WILL BE IMPLEMENTED SOON<br><br>
-
-<input id = "name" class = "type">Username:</input><br><br>
-<input id = "pass" class = "type">Password:</input>
-<button onclick="sendRequest()" id = "login">Login</button>
-
+<!--THIS WILL BE IMPLEMENTED SOON<br><br>-->
+	<div>
+		Please log in or sign up below.<br><br>
+		<input id = "name" class = "type">Username:</input><br><br>
+		<input id = "pass" class = "type" type="password">Password:</input><br>
+		<button onclick="sendRequest(false)" id = "signup">Sign-up</button>
+		<button onclick="sendRequest(true)" id = "login">Login</button><br><br>
+		<div id = "info" style = "color:red;text-align:center;"></div>
+	</div>
 </body>
 </html>
