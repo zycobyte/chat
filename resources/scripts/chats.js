@@ -26,6 +26,7 @@ function onSend(message){
 		data += format("username", readCookie("username"));
 		data += format("content", msg);
 		data = pack(data);
+		console.log(data);
 		
 		document.getElementById("messageBox").innerHTML += "<bar><br></bar>##SENDING## "+readCookie("username")+"<br>"+msg+"<br>";
 		updateScroll();
@@ -43,6 +44,7 @@ function onSend(message){
 		};
 		socket.onmessage = function(event){
 			message = extract(event.data)[0].split(":")[1];
+			console.log(event.data);
 			//console.log(message);
 			message = message.replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose");
 			document.getElementById("messageBox").innerHTML = message;
