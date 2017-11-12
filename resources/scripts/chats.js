@@ -21,11 +21,11 @@ function onSend(message){
 		
 		msg = msg.replaceAll("<", "&lt").replaceAll(">", "&gt").replaceAll(":", "&colon").replaceAll(";", "&semicolon").replaceAll("\"", "&speech").replaceAll("{", "&curlyopen").replaceAll("}", "&curlyclose");
 		
-		data = format("oAuth", readCookie("oAuth"));
-		data += format("chat", id);
-		data += format("username", readCookie("username"));
-		data += format("content", msg);
-		dataToSend = pack(data);
+		data_ = format("oAuth", readCookie("oAuth"));
+		data_ += format("chat", id);
+		data_ += format("username", readCookie("username"));
+		data_ += format("content", msg);
+		dataToSend = pack(data_);
 		
 		document.getElementById("messageBox").innerHTML += "<bar><br></bar>##SENDING## "+readCookie("username")+"<br>"+msg+"<br>";
 		updateScroll();
@@ -63,10 +63,10 @@ function retriveMsgs(){
 			return;
 		}
 		
-		data = format("oAuth", readCookie("oAuth"));
-		data += format("chat", id);
-		data += format("username", readCookie("username"));
-		dataToSend = pack(data);
+		data_ = format("oAuth", readCookie("oAuth"));
+		data_ += format("chat", id);
+		data_ += format("username", readCookie("username"));
+		dataToSend = pack(data_);
 		//console.log(data);
 		var socket = new WebSocket('ws://'+SERVER+':'+PORT_RETRIVE);
 
@@ -79,11 +79,11 @@ function retriveMsgs(){
 			console.log('WebSocket Error: ' + error);
 		};
 		socket.onmessage = function(event){
-			data = extract(event.data);
-			message = data[0].split(":")[1];
+			data__ = extract(event.data);
+			message = data__[0].split(":")[1];
 			message = message.replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose");
 			
-			members = data[1].split(":")[1];
+			members = data__[1].split(":")[1];
 			members = members.replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose");	
 			document.getElementById("members").innerHTML = members;
 			
