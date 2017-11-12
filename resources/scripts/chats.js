@@ -34,7 +34,7 @@ function onSend(message){
 		var socket = new WebSocket('ws://'+SERVER+':'+PORT_SEND);
 
 		socket.onopen = function(event) {
-			//console.log("sending:"+data);
+			console.log("sending:"+dataToSend);
 			socket.send(dataToSend);
 		};
 
@@ -63,16 +63,16 @@ function retriveMsgs(){
 			return;
 		}
 		
-		data_ = format("oAuth", readCookie("oAuth"));
-		data_ += format("chat", id);
-		data_ += format("username", readCookie("username"));
-		dataToSend = pack(data_);
+		data__ = format("oAuth", readCookie("oAuth"));
+		data__ += format("chat", id);
+		data__ += format("username", readCookie("username"));
+		dataToSend__ = pack(data__);
 		//console.log(data);
 		var socket = new WebSocket('ws://'+SERVER+':'+PORT_RETRIVE);
 
 		socket.onopen = function(event) {
 			//console.log("sending:"+data);
-			socket.send(dataToSend);
+			socket.send(dataToSend__);
 		};
 
 		socket.onerror = function(error) {
