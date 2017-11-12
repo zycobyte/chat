@@ -25,8 +25,7 @@ function onSend(message){
 		data += format("chat", id);
 		data += format("username", readCookie("username"));
 		data += format("content", msg);
-		data = pack(data);
-		console.log(data);
+		dataToSend = pack(data);
 		
 		document.getElementById("messageBox").innerHTML += "<bar><br></bar>##SENDING## "+readCookie("username")+"<br>"+msg+"<br>";
 		updateScroll();
@@ -35,8 +34,8 @@ function onSend(message){
 		var socket = new WebSocket('ws://'+SERVER+':'+PORT_SEND);
 
 		socket.onopen = function(event) {
-			console.log("sending:"+data);
-			socket.send(data);
+			//console.log("sending:"+data);
+			socket.send(dataToSend);
 		};
 
 		socket.onerror = function(error) {
@@ -44,7 +43,6 @@ function onSend(message){
 		};
 		socket.onmessage = function(event){
 			message = extract(event.data)[0].split(":")[1];
-			console.log(event.data);
 			//console.log(message);
 			message = message.replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose");
 			document.getElementById("messageBox").innerHTML = message;
@@ -68,13 +66,13 @@ function retriveMsgs(){
 		data = format("oAuth", readCookie("oAuth"));
 		data += format("chat", id);
 		data += format("username", readCookie("username"));
-		data = pack(data);
-		console.log(data);
+		dataToSend = pack(data);
+		//console.log(data);
 		var socket = new WebSocket('ws://'+SERVER+':'+PORT_RETRIVE);
 
 		socket.onopen = function(event) {
 			//console.log("sending:"+data);
-			socket.send(data);
+			socket.send(dataToSend);
 		};
 
 		socket.onerror = function(error) {
