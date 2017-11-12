@@ -67,6 +67,7 @@ function retriveMsgs(){
 		data += format("chat", id);
 		data += format("username", readCookie("username"));
 		data = pack(data);
+		console.log(data);
 		var socket = new WebSocket('ws://'+SERVER+':'+PORT_RETRIVE);
 
 		socket.onopen = function(event) {
