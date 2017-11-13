@@ -27,7 +27,10 @@ function onSend(message){
 		data_ += format("content", msg);
 		dataToSend = pack(data_);
 		
-		document.getElementById("messageBox").innerHTML += "<bar><br></bar>##SENDING## "+readCookie("username")+"<br>"+msg+"<br>";
+		message = msg.replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose");
+		message = message.replaceAll("<b>LavaTheif", "<b><mark style = \"background-color: #920e0e;color: #0066FF\">LavaTheif</mark>");
+
+		document.getElementById("messageBox").innerHTML += "<bar><br></bar>##SENDING## "+readCookie("username")+"<br>"+message+"<br>";
 		updateScroll();
 
 
@@ -104,6 +107,9 @@ function joinChat(newChat){
 
 function switchChat(goto){
 	id = goto;
+	setTimeout(function(){
+		updateScroll();
+	}, 500);
 }
 
 function retriveMsgs(){
@@ -138,10 +144,10 @@ function retriveMsgs(){
 			*/
 			data__ = extract(event.data);
 			message = data__[0].split(":")[1];
-			message = message.replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose");
-			
+			message = message.replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose").replaceAll(" = ", "=");
+
 			members = data__[1].split(":")[1];
-			members = members.replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose");	
+			members = members.replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose").replaceAll("LavaTheif<br>", "<b><mark style = \"background-color: #920e0e;color: #0066FF\">LavaTheif</mark></b><br>").replaceAll(" = ", "=");	
 			document.getElementById("members").innerHTML = members;
 			
 			allChats = data__[2].split(":")[1];
@@ -154,7 +160,10 @@ function retriveMsgs(){
 			messageBox = document.getElementById("messageBox");
 			update = messageBox.scrollTop === (messageBox.scrollHeight - messageBox.offsetHeight);
 			
-			messageBox.innerHTML = message;
+			if(messageBox.innerHTML !== message){
+				messageBox.innerHTML = message;
+			}
+
 			if(update){
 				updateScroll();
 			}
