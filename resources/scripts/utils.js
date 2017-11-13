@@ -18,7 +18,11 @@ function checkValidity(){
 				return false;
 			}
 		}else{
-			return true;
+			if(window.location.pathname.includes("chats.html")){
+				alert = document.getElementById("alert");
+				alert.className = "hide";
+				return true;
+			}		
 		}
 	}, 1000);
 }

@@ -16,11 +16,18 @@ isValid(true);
 </script>
 
 <div disabled class = "messages scrollBar" id = "messageBox" placeholder = "No Messages"></div>
-<div class = "chats">Select chat room -- Comming soon!</div>
+<div class = "chats" id = "chats">Select chat room -- Comming soon!</div>
+<div style = "font-size: 85%;" class = "join" id = "joinchat">
+	Enter a chat ID in the box below and hit join, or create a new chat!<br>
+	<input class = "inputBox" id = "chatid"></input>
+	<button class = "button" onclick = "joinChat(false)" style = "margin: auto;">join</button>
+	<br><bar></bar><br>
+	<button class = "button"  onclick = "joinChat(true)" style = "margin: auto;">create</button>
+</div>
 <div disabled class = "scrollBar users" id = "members">Users in the chat</div>
 <textarea class = "type  scrollBar" placeholder = "Type Message Here" id = "messageArea"></textarea>
 <div class = "send" type = "button" id = "send" onclick = "onSend(document.getElementById('messageArea'))">Send</div>
-<div class = "settings">Setting -- Comming soon!s</div>
+<div class = "settings">Setting -- Comming soon!</div>
 
 <div class = "hide" id = "alert">
 	<b>Invalid Auth Key. </b>Please login so we can validate it is you.<br><br>

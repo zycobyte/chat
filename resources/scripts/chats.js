@@ -1,5 +1,5 @@
 var id = 0;
-
+/**/
 function onSend(message){
 	/*
 	"{oAuth:auth;chat:id;username:name;content:message}"
@@ -53,6 +53,59 @@ function onSend(message){
 	
 }
 
+function joinChat(newChat){
+		/*
+		 * "{oAuth:key;username:name;action:join;server:id}"
+		 */
+
+	checkValidity();
+	
+	setTimeout(function(){
+		if(!oAuthIsValid){
+			return;
+		}
+		
+		newChatID = "new";
+		if(!newChat){
+			newChatID = document.getElementById("chatid").value;
+		}
+		
+		data_ = format("oAuth", readCookie("oAuth"));
+		data_ += format("username", readCookie("username"));
+		data_ += format("action", "join");
+		data_ += format("server", newChatID);
+		dataToSend = pack(data_);
+		
+		//document.getElementById("messageBox").innerHTML += "<bar><br></bar>##SENDING## "+readCookie("username")+"<br>"+msg+"<br>";
+
+		var socket = new WebSocket('ws://'+SERVER+':'+PORT_PROFILE);
+
+		socket.onopen = function(event) {
+			console.log("sending:"+dataToSend);
+			socket.send(dataToSend);
+		};
+
+		socket.onerror = function(error) {
+			console.log('WebSocket Error: ' + error);
+		};
+		socket.onmessage = function(event){
+			/*
+			 * "{server:id}"
+			 */
+			serverID = extract(event.data);
+			console.log("before:" + id + " -- " + serverID);
+			id = serverID[0].split(":")[1];
+			console.log("after:" + id);
+			
+			socket.close();
+		}
+	}, 500);
+}
+
+function switchChat(goto){
+	id = goto;
+}
+
 function retriveMsgs(){
 	/*
 	"{oAuth:auth;chat:id;username:name}"
@@ -60,6 +113,7 @@ function retriveMsgs(){
 	checkValidity();
 	setTimeout(function(){
 		if(!oAuthIsValid){
+			id = 0;
 			return;
 		}
 		
@@ -79,6 +133,9 @@ function retriveMsgs(){
 			console.log('WebSocket Error: ' + error);
 		};
 		socket.onmessage = function(event){
+			/*
+			"{messages:currentChatMessages;members:currentChatMembers;chats:allChats}"
+			*/
 			data__ = extract(event.data);
 			message = data__[0].split(":")[1];
 			message = message.replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose");
@@ -86,6 +143,13 @@ function retriveMsgs(){
 			members = data__[1].split(":")[1];
 			members = members.replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose");	
 			document.getElementById("members").innerHTML = members;
+			
+			allChats = data__[2].split(":")[1];
+			allChats = allChats.replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose");
+			
+			if(document.getElementById("chats").innerHTML !== allChats){
+				document.getElementById("chats").innerHTML = allChats;
+			}
 			
 			messageBox = document.getElementById("messageBox");
 			update = messageBox.scrollTop === (messageBox.scrollHeight - messageBox.offsetHeight);

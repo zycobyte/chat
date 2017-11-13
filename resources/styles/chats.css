@@ -75,17 +75,65 @@ bar{
 	border-color: black;
 	position: absolute;
 }
+.button{
+	background-color: #454545;
+	height: 23px;
+    border-style: solid;
+    border-width: 1px;
+	border-color: black;
+	position: relative;
+	text-align: center;
+	padding: 5px;
+}
+.inputBox{
+	background-color: #454545;
+	height: 19px;
+	left: 33px;
+    border-style: solid;
+    border-width: 1px;
+	border-color: black;
+	position: absolute;
+}
 .send{
 	background-color: #454545;
 	top: 510px;
 	right: 0;
 	width: 5%;
-	height: 23px;
+	height: 24px;
+    border-style: solid;
+    border-width: 1px;
+	border-color: black;
+	position: absolute;
+	text-align: center;	
+}
+	
+.chatButton{
+	background-color: #454545;
+	width: 40px;
+	height: 40px;
     border-style: solid;
     border-width: 1px;
 	border-color: black;
 	position: absolute;
 	text-align: center;
+    font-size: 75%;
+	margin: 5px;
+	padding-left: 80px;
+    text-indent: 0px;
+}
+.infoTable{
+	margin: auto;
+	background-color: #545454;
+	width: 90%;
+	height: 60px;
+    border-style: solid;
+    border-width: 1px;
+	border-color: black;
+	position: static;
+	text-align: left;
+    font-size: 100%;
+	margin: auto;
+    text-indent: 60px;
 }
 .settings{
 	background-color: #454545;
@@ -102,13 +150,27 @@ bar{
 	background-color: #303030;
 	left: 0;
 	top: 540px;
-	width: 75%;
+	width: 50%;
+	height: 90px;
+    border-style: solid;
+    border-width: 1px;
+	border-color: black;
+	font-size: 82%;
+    overflow:auto;
+	resize: none;
+	padding: 5px;
+}
+.join{
+	background-color: #303030;
+	left: 52%;
+	top: 540px;
+	width: 23%;
 	height: 100px;
     border-style: solid;
     border-width: 1px;
 	border-color: black;
-}
 
+}
 
 .loginForm{
 	background-color: #454545;
