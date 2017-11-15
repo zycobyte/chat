@@ -14,9 +14,17 @@
 <script>
 isValid(true);
 </script>
-
 <div disabled class = "messages scrollBar" id = "messageBox" placeholder = "No Messages"></div>
-<div class = "chats" id = "chats">Select chat room -- Comming soon!</div>
+<div class = "chats">
+<div  id = "chats"></div>
+
+<div class = "selectors">
+<div id = "select-chat">Select Chat</div>
+<div id = "select-dm">Select Direct Message -- Comming Soon!</div>
+</div>
+
+</div>
+
 <div style = "font-size: 85%;" class = "join" id = "joinchat">
 	Enter a chat ID in the box below and hit join, or create a new chat!<br>
 	<input class = "inputBox" id = "chatid"></input>
@@ -28,12 +36,12 @@ isValid(true);
 <textarea class = "type  scrollBar" placeholder = "Type Message Here" id = "messageArea"></textarea>
 <div class = "send" type = "button" id = "send" onclick = "onSend(document.getElementById('messageArea'))">Send</div>
 <div class = "settings">Setting -- Comming soon!</div>
-
+<div id = "profile"></div>
 <div class = "hide" id = "alert">
 	<b>Invalid Auth Key. </b>Please login so we can validate it is you.<br><br>
 	<input id = "name" class = "loginForm">Username:</input><br><br>
 	<input id = "pass" class = "loginForm" type="password">Password:</input><br>
-	<button id = "signup" onclick="red = confirm('redirecting to login page to sign up'); if(red){window.location.href = 'login.html'}">Sign-up</button>
+	<button id = "signup" onclick="red = confirm('redirecting to sign up page'); if(red){window.location.href = 'signup.html'}">Sign-up</button>
 	<button onclick="sendRequest(true)" id = "login">Login</button><br><br>
 	<div id = "info" style = "color:red;text-align:center;"></div>
 </div>

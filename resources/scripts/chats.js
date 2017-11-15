@@ -1,4 +1,5 @@
 var id = 0;
+var updateCheck = "";
 /**/
 function onSend(message){
 	/*
@@ -107,8 +108,53 @@ function joinChat(newChat){
 
 function switchChat(goto){
 	id = goto;
+	update = "";
 	setTimeout(function(){
 		updateScroll();
+	}, 500);
+}
+
+function createDM(user){
+	//TODO
+}
+
+function getProfile(user){
+	/*
+	"{oAuth:auth;username:name;action:"user";user:user;sub:"get"}"
+	*/
+	checkValidity();
+	setTimeout(function(){
+		if(!oAuthIsValid){
+			return;
+		}
+		
+		data__ = format("oAuth", readCookie("oAuth"));
+		data__ += format("username", readCookie("username"));
+		data__ += format("action", "user");
+		data__ += format("user", user);
+		data__ += format("sub", "get");
+		dataToSend__ = pack(data__);
+		//console.log(data);
+		var socket = new WebSocket('ws://'+SERVER+':'+PORT_PROFILE);
+
+		socket.onopen = function(event) {
+			//console.log("sending:"+data);
+			socket.send(dataToSend__);
+		};
+
+		socket.onerror = function(error) {
+			console.log('WebSocket Error: ' + error);
+		};
+		socket.onmessage = function(event){
+			/*
+			"{data:HTML}"
+			*/
+			data__ = extract(event.data);
+			HTML = data__[0].split(":")[1].replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose");
+			HTML = data__[0].split(":")[1].replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose");
+			//console.log(HTML);
+			document.getElementById("profile").innerHTML = HTML;
+		}
 	}, 500);
 }
 
@@ -144,7 +190,7 @@ function retriveMsgs(){
 			*/
 			data__ = extract(event.data);
 			message = data__[0].split(":")[1];
-			message = message.replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose").replaceAll(" = ", "=");
+			message = message.replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose");//.replaceAll(" = ", "=").replaceAll(" =", "=").replaceAll("= ", "=");
 
 			members = data__[1].split(":")[1];
 			members = members.replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose").replaceAll("LavaTheif<br>", "<b><mark style = \"background-color: #920e0e;color: #0066FF\">LavaTheif</mark></b><br>").replaceAll(" = ", "=");	
@@ -160,11 +206,14 @@ function retriveMsgs(){
 			messageBox = document.getElementById("messageBox");
 			update = messageBox.scrollTop === (messageBox.scrollHeight - messageBox.offsetHeight);
 			
-			if(messageBox.innerHTML !== message){
+			storeVar0__ = updateCheck;
+			
+			if(updateCheck !== data__[3].split(":")[1]){
 				messageBox.innerHTML = message;
+				updateCheck = data__[3].split(":")[1];
 			}
 
-			if(update){
+			if(update || storeVar0__ == ""){
 				updateScroll();
 			}
 			socket.close();

@@ -17,12 +17,17 @@ function checkValidity(){
 				alert.className = "show";
 				return false;
 			}
+			if(window.location.pathname.includes("veify.html")){
+				current = window.location.pathname;
+				window.location.pathname = "login.html?redirect="+current;
+				return false;
+			}
 		}else{
 			if(window.location.pathname.includes("chats.html")){
 				alert = document.getElementById("alert");
 				alert.className = "hide";
 				return true;
-			}		
+			}
 		}
 	}, 1000);
 }
@@ -60,7 +65,7 @@ function isValid(auto){
 		valid = data[0].split(":")[1] === "true";
 		if(auto){
 			if(!valid){
-				if(!window.location.pathname.includes("login.html")){
+				if(!window.location.pathname.includes("login.html") && !window.location.pathname.includes("signup.html")){
 					window.location.href="login.html";
 				}
 			}else{

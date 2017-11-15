@@ -9,6 +9,9 @@ function sendRequest(login){
 	
 	name = document.getElementById("name").value;
 	pass = document.getElementById("pass").value;
+	if(!login){
+		email = document.getElementById("email").value;
+	}
 	
 	name = name.replaceAll("<", "&lt").replaceAll(">", "&gt").replaceAll(":", "&colon").replaceAll(";", "&semicolon").replaceAll("\"", "&speech").replaceAll("{", "&curlyopen").replaceAll("}", "&curlyclose");
 
@@ -26,6 +29,16 @@ function sendRequest(login){
 	data = format("username", name);
 	data += format("password", pass);
 	data += format("login", login);
+	if(!login){
+		data += format("email", email);
+		if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))){
+			error("Invalid Email Address.");
+			return;
+		}
+		//else{
+		//	return;
+		//}
+	}
 	toSend = pack(data);
 
 	recieved = "";
@@ -55,8 +68,17 @@ function sendRequest(login){
 		if(valid){
 			createCookie("username", name, 10);
 			createCookie("oAuth", data[1].split(":")[1], 10);
-			if(!window.location.pathname.includes("chats.html")){
-				window.location.href="chats.html";
+			createCookie("email", data[2].split(":")[1], 10);
+			if(!window.location.href.includes("chats.html")){
+				if(location.href.includes("?redirect=")){
+					//console.log(location.href);
+					//console.log(location.href.split("?redirect="))
+					window.location.href= location.href.split("?redirect=")[1];
+				}else{
+					//console.log(location.href);
+					//console.log(location.href.split("?redirect="))
+					window.location.href="chats.html";
+				}
 			}else{
 				alert = document.getElementById("alert");
 				alert.className = "hide";

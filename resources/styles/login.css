@@ -9,6 +9,26 @@ div{
 	position: absolute;
 }
 
+/* unvisited link */
+a:link {
+	color: #00FFFF
+}
+
+/* visited link */
+a:visited {
+	color: #9900FF
+}
+
+/* mouse over link */
+a:hover {
+	color: #0000FF
+}
+
+/* selected link */
+a:active {
+	color: #00FFFF
+}
+
 .type{
 	background-color: #454545;
 	width: 100px;
@@ -27,13 +47,30 @@ div{
 	top: 67px;
 	left: 80px;
 }
+#email{
+	top: 97px;
+	left: 80px;
+}
 #signup{
-    top: 100px;
+	top: 130px;
+	left: 80px;
+	width: 80px;
+	position: absolute;
+}
+#login{
+	top: 130px;
+	left: 80px;
+	position: absolute;
+}
+
+
+#signup-l{
+    top: 97px;
     left: 10px;
     position: absolute;
 }
-#login{
-	top: 100px;
+#login-l{
+	top: 97px;
 	left: 80px;
 	position: absolute;
 }
