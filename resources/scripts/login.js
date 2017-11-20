@@ -43,7 +43,9 @@ function sendRequest(login){
 
 	recieved = "";
 	
-	var socket = new WebSocket('ws://'+SERVER+':'+PORT_LOGIN);
+	error ("Please wait");
+	
+	var socket = new WebSocket('ws://'+SERVER+':25005'+LOGIN);
 
 	// Show a connected message when the WebSocket is opened.
 	socket.onopen = function(event) {
@@ -80,8 +82,8 @@ function sendRequest(login){
 					window.location.href="chats.html";
 				}
 			}else{
-				alert = document.getElementById("alert");
-				alert.className = "hide";
+                alerting = document.getElementById("alerting");
+                alerting.className = "hide";
 			}
 		}else{
 			if(login){

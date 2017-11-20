@@ -22,5 +22,12 @@ isValid(true);
 
 
 	</div>
+<script>
+    if(location.href.includes("?&id=0")){
+        document.getElementById("info").innerHTML = "Successfully logged out!";
+    }else if(location.href.includes("?&id=1")){
+        document.getElementById("info").innerHTML = "Please log in.";
+    }
+</script>
 </body>
 </html>

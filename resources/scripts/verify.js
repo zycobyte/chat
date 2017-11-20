@@ -7,7 +7,7 @@ function newKey(){
 				
 				toSend = "\"{oAuth:"+readCookie("oAuth")+";username:"+readCookie("username")+";action:new-verify}\"";
 				
-				var socket = new WebSocket('ws://'+SERVER+':'+PORT_PROFILE);
+				var socket = new WebSocket('ws://'+SERVER+':25005'+PROFILE);
 
 				// Show a connected message when the WebSocket is opened.
 				socket.onopen = function(event) {
@@ -45,7 +45,7 @@ function check(){
 				
 				toSend = "\"{oAuth:"+readCookie("oAuth")+";username:"+readCookie("username")+";action:verify;email:"+readCookie("email")+";key:"+key+"}\"";
 				
-				var socket = new WebSocket('ws://'+SERVER+':'+PORT_PROFILE);
+				var socket = new WebSocket('ws://'+SERVER+':25005'+PROFILE);
 
 				// Show a connected message when the WebSocket is opened.
 				socket.onopen = function(event) {

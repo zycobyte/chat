@@ -1,10 +1,9 @@
-var SERVER = window.location.hostname == "localhost" ? "localhost" : "35.167.63.112";
-var PORT_LOGIN = 25001;
-var PORT_SEND = 25002;
-var PORT_PROFILE = 25003;
-var PORT_RETRIVE = 25004;
-var PORT_VALIDATE = 25005;
-//var PORT_NULL = 25006;
+var SERVER = window.location.hostname == "localhost" ? "localhost" : "servers.us-west.eiennochat.co.uk";
+var LOGIN = "/servers0/login";
+var SEND = "/servers1/message";
+var PROFILE = "/servers2/editProfile";
+var RETRIVE = "/servers3/refreshMessages";
+var VALIDATE = "/server4/verify";
 oAuthIsValid = true;
 
 function checkValidity(){
@@ -13,8 +12,8 @@ function checkValidity(){
 	setTimeout(function(){
 		if(!oAuthIsValid){
 			if(window.location.pathname.includes("chats.html")){
-				alert = document.getElementById("alert");
-				alert.className = "show";
+                alerting = document.getElementById("alerting");
+                alerting.className = "show";
 				return false;
 			}
 			if(window.location.pathname.includes("veify.html")){
@@ -24,8 +23,8 @@ function checkValidity(){
 			}
 		}else{
 			if(window.location.pathname.includes("chats.html")){
-				alert = document.getElementById("alert");
-				alert.className = "hide";
+                alerting = document.getElementById("alerting");
+                alerting.className = "hide";
 				return true;
 			}
 		}
@@ -45,7 +44,7 @@ String.prototype.replaceEach = function(replacement, search) {
 
 
 function isValid(auto){
-	var socket = new WebSocket('ws://'+SERVER+':'+PORT_VALIDATE);
+	var socket = new WebSocket('ws://'+SERVER+':25005'+VALIDATE);
 	send = pack(format("name", readCookie("username")) + format("oAuth", readCookie("oAuth")));
 	valid = false;
 	
@@ -66,7 +65,7 @@ function isValid(auto){
 		if(auto){
 			if(!valid){
 				if(!window.location.pathname.includes("login.html") && !window.location.pathname.includes("signup.html")){
-					window.location.href="login.html";
+					window.location.href="login.html?&id=1";
 				}
 			}else{
 				if(!window.location.pathname.includes("chats.html")){

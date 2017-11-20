@@ -1,8 +1,13 @@
+html{
+	height: 95%;
+	position: relative;
+}
 body{
 	background-color: #404040;
 	color: #FFFFFF;
 	font-family: "Times New Roman", Times, serif;
 	position: relative;
+	height: 100%;
 }
 div{
 	position: absolute;
@@ -27,17 +32,41 @@ a:visited {
 
 /* mouse over link */
 a:hover {
-    background-color: #303030;
+	background-color: #303030;
 	color: #AFAFAF
 }
 
 /* selected link */
 a:active {
-    background-color: #303030;
+	background-color: #303030;
 	color: #909090
 }
 
-#alert{
+
+/* unvisited link */
+#url:link {
+	background-color: #505050;
+	color: #AAAAFF;
+}
+
+/* visited link */
+#url:visited {
+	background-color: #505050;
+	color: #AAAAFF;
+}
+/* mouse over link */
+#url:hover {
+	background-color: #303030;
+	color: #AFAFAF
+}
+
+/* selected link */
+#url:active {
+	background-color: #303030;
+	color: #909090
+}
+
+#alerting{
 	width: 100%;
 	height: 650px;
 	background-color: #555555;
@@ -46,10 +75,12 @@ a:active {
 
 .hide{
 	display: none;
+	z-index: -1;
 }
 
 .show{
 	display: block;
+	z-index: 100;
 }
 
 .scrollBar{
@@ -65,7 +96,7 @@ a:active {
 	right: 0;
 	top: 5px;
 	width: 75%;
-	height: 500px;
+	height: 77%;/*500px;*/
 	color: black;
     font-family: Verdana, Tahoma, Arial, Helvetica, sans-serif;
     border-style: solid;
@@ -80,17 +111,29 @@ a:active {
 	left: 0%;
 	top: 5px;
 	width: 24%;
-	height: 500px;
+	height: 77%;
     border-style: solid;
     border-width: 1px;
 	border-color: black;
 }
-
-.type{
+.settingOption{
+	width: 100%;
+	height: 33%;
 	background-color: #454545;
-	top: 510px;
-	width: 94.5%;
-	height: 20px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: black;
+	position: relative;
+	text-align: center;
+	padding: 5px;
+	margin-bottom: 1px;
+}
+.type {
+	background-color: #454545;
+	top: 79%;/*510px;*/
+	left: 10%;
+	width: 84.5%;
+	height: 20px;/*20px;*/
     border-style: solid;
     border-width: 1px;
 	border-color: black;
@@ -98,7 +141,7 @@ a:active {
 }
 .button{
 	background-color: #454545;
-	height: 23px;
+	height: 26px;
     border-style: solid;
     border-width: 1px;
 	border-color: black;
@@ -108,19 +151,21 @@ a:active {
 }
 .inputBox{
 	background-color: #454545;
-	height: 19px;
+	height: 20%;/*19px;*/
 	left: 33px;
+	width: 80%;
     border-style: solid;
     border-width: 1px;
 	border-color: black;
 	position: absolute;
+	top: 35%;
 }
 .send{
 	background-color: #454545;
-	top: 510px;
+	top: 79%;/*510px;*/
 	right: 0;
 	width: 5%;
-	height: 24px;
+	height: 4%;/*24px;*/
     border-style: solid;
     border-width: 1px;
 	border-color: black;
@@ -164,20 +209,21 @@ a:active {
 .settings{
 	background-color: #454545;
 	right: 0;
-	top: 540px;
-	width: 24%;
-	height: 100px;
+	top: 85%;/*540px;*/
+	width: 23%;
+	height: 15%;/*100px;*/
 	border-style: solid;
     border-width: 1px;
 	border-color: black;
+	padding: 5px;
 }
 
 .chats{
 	background-color: #303030;
 	left: 0;
-	top: 540px;
+	top: 85%;/*540px;*/
 	width: 50%;
-	height: 90px;
+	height: 15%;/*90px;*/
     border-style: solid;
     border-width: 1px;
 	border-color: black;
@@ -185,6 +231,18 @@ a:active {
     overflow:auto;
 	resize: none;
 	padding: 5px;
+}
+#filename{
+	background-color: #454545;
+	top: 79%;/*510px;*/
+	left: 0;
+	width: 86px;
+	height: 20px;/*20px;*/
+	border-style: solid;
+	border-width: 1px;
+	border-color: black;
+	position: absolute;
+
 }
 #chats{
 	width: 99%;
@@ -221,12 +279,13 @@ a:active {
 .join{
 	background-color: #303030;
 	left: 52%;
-	top: 540px;
-	width: 23%;
-	height: 100px;
+	top: 85%;/*540px;*/
+	width: 22%;
+	height: 15%;/*100px;*/
     border-style: solid;
     border-width: 1px;
 	border-color: black;
+	padding: 5px;
 
 }
 
@@ -257,4 +316,24 @@ a:active {
 	top: 100px;
 	left: 80px;
 	position: absolute;
+}
+#join{
+	top: 35%;
+	left:0px;
+	position: absolute;
+}
+#create{
+	top: 65%;
+	left: 0px;
+	position: absolute;
+}
+
+#image-area{
+	height: 75%;
+	padding: 10px;
+}
+#image-area-bg{
+	width: 100%;
+	height: 100%;
+	background: black;
 }

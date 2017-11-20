@@ -20,7 +20,7 @@ isValid(true);
 
 <div class = "selectors">
 <div id = "select-chat">Select Chat</div>
-<div id = "select-dm">Select Direct Message -- Comming Soon!</div>
+<div id = "select-dm">Select Direct Message -- Coming Soon!</div>
 </div>
 
 </div>
@@ -28,16 +28,23 @@ isValid(true);
 <div style = "font-size: 85%;" class = "join" id = "joinchat">
 	Enter a chat ID in the box below and hit join, or create a new chat!<br>
 	<input class = "inputBox" id = "chatid"></input>
-	<button class = "button" onclick = "joinChat(false)" style = "margin: auto;">join</button>
-	<br><bar></bar><br>
-	<button class = "button"  onclick = "joinChat(true)" style = "margin: auto;">create</button>
+	<button id = "join" class = "button" onclick = "joinChat(false)" style = "margin: auto;">join</button>
+	<bar></bar>
+	<button id = "create" class = "button"  onclick = "joinChat(true)" style = "margin: auto;">create</button>
 </div>
 <div disabled class = "scrollBar users" id = "members">Users in the chat</div>
 <textarea class = "type  scrollBar" placeholder = "Type Message Here" id = "messageArea"></textarea>
-<div class = "send" type = "button" id = "send" onclick = "onSend(document.getElementById('messageArea'))">Send</div>
-<div class = "settings">Setting -- Comming soon!</div>
+<input type="file" id="filename"/>
+<button class = "send button" id = "send" onclick = "onSend(document.getElementById('messageArea'))">Send</button>
+<div class = "settings">
+    <button class = "settingOption">Friends -- Coming soon</button>
+    <button class = "settingOption" >Settings -- Coming soon</button>
+    <button class = "settingOption" onClick = "eraseCookie('email');eraseCookie('username');eraseCookie('oAuth');window.location.href='login.html?&id=0';">Log-out</button>
+</div>
 <div id = "profile"></div>
-<div class = "hide" id = "alert">
+
+
+<div class = "hide" id = "alerting">
 	<b>Invalid Auth Key. </b>Please login so we can validate it is you.<br><br>
 	<input id = "name" class = "loginForm">Username:</input><br><br>
 	<input id = "pass" class = "loginForm" type="password">Password:</input><br>
@@ -45,7 +52,7 @@ isValid(true);
 	<button onclick="sendRequest(true)" id = "login">Login</button><br><br>
 	<div id = "info" style = "color:red;text-align:center;"></div>
 </div>
-
+<div id = "image-area-bg" class = "hide" onclick="focusImg()"><img class = "hide" id = "image-area" src = "" onclick="focusImg()"></img></div>
 <script>
 addListener("messageArea", "send");
 retriveMsgs();
