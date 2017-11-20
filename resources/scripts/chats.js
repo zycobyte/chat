@@ -30,7 +30,7 @@ function onSend(message) {
 
         function connectToFileServer(file) {
             ws = new WebSocket(
-                "ws://localhost:25004/file-upload/");
+                "ws://"+SERVER+":25004/file-upload/");
 
             ws.binaryType = "arraybuffer";
             ws.onopen = function () {
