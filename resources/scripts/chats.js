@@ -1,6 +1,13 @@
 var id = 0;
-var updateCheck = "";
+var chatUpdate = 0;
+var userListUpdate = 0;
+var chatListUpdate = 0;
+var dmListUpdate = 0;
+
 var pleaseWait = false;
+var chats = true;
+var dm = false;
+var storeImageLink = "", msg, creatingChat = false;
 /**/
 function onSend(message) {
     /*
@@ -17,7 +24,7 @@ function onSend(message) {
         return
     }
 
-    checkValidity();
+    //checkValidity();
     msg = message.value;
     message.value = "";
 
@@ -25,72 +32,20 @@ function onSend(message) {
         if (!oAuthIsValid) {
             return;
         }
-        var ws;
-        sent = 0;
 
-        function connectToFileServer(file) {
-            ws = new WebSocket(
-                "ws://"+SERVER+":25004/file-upload/");
-
-            ws.binaryType = "arraybuffer";
-            ws.onopen = function () {
-                // alert("Connected.")
-                sendFile(file);
-            };
-
-            ws.onmessage = function (evt) {
-                console.log(evt.data);
-                msg += " " + evt.data;
-            };
-
-            ws.onclose = function () {
-                sent += 1;
-                console.log("Connection is closed...");
-                if(sent >= toSend){
-                    sendMsg();
-                }
-            };
-            ws.onerror = function (e) {
-                // alert(e.msg);
-				console.log(e.data);
-                sendMsg();
-                msg += " [Unable to attach file]";
-            }
-
-        }
-
-        function sendFile(file) {
-            //var file = document.getElementById('filename').files[0];
-            ws.send('filename:' + file.name + ';folder:' + id + "/" + readCookie("username") + ';oAuth:' + readCookie("oAuth") + ';username:' + readCookie("username"));
-            var reader = new FileReader();
-            var rawData = new ArrayBuffer();
-            //alert(file.name);
-
-            reader.loadend = function () {
-
-            }
-            reader.onload = function (e) {
-                rawData = e.target.result;
-                //alert(rawData);
-                ws.send(rawData);
-                //alert("the File has been transferred.")
-                ws.send('end');
-            }
-            reader.readAsArrayBuffer(file);
-        }
-
-        timeout = 0;
+        //timeout = 0;
         pleaseWait = true;
-        toSend = document.getElementById('filename').files.length;
-        if (document.getElementById('filename').files.length > 0) {
-            if(document.getElementById('filename').files[0].size>5242880){
+
+        toSend = document.getElementById('fileStore').files.length;
+        if (document.getElementById('fileStore').files.length > 0) {
+            if(document.getElementById('fileStore').files[0].size>5242880){
             	alert("Files must not exceed 5Mb.  Sorry!");
-                document.getElementById('filename').value = null;
+                document.getElementById('fileStore').value = null;
             	toSend = 0;
 			}else{
-				connectToFileServer(document.getElementById('filename').files[0]);
-                document.getElementById('filename').value = null;
-				timeout = 1000;
+				connectToFileServer(document.getElementById('fileStore').files[0], readCookie("username"), sendMsg);
+                document.getElementById('fileStore').value = null;
+				//timeout = 1000;
             }
         }
         if(toSend == 0){
@@ -98,49 +53,106 @@ function onSend(message) {
         }
     }, 1000);
 }
+
+function selectChats(){
+    var chat = document.getElementById("select-chat");
+    var dm = document.getElementById("select-dm");
+    chat.classList = "selected";
+    dm.classList = "un-selected";
+    chats = true;
+    chatListUpdate = 0;
+}
+function selectDms(){
+    var chat = document.getElementById("select-chat");
+    var dm = document.getElementById("select-dm");
+    dm.classList = "selected";
+    chat.classList = "un-selected";
+    chats = false;
+    dmListUpdate = 0;
+}
+
 function sendMsg(){
 	// console.log(sent + " " + toSend);
     pleaseWait = false;
     msg = msg.replaceAll("<", "&lt").replaceAll(">", "&gt").replaceAll(":", "&colon").replaceAll(";", "&semicolon").replaceAll("\"", "&speech").replaceAll("{", "&curlyopen").replaceAll("}", "&curlyclose");
 
-    data_ = format("oAuth", readCookie("oAuth"));
-    data_ += format("chat", id);
-    data_ += format("username", readCookie("username"));
-    data_ += format("content", msg);
-    dataToSend = pack(data_);
-	message = msg.replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose");
+    var data_ = {};
+    var time = new Date().getTime();
+    data_ = {"content": msg, "isDm": dm, "time":time};
+
+    var dataToSend = JSONData(data_);
+    var message = msg.replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose");
     message = message.replaceAll("<b>LavaTheif", "<b><mark style = \"background-color: #920e0e;color: #0066FF\">LavaTheif</mark>");
 
-    document.getElementById("messageBox").innerHTML += "<bar><br></bar>##SENDING## " + readCookie("username") + "<br>" + message + "<br>";
+    document.getElementById("messageBox").innerHTML += "<div id = \"messageBox-"+time+"\"><br>##SENDING## " + readCookie("username") + "<br>" + message + "<br></div><br><br><br><br>";
     updateScroll();
 
+        sendData(SEND, dataToSend, handleSendMsg);
 
-	var socket = new WebSocket('ws://' + SERVER + ':25005' + SEND);
 
-            socket.onopen = function (event) {
-                console.log("sending:" + dataToSend);
-                socket.send(dataToSend);
-            };
-
-            socket.onerror = function (error) {
-                console.log('WebSocket Error: ' + error);
-            };
-            socket.onmessage = function (event) {
-                message = extract(event.data)[0].split(":")[1];
-                //console.log(message);
-                message = message.replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose");
-                document.getElementById("messageBox").innerHTML = message;
-                updateScroll();
-                socket.close();
-            }
+    // var socket = new WebSocket('ws://' + SERVER + ':25005' + SEND);
+    //
+    //         socket.onopen = function (event) {
+    //             console.log("sending:" + dataToSend);
+    //             socket.send(dataToSend);
+    //         };
+    //
+    //         socket.onerror = function (error) {
+    //             console.log('WebSocket Error: ' + error);
+    //         };
+    //         socket.onmessage = function (event) {
+    //         }
         //}, timeout);
 	//}, 500);
 	
 }
+function handleSendMsg(event, rawData,  socket){
+    // message = rawData["content"];
+    // var time = rawData["time"];
+    //console.log(message);
+    // message = message.replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose").replaceEach("\\", "\\\\");
+    // if(document.getElementById("messageBox-"+time) !== null){
+    //     document.getElementById("messageBox-"+time).innerHTML = message;
+    // }else{
+    //     document.getElementById("messageBox").innerHTML += message;
+    // }
+    // updateScroll();
+    socket.close();
+}
+
+function readURL(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            $('#image-display')
+                .attr('src', e.target.result)
+                .width(100)
+                .height(100);
+        };
+
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+function readURL_(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            $('#image-display-')
+                .attr('src', e.target.result)
+                .width(100)
+                .height(100);
+        };
+
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
 
 function focusImg(src){
-    imgArea = document.getElementById("image-area");
-    imgArea_bg = document.getElementById("image-area-bg");
+    var imgArea = document.getElementById("image-area");
+    var imgArea_bg = document.getElementById("image-area-bg");
 	if(src){
         imgArea.src = src;
         imgArea.classList = "show";
@@ -156,27 +168,29 @@ function joinChat(newChat){
 		 * "{oAuth:key;username:name;action:join;server:id}"
 		 */
 
-	checkValidity();
-	
-	setTimeout(function(){
+	// checkValidity();
 		if(!oAuthIsValid){
 			return;
 		}
 		
-		newChatID = "new";
+		var newChatID = "new";
 		if(!newChat){
 			newChatID = document.getElementById("chatid").value;
+            document.getElementById('joinChatPopup').className = 'hide';
+            document.getElementById('please-wait').className = 'show';
 		}
-		
-		data_ = format("oAuth", readCookie("oAuth"));
+
+		var data_ = format("oAuth", readCookie("oAuth"));
 		data_ += format("username", readCookie("username"));
 		data_ += format("action", "join");
 		data_ += format("server", newChatID);
 		dataToSend = pack(data_);
 		
 		//document.getElementById("messageBox").innerHTML += "<bar><br></bar>##SENDING## "+readCookie("username")+"<br>"+msg+"<br>";
+        sendData(PROFILE, dataToSend, handleJoin);
 
-		var socket = new WebSocket('ws://'+SERVER+':25005'+PROFILE);
+
+		/*var socket = new WebSocket('ws://'+SERVER+':25005'+PROFILE);
 
 		socket.onopen = function(event) {
 			console.log("sending:"+dataToSend);
@@ -189,34 +203,210 @@ function joinChat(newChat){
 		socket.onmessage = function(event){
 			/*
 			 * "{server:id}"
-			 */
-			serverID = extract(event.data);
-			console.log("before:" + id + " -- " + serverID);
+			 *//*
+			var serverID = extract(event.data);
+			//console.log("before:" + id + " -- " + serverID);
 			id = serverID[0].split(":")[1];
-			console.log("after:" + id);
+			dm = false;
+			//console.log("after:" + id);
 			
 			socket.close();
-		}
-	}, 500);
+		}*/
+}
+function handleJoin(event, parsedFile, socket){
+    //var serverID = extract(event.data);
+    if(!parsedFile["error"]) {
+        id = parsedFile["chat-id"];
+        dm = false;
+        socket.close();
+        if (creatingChat) {
+            uploadChatIcon("name-of-chat", "img-upload");
+        } else {
+            document.getElementById('please-wait').className = 'hide';
+            document.getElementById('dim').className = 'hide';
+        }
+    }else{
+        document.getElementById('please-wait').innerHTML = "Couldn't join chat."
+        setTimeout(function() {
+            handleEditChat();
+            socket.close();
+            document.getElementById('please-wait').innerHTML = "Please wait..."
+            document.getElementById('please-wait').className = 'hide';
+            document.getElementById('dim').className = 'hide';
+        }, 500);
+
+    }
+}
+function joinDm(user){
+    /*
+     * "{oAuth:key;username:name;action:join;server:id}"
+     */
+
+    // checkValidity();
+    if(!oAuthIsValid){
+        return;
+    }
+
+    var data_ = format("oAuth", readCookie("oAuth"));
+    data_ += format("username", readCookie("username"));
+    data_ += format("action", "join");
+    data_ += format("server", "dm");
+    data_ += format("user", formatMessage(user));
+    var dataToSend = pack(data_);
+
+    //document.getElementById("messageBox").innerHTML += "<bar><br></bar>##SENDING## "+readCookie("username")+"<br>"+msg+"<br>";
+    sendData(PROFILE, dataToSend, handleJoinDm);
+    // var socket = new WebSocket('ws://'+SERVER+':25005'+PROFILE);
+    //
+    // socket.onopen = function(event) {
+    //     console.log("sending:"+dataToSend);
+    //     socket.send(dataToSend);
+    // };
+    //
+    // socket.onerror = function(error) {
+    //     console.log('WebSocket Error: ' + error);
+    // };
+    // socket.onmessage = function(event){
+    //     /*
+    //      * "{server:id}"
+    //      */
+    //     serverID = extract(event.data);
+    //     //console.log("before:" + id + " -- " + serverID);
+    //     id = serverID[0].split(":")[1];
+    //     //console.log(id)
+    //     dm = true;
+    //     //console.log("after:" + id);
+    //
+    //     socket.close();
+    // }
+}
+
+function createChat(){
+    document.getElementById('createChat').className = 'hide';
+    document.getElementById('please-wait').className = 'show';
+    creatingChat = true;
+    joinChat(true);
+}
+
+function uploadChatIcon(name_box, img_upload){
+    document.getElementById('editChat').className = 'hide';
+    document.getElementById('please-wait').className = 'show';
+
+    creatingChat = false;
+    storeImageLink = "";
+    var imageUpload = document.getElementById(img_upload);
+
+    toSend = imageUpload.files.length;
+    if (imageUpload.files.length > 0) {
+        if(imageUpload.files[0].size>5242880){
+            alert("Files must not exceed 5Mb.  Sorry!");
+            imageUpload.value = null;
+            toSend = 0;
+        }else{
+            connectToFileServer(imageUpload.files[0], "chat-files-upload", handleChatIconUpload);
+            imageUpload.value = null;
+        }
+    }else{
+        handleChatIconUpload(name_box);
+    }
+}
+
+function openCreateChat(){
+    document.getElementById("select-public-radio-button").checked = "checked";
+    document.getElementById('createChat').className = 'show';
+    document.getElementById('createDM').className = 'hide';
+    document.getElementById('dim').className = 'show';
+}
+function openCreateDM(){
+    document.getElementById("select-DM-radio-button").checked = "checked";
+    document.getElementById('createChat').className = 'hide';
+    document.getElementById('createDM').className = 'show';
+    document.getElementById('dim').className = 'show';
+}
+function openJoinChat(){
+    document.getElementById('joinChatPopup').className = 'show';
+    document.getElementById('dim').className = 'show';
+}
+//joinChat(false)
+function createDM(user){
+    document.getElementById("create-DM-with-user").value = user;
+    createDM_();
+}
+function createDM_(){
+    document.getElementById('createDM').className = 'hide';
+    document.getElementById('please-wait').className = 'show';
+    creatingChat = true;
+    joinDm(document.getElementById("create-DM-with-user").value);
+}
+
+function handleJoinDm(event, parsedFile, socket){
+    creatingChat = false;
+    if(!parsedFile["error"]) {
+        id = parsedFile["chat-id"];
+        dm = true;
+        handleEditChat();
+        socket.close();
+    }else{
+        document.getElementById('please-wait').innerHTML = "Couldn't create DM with user."
+        setTimeout(function() {
+            handleEditChat();
+            socket.close();
+            document.getElementById('please-wait').innerHTML = "Please wait..."
+        }, 500);
+
+    }
+}
+
+function handleChatIconUpload(name_box){
+    var nameOfChat = document.getElementById(name_box).value;
+    var JSONDataToSend = JSONData({"new-name":formatMessage(nameOfChat), "new-image": formatMessage(storeImageLink)});
+    sendData(EDIT_SERVER, JSONDataToSend, handleEditChat);
+}
+
+function openEditChatMenu(idOfChat){
+    id = idOfChat;
+    document.getElementById('name-of-chat-').value = "";
+    document.getElementById('editChat').className = 'show';
+    document.getElementById('dim').className = 'show'
+}
+
+function handleEditChat() {
+    var nameOfChat = document.getElementById("name-of-chat");
+    var imageUpload = document.getElementById("img-upload");
+    document.getElementById("create-DM-with-user").value = "LavaTheif";
+    document.getElementById('joinChatPopup').className = 'hide';
+    document.getElementById('createDM').className = 'hide';
+    nameOfChat.value = "Chat does not have a name yet.";
+    imageUpload.value = null;
+    document.getElementById('createChat').className = 'hide';
+    document.getElementById('editChat').className = 'hide';
+    document.getElementById('dim').className = 'hide';
+    document.getElementById('please-wait').className = 'hide';
+    chatListUpdate = 0;
 }
 
 function switchChat(goto){
 	id = goto;
+	dm = false;
 	update = "";
 	setTimeout(function(){
 		updateScroll();
 	}, 500);
 }
-
-function createDM(user){
-	//TODO
+function switchDm(goto){
+    id = goto;
+    dm = true;
+    update = "";
+    setTimeout(function(){
+        updateScroll();
+    }, 500);
 }
 
 function getProfile(user){
 	/*
 	"{oAuth:auth;username:name;action:"user";user:user;sub:"get"}"
 	*/
-	checkValidity();
+	//checkValidity();
 	setTimeout(function(){
 		if(!oAuthIsValid){
 			return;
@@ -252,73 +442,6 @@ function getProfile(user){
 	}, 500);
 }
 
-function retriveMsgs(){
-	/*
-	"{oAuth:auth;chat:id;username:name}"
-	*/
-	checkValidity();
-	setTimeout(function(){
-		if(!oAuthIsValid){
-			id = 0;
-			return;
-		}
-		
-		data__ = format("oAuth", readCookie("oAuth"));
-		data__ += format("chat", id);
-		data__ += format("username", readCookie("username"));
-		dataToSend__ = pack(data__);
-		//console.log(data);
-		var socket = new WebSocket('ws://'+SERVER+':25005'+RETRIVE);
-		// console.log(RETRIVE);
-		socket.onopen = function(event) {
-			//console.log("sending:"+data);
-			socket.send(dataToSend__);
-		};
-
-		socket.onerror = function(error) {
-			console.log('WebSocket Error: ' + error);
-		};
-		socket.onmessage = function(event){
-			/*
-			"{messages:currentChatMessages;members:currentChatMembers;chats:allChats}"
-			*/
-			data__ = extract(event.data);
-			// console.log(data__);
-
-			message = data__[0].split(":")[1];
-			message = message.replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose");//.replaceAll(" = ", "=").replaceAll(" =", "=").replaceAll("= ", "=");
-
-			members = data__[1].split(":")[1];
-			members = members.replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose").replaceAll("LavaTheif<br>", "<b><mark style = \"background-color: #920e0e;color: #0066FF\">LavaTheif</mark></b><br>").replaceAll(" = ", "=");	
-			document.getElementById("members").innerHTML = members;
-			
-			allChats = data__[2].split(":")[1];
-			allChats = allChats.replaceEach(":", "&colon").replaceEach(";", "&semicolon").replaceEach("\"", "&speech").replaceEach("{", "&curlyopen").replaceEach("}", "&curlyclose");
-			
-			if(document.getElementById("chats").innerHTML !== allChats){
-				document.getElementById("chats").innerHTML = allChats;
-			}
-			
-			messageBox = document.getElementById("messageBox");
-			update = messageBox.scrollTop === (messageBox.scrollHeight - messageBox.offsetHeight);
-			
-			storeVar0__ = updateCheck;
-			
-			if(updateCheck !== data__[3].split(":")[1]){
-				messageBox.innerHTML = message;
-				updateCheck = data__[3].split(":")[1];
-			}
-
-			if(update || storeVar0__ == ""){
-				updateScroll();
-			}
-			socket.close();
-		}
-	}, 100);
-	
-}
-
-setInterval(retriveMsgs, 500);
 
 function updateScroll(){
     var element = document.getElementById("messageBox");

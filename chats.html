@@ -2,39 +2,136 @@
 <html>
 <head>
 	<title>Eienno Chat -- Messages</title>
-	<link rel="stylesheet" type="text/css" href="resources/styles/chats.css"></link>	
-	<link rel="icon" href="/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" type="text/css" href="resources/styles/chats.css">
+	<link rel="stylesheet" type="text/css" href="resources/styles/classes.css">
+	<link rel="stylesheet" type="text/css" href="resources/styles/ids.css">
+	<link rel="stylesheet" type="text/css" href="resources/styles/tags.css">
+
+	<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+	<link rel="icon" type="image/png" sizes="192x192"  href="/android-icon-192x192.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/manifest.json">
+
+	<meta name="msapplication-TileColor" content="#ffffff">
+	<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+	<meta name="theme-color" content="#ffffff">
+	<meta charset=utf-8 />
+
 	<script type="text/javascript" src = "resources/scripts/cookies.js"></script>
 	<script type="text/javascript" src = "resources/scripts/utils.js"></script>
 	<script type="text/javascript" src = "resources/scripts/chats.js"></script>
+	<script type="text/javascript" src = "resources/scripts/Loops.js"></script>
 	<script type="text/javascript" src = "resources/scripts/login.js"></script>
+	<script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+	<script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.0/jquery-ui.min.js"></script>
 </head>
 
 <body>
 <script>
 isValid(true);
 </script>
+
+<img src = "resources/images/Logo-wide.png" id = "logo"/>
+
 <div disabled class = "messages scrollBar" id = "messageBox" placeholder = "No Messages"></div>
 <div class = "chats">
 <div  id = "chats"></div>
 
 <div class = "selectors">
-<div id = "select-chat">Select Chat</div>
-<div id = "select-dm">Select Direct Message -- Coming Soon!</div>
+<div class = "selected" id = "select-chat" onclick = "selectChats()">Select Chat</div>
+<div class = "un-selected" id = "select-dm" onclick = "selectDms()">Select Direct Message</div>
 </div>
 
 </div>
 
 <div style = "font-size: 85%;" class = "join" id = "joinchat">
-	Enter a chat ID in the box below and hit join, or create a new chat!<br>
-	<input class = "inputBox" id = "chatid"></input>
-	<button id = "join" class = "button" onclick = "joinChat(false)" style = "margin: auto;">join</button>
-	<bar></bar>
-	<button id = "create" class = "button"  onclick = "joinChat(true)" style = "margin: auto;">create</button>
+	<!--Enter a chat ID in the box below and hit join, or create a new chat!<br>-->
+	<!--<input class = "inputBox" id = "chatid"></input>-->
+	<button id = "join" class = "button" onclick = "openJoinChat()" style = "margin: auto;">join</button>
+	<button id = "create" class = "button"  onclick = "openCreateChat()" style = "margin: auto;">create</button>
 </div>
-<div disabled class = "scrollBar users" id = "members">Users in the chat</div>
-<textarea class = "type  scrollBar" placeholder = "Type Message Here" id = "messageArea"></textarea>
-<input type="file" id="filename"/>
+<div class = "scrollBar users" id = "members">Users in the chat</div>
+<input class = "type  scrollBar" placeholder = "Type Message Here" id = "messageArea"/>
+
+<label id="filename">
+	<input type="file" id="fileStore" class = "hide"/>
+	+
+</label>
+<div id = "dim" class = "hide"></div>
+<div id = "please-wait" class = "hide">Please Wait...</div>
+<div id ="createChat" class = "hide">
+	Name: <input maxlength="30" minlength="1" size="30" class="nameOfChat  scrollBar"
+				 placeholder="Type Server Name Here" id="name-of-chat" value="Chat does not have a name yet."/>
+	<br>
+	<label id="image">
+		Icon:
+		<input onchange="readURL(this);" type="file" accept="image/*" id="img-upload" class = "hide"/>
+		[+]
+	</label>
+	<img src = "http://files.servers.us-west.eiennochat.co.uk/icons/defaults/chat-icon.png" id = "image-display"/>
+
+	<label  id = "select-DM-radio">
+		<input onclick = "openCreateDM()" type = "radio" name = "something" value = "DM">DM</input>
+	</label>
+	<label id = "select-public-radio">
+		<input id = "select-public-radio-button" type = "radio" name = "something" value = "Public chat" checked="checked">Public Chat</input>
+	</label>
+	<button class = "button" id = "buttonCancel" onclick = "handleEditChat()">cancel</button>
+	<button class = "button" id = "buttonCreate" onclick = "createChat()">create</button>
+</div>
+
+<div id ="editChat" class = "hide">
+	Anything left blank will be unchanged.<br>
+	Name: <input maxlength="30" minlength="1" size="30" class="nameOfChat  scrollBar"
+				 placeholder="Type Server Name Here" id="name-of-chat-"/>
+	<br>
+	<label id="image-">
+		Icon:
+		<input onchange="readURL_(this);" type="file" accept="image/*" id="img-upload-" class = "hide"/>
+		[+]
+	</label>
+	<img src = "http://files.servers.us-west.eiennochat.co.uk/icons/defaults/chat-icon.png" id = "image-display-"/>
+
+	<button class = "button" id = "buttonCancel" onclick = "handleEditChat()">cancel</button>
+	<button class = "button" id = "buttonCreate" onclick = "uploadChatIcon('name-of-chat-', 'img-upload-')">edit</button>
+</div>
+
+
+<div id ="createDM" class = "hide">
+	Name: <input maxlength="30" minlength="1" size="16" class="createDMWithUser  scrollBar"
+				 placeholder="Type Users Name Here" id="create-DM-with-user" value="LavaTheif"/>
+	<br>
+
+	<label  id = "select-DM-radio">
+		<input id = "select-DM-radio-button" type = "radio" name = "something" value = "DM">DM</input>
+	</label>
+	<label id = "select-public-radio">
+		<input onclick = "openCreateChat()" type = "radio" name = "something" value = "Public chat" checked="checked">Public Chat</input>
+	</label>
+	<button class = "button" id = "buttonCancel" onclick = "handleEditChat()">cancel</button>
+	<button class = "button" id = "buttonCreate" onclick = "createDM_()">create</button>
+</div>
+
+<div id ="joinChatPopup" class = "hide">
+	Chat ID: <input maxlength="15" minlength="1" size="16" class="createDMWithUser  scrollBar"
+				 placeholder="Type Server ID Here" id="chatid" value="0"/>
+	<br>
+
+	<button class = "button" id = "buttonCancel" onclick = "handleEditChat()">cancel</button>
+	<button class = "button" id = "buttonCreate" onclick = "joinChat(false)">join</button>
+</div>
+
+
 <button class = "send button" id = "send" onclick = "onSend(document.getElementById('messageArea'))">Send</button>
 <div class = "settings">
     <button class = "settingOption">Friends -- Coming soon</button>
@@ -45,14 +142,16 @@ isValid(true);
 
 
 <div class = "hide" id = "alerting">
-	<b>Invalid Auth Key. </b>Please login so we can validate it is you.<br><br>
-	<input id = "name" class = "loginForm">Username:</input><br><br>
-	<input id = "pass" class = "loginForm" type="password">Password:</input><br>
+	<div style="position:absolute"><b>Invalid Auth Key.</b> Please login so we can validate it is you.</div><br><br>
+	Username:<input id = "name" class = "loginForm"/><br><br>
+	Password:<input id = "pass" class = "loginForm" type="password"/><br>
 	<button id = "signup" onclick="red = confirm('redirecting to sign up page'); if(red){window.location.href = 'signup.html'}">Sign-up</button>
 	<button onclick="sendRequest(true)" id = "login">Login</button><br><br>
 	<div id = "info" style = "color:red;text-align:center;"></div>
 </div>
-<div id = "image-area-bg" class = "hide" onclick="focusImg()"><img class = "hide" id = "image-area" src = "" onclick="focusImg()"></img></div>
+<div id = "image-area-bg" class = "hide" onclick="focusImg()">
+	<img class = "hide" id = "image-area" src = "" onclick="focusImg()"/>
+</div>
 <script>
 addListener("messageArea", "send");
 retriveMsgs();

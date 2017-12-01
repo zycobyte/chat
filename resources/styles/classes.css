@@ -1,0 +1,204 @@
+.hide{
+    display: none;
+    z-index: -1;
+}
+
+.show{
+    /*display: block;*/
+    display: flex;
+    z-index: 100;
+}
+
+.scrollBar{
+    font-size: 82%;
+    overflow:auto;
+    resize: none;
+    word-wrap: break-word;
+}
+
+.messages{
+    position: absolute;
+    background-color: #437F7F;
+    right: 0;
+    top: 0;
+    width: 75%;
+    height: 77%;/*500px;*/
+    color: black;
+    font-family: Verdana, Tahoma, Arial, Helvetica, sans-serif;
+    /*border-style: solid;
+    border-width: 1px;
+	border-color: black;
+*/}
+
+.users{
+    color: #FFFFFF;
+    font-family: "Times New Roman", Times, serif;
+    background-color: #658E9C;
+    left: 0;
+    top: 15%;
+    width: 24%;
+    height: 62%;
+    /*border-style: solid;
+    border-width: 1px;
+	border-color: black;*/
+}
+.settingOption{
+    width: 100%;
+    height: 33%;
+    background-color: #28619B;
+    border: 1px solid black;
+    position: relative;
+    text-align: center;
+    padding: 5px;
+    margin-bottom: 1px;
+}
+.type {
+    background-color: #419999;
+    top: 78%;/*510px;*/
+    right: 5%;
+    width: 70%;
+    height: 6%;/*20px;*/
+    border: 1px solid black;
+    position: absolute;
+    padding: 0;
+}
+.nameOfChat{
+    background-color: #419999;
+    height: 10%;/*20px;*/
+    border: 1px solid black;
+    position: absolute;
+    padding: 0;
+}
+.createDMWithUser{
+    background-color: #419999;
+    height: 10%;/*20px;*/
+    border: 1px solid black;
+    position: absolute;
+    padding: 0;
+}
+
+.button{
+    background-color: #28619B;
+    height: 26px;
+    border: 1px solid black;
+    position: relative;
+    text-align: center;
+    padding: 5px;
+}
+.inputBox{
+    background-color: #419999;
+    height: 20%;/*19px;*/
+    left: 33px;
+    width: 80%;
+    border: 1px solid black;
+    position: absolute;
+    top: 35%;
+}
+.send{
+    background-color: #28619B;
+    top: 78%;/*510px;*/
+    right: 0;
+    width: 5%;
+    height: 6%;/*24px;*/
+    border: 1px solid black;
+    position: absolute;
+    text-align: center;
+    padding: 0;
+}
+
+.chatButton{
+    background-color: #0B4C89;
+    width: 50px;
+    max-height: 50px;
+    height: 50%;
+    border: 1px solid black;
+    position: absolute;
+    text-align: center;
+    font-size: 75%;
+    margin: 5px;
+    padding-left: 80px;
+    text-indent: 0;
+    left: 25%;
+}
+.t{
+    text-indent: 60px;
+    position: absolute;
+}
+.infoTable{
+    margin: auto;
+    background-color: #28619B;
+    width: 50%;
+    height: 60%;
+    min-height: 60px;
+    border: 1px solid black;
+    position: static;
+    text-align: left;
+    font-size: 100%;
+    text-indent: 60px;
+
+}
+.settings{
+    background-color: #70C1B3;
+    left: 0;
+    top: 85%; /*540px;*/
+    width: 23%;
+    height: 15%;/*100px;*/
+    border: 1px solid black;
+    padding: 0.5%;
+}
+
+.chats{
+    background-color: #70C1B3;
+    right: 0;
+    top: 85%;/*540px;*/
+    width: 74%;
+    height: 15%;/*90px;*/
+    /*border-style: solid;
+    border-width: 1px;
+	border-color: black;*/
+    font-size: 82%;
+    overflow:auto;
+    resize: none;
+    padding: 0.5%;
+}
+.selectors{
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 20%;
+    /*border-style: solid;
+    border-width: 1px;
+    border-color: black;*/
+    font-size: 82%;
+    position: sticky;
+    text-align: center;
+}
+.selected{
+    background-color: #59A5D8;
+    border-bottom: 2px solid #0000FF;
+
+}
+.un-selected{
+    background-color: #acc7d4;
+    border-bottom: 2px solid #5171A5;
+
+}
+
+.join{
+    background-color: #70C1B3;
+    left: 0;/*52%;*/
+    top: 78%;/*540px;*/
+    width: 23%;
+    height: 4%;/*100px;*/
+    border: 1px solid black;
+    padding: 0.5%;
+
+}
+
+.loginForm{
+    background-color: #5171A5;
+    width: 100px;
+    height: 20px;
+    border: 1px solid black;
+    position: absolute;
+}
