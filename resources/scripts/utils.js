@@ -139,7 +139,7 @@ function sendData(PORT, JSONDataToSend, onMessageMethod){
 var ws, sent, toSend;
 sent = 0;
 
-function connectToFileServer(file, folder, handle) {
+function connectToFileServer(file, folder, handle, arg) {
     ws = new WebSocket(
         "ws://"+SERVER+":25004/file-upload/");
 
@@ -159,7 +159,7 @@ function connectToFileServer(file, folder, handle) {
         sent += 1;
         console.log("Connection is closed...");
         if(sent >= toSend){
-            handle();
+            handle(arg);
         }
     };
     ws.onerror = function (e) {
@@ -167,7 +167,7 @@ function connectToFileServer(file, folder, handle) {
         console.log(e.data);
         socket.close();
         msg += " [Unable to attach file]";
-        handle();
+        handle(arg);
     }
 
 }

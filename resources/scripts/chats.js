@@ -303,7 +303,7 @@ function uploadChatIcon(name_box, img_upload){
             imageUpload.value = null;
             toSend = 0;
         }else{
-            connectToFileServer(imageUpload.files[0], "chat-files-upload", handleChatIconUpload);
+            connectToFileServer(imageUpload.files[0], "chat-files-upload", handleChatIconUpload, name_box);
             imageUpload.value = null;
         }
     }else{
