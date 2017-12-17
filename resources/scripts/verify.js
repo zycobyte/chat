@@ -5,7 +5,7 @@ function newKey(){
 				document.getElementById("result").innerHTML = "Couldn't generate new key.  Try logging in again.";
 			}
 				
-				toSend = "\"{oAuth:"+readCookie("oAuth")+";username:"+readCookie("username")+";action:new-verify}\"";
+				toSend = JSONData({"action":"new-verify"});//"\"{oAuth:"+readCookie("oAuth")+";username:"+readCookie("username")+";action:new-verify}\"";
 				
 				var socket = new WebSocket('ws://'+SERVER+':25005'+PROFILE);
 
@@ -22,8 +22,8 @@ function newKey(){
 
 				socket.onmessage = function(event) {
 					console.log(event.data);
-					recived = extract(event.data);
-					reply = recived[0].split(":")[1];
+					var recived = extract(event.data);
+					var reply = recived[0].split(":")[1];
 					document.getElementById("result").innerHTML = reply;					
 				}
 	}, 1000);
@@ -40,10 +40,10 @@ function check(){
 				location.href = "login.html?redirect=" + redirect;
 			}
 			if(location.href.includes("?validationKey=")){
-				key = location.href.split("?validationKey=")[1];
+				var key = location.href.split("?validationKey=")[1];
 				document.getElementById("result").innerHTML = "Verifying E-Mail";
 				
-				toSend = "\"{oAuth:"+readCookie("oAuth")+";username:"+readCookie("username")+";action:verify;email:"+readCookie("email")+";key:"+key+"}\"";
+				var toSend = JSONData({"action":"verify", "key":key});//"\"{oAuth:"+readCookie("oAuth")+";username:"+readCookie("username")+";action:verify;email:"+readCookie("email")+";key:"+key+"}\"";
 				
 				var socket = new WebSocket('ws://'+SERVER+':25005'+PROFILE);
 
@@ -60,8 +60,8 @@ function check(){
 
 				socket.onmessage = function(event) {
 					console.log(event.data);
-					recived = extract(event.data);
-					valid = recived[0].split(":")[1] == "true";
+					var recived = extract(event.data);
+					var valid = recived[0].split(":")[1] == "true";
 					if(valid){
 						document.getElementById("result").innerHTML = "E-Mail verified!";
 					}else{

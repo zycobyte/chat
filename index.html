@@ -10,6 +10,11 @@
 <body>
 
 <script>
+    var userAgent = navigator.userAgent.toLowerCase();
+    if (userAgent.indexOf(' electron/') > -1) {
+        createCookie("desktop", "true")
+    }</script>
+<script>
 isValid(true);
 </script>
 

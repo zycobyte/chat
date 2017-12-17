@@ -1,0 +1,77 @@
+body{
+	background-color: #01295F;
+	color: #FFFFFF;
+	font-family: "Times New Roman", Times, serif;
+	position: relative;
+}
+
+div{
+	position: absolute;
+	left: 40%;
+}
+
+/* unvisited link */
+a:link {
+	color: #00FFFF
+}
+
+/* visited link */
+a:visited {
+	color: #9900FF
+}
+
+/* mouse over link */
+a:hover {
+	color: #0000FF
+}
+
+/* selected link */
+a:active {
+	color: #00FFFF
+}
+
+.type{
+	background-color: #419999;
+	width: 100px;
+	height: 20px;
+    border-style: solid;
+    border-width: 1px;
+	border-color: black;
+	position: absolute;
+}
+
+#name{
+	top: 37px;
+	left: 80px;
+}
+#pass{
+	top: 67px;
+	left: 80px;
+}
+#email{
+	top: 97px;
+	left: 80px;
+}
+#signup{
+	top: 130px;
+	left: 80px;
+	width: 80px;
+	position: absolute;
+}
+#login{
+	top: 130px;
+	left: 80px;
+	position: absolute;
+}
+
+
+#signup-l{
+    top: 97px;
+    left: 10px;
+    position: absolute;
+}
+#login-l{
+	top: 97px;
+	left: 80px;
+	position: absolute;
+}

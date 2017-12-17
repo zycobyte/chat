@@ -11,28 +11,28 @@ oAuthIsValid = true;
 var id = -1;
 
 function checkValidity(){
-    isValid(false);
-    //console.log("Checking oAuth");
-    setTimeout(function(){
-        if(!oAuthIsValid){
-            if(window.location.pathname.includes("chats")){
+	isValid(false);
+	//console.log("Checking oAuth");
+	setTimeout(function(){
+		if(!oAuthIsValid){
+			if(window.location.pathname.includes("chats")){
                 alerting = document.getElementById("alerting");
                 alerting.className = "show";
-                return false;
-            }
-            if(window.location.pathname.includes("veify.html")){
-                current = window.location.pathname;
-                window.location.pathname = URL_PRE+"login.html?redirect="+current;
-                return false;
-            }
-        }else{
-            if(window.location.pathname.includes("chats")){
+				return false;
+			}
+			if(window.location.pathname.includes("veify.html")){
+				current = window.location.pathname;
+				window.location.pathname = URL_PRE+"login.html?redirect="+current;
+				return false;
+			}
+		}else{
+			if(window.location.pathname.includes("chats")){
                 alerting = document.getElementById("alerting");
                 alerting.className = "hide";
-                return true;
-            }
-        }
-    }, 1000);
+				return true;
+			}
+		}
+	}, 1000);
 }
 
 setInterval(checkValidity, 60*30*1000);
@@ -48,40 +48,40 @@ String.prototype.replaceEach = function(replacement, search) {
 
 
 function isValid(auto){
-    var socket = new WebSocket('ws://'+SERVER+':25005'+VALIDATE);
-    // send = pack(format("name", readCookie("username")) + format("oAuth", readCookie("oAuth")));
+	var socket = new WebSocket('ws://'+SERVER+':25005'+VALIDATE);
+	// send = pack(format("name", readCookie("username")) + format("oAuth", readCookie("oAuth")));
     var send = JSONData();
-    valid = false;
+	valid = false;
 
-    socket.onopen = function(event) {
-        //console.log(send);
-        socket.send(send);
-    };
+	socket.onopen = function(event) {
+		//console.log(send);
+		socket.send(send);
+	};
 
-    socket.onerror = function(error) {
-        console.log('WebSocket Error: ' + error);
-    };
+	socket.onerror = function(error) {
+		console.log('WebSocket Error: ' + error);
+	};
 
-    socket.onmessage = function(event) {
-        var message = event.data;
-        socket.close();
-        data = extract(message);
-        valid = data[0].split(":")[1] === "true";
-        if(auto){
-            if(!valid){
-                if(!window.location.pathname.includes("login.html") && !window.location.pathname.includes("signup.html")){
-                    window.location.href=URL_PRE+"login.html?&id=1";
-                }
-            }else{
-                if(!window.location.pathname.includes("chats")){
-                    window.location.href="chats/";
-                }
-            }
-        }else{
-            oAuthIsValid = valid;
-        }
+	socket.onmessage = function(event) {
+	  	var message = event.data;
+		socket.close();
+		data = extract(message);
+		valid = data[0].split(":")[1] === "true";
+		if(auto){
+			if(!valid){
+				if(!window.location.pathname.includes("login.html") && !window.location.pathname.includes("signup.html")){
+					window.location.href=URL_PRE+"login.html?&id=1";
+				}
+			}else{
+				if(!window.location.pathname.includes("chats")){
+					window.location.href="chats/";
+				}
+			}
+		}else{
+			oAuthIsValid = valid;
+		}
 
-    };
+	};
 }
 
 function extract(data){
@@ -101,18 +101,16 @@ function extract(data){
 // }
 
 function JSONData(rawData){
-    // if(!id){
-    //     var id="-1";
-    // }
+
     var defaults = {"UserName":readCookie("username"), "oAuth Key":readCookie("oAuth"), "E-Mail":readCookie("email"), "id":readCookie("id"), "Chat":id};
     var result = {};
     for(var key in defaults) result[key] = ""+defaults[key];
     for(var key in rawData) result[key] = ""+rawData[key];
-    return JSON.stringify(result);
+	return JSON.stringify(result);
 }
 
 function sendData(PORT, JSONDataToSend, onMessageMethod){
-    console.log("Preparing to send data");
+	console.log("Preparing to send data");
     var socket = new WebSocket('ws://'+SERVER+':25005'+PORT);
     var onclose = true;
 
@@ -125,20 +123,20 @@ function sendData(PORT, JSONDataToSend, onMessageMethod){
         console.log('WebSocket Error: ' + error);
     };
     socket.onmessage = function(event){
-        //console.log(event.data);
-        var parsedFile = JSON.parse(event.data);
-        onclose = false;
+    	//console.log(event.data);
+		var parsedFile = JSON.parse(event.data);
+		onclose = false;
 
-        if(!parsedFile["valid"]){
-            document.getElementById("alerting").className = "show";
-            socket.close();
-        }else {
+		if(!parsedFile["valid"]){
+			document.getElementById("alerting").className = "show";
+			socket.close();
+		}else {
             onMessageMethod(event, parsedFile, socket);
         }
-    }
-    socket.onclose = function(event) {
-        if(onclose){
-            onMessageMethod(event, "", socket);
+	}
+	socket.onclose = function(event) {
+    	if(onclose){
+    		onMessageMethod(event, "", socket);
         }
     }
 }
@@ -158,8 +156,12 @@ function connectToFileServer(file, folder, handle, arg) {
 
     ws.onmessage = function (evt) {
         console.log(evt.data);
-        msg += " " + evt.data;
-        storeImageLink = evt.data;
+        if(evt.data.includes("{\"valid\":false}")){
+
+        }else {
+            msg += " " + evt.data;
+            storeImageLink = evt.data;
+        }
     };
 
     ws.onclose = function () {
@@ -201,5 +203,5 @@ function sendFile(file, folder) {
 }
 
 function formatMessage(message){
-    return message.replaceAll("<", "&lt").replaceAll(">", "&gt").replaceAll(":", "&colon").replaceAll(";", "&semicolon").replaceAll("\"", "&speech").replaceAll("{", "&curlyopen").replaceAll("}", "&curlyclose");
+	return message.replaceAll("<", "&lt").replaceAll(">", "&gt").replaceAll(":", "&colon").replaceAll(";", "&semicolon").replaceAll("\"", "&speech").replaceAll("{", "&curlyopen").replaceAll("}", "&curlyclose");
 }

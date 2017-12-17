@@ -76,7 +76,7 @@ function sendRequest(login){
 		if(valid){
             createCookie("username", data[3].split(":")[1], 10);//Creates name cookie with correct capitals
 			createCookie("oAuth", data[1].split(":")[1], 10);
-            createCookie("email", data[2].split(":")[1], 10);
+			createCookie("email", data[2].split(":")[1], 10);
             createCookie("id", data[4].split(":")[1], 10);
 			if(!window.location.href.includes("chats")){
 				if(location.href.includes("?redirect=")){

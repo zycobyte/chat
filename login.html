@@ -2,6 +2,9 @@
 <html>
 <head>
 	<title>Eienno Chat -- Login</title>
+	<script type="text/javascript" src = "resources/scripts/login.js"></script>
+	<script type="text/javascript" src = "resources/scripts/cookies.js"></script>
+	<script type="text/javascript" src = "resources/scripts/utils.js"></script>
 	<link rel="stylesheet" type="text/css" href="resources/styles/login.css"></head>
 <body>
 <script>
@@ -16,8 +19,7 @@ isValid(true);
 		<button onclick="sendRequest(true)" id = "login-l">Login</button>
 		<a href="signup.html"><h6>Don't have an account? Sign-up</h6></a>
 		<div id = "info" style = "color:red;text-align:center;"></div>
-		
-		<br><br>Eien.no Chat is currently updating, please try again later!
+
 
 	</div>
 <script>
@@ -25,6 +27,8 @@ isValid(true);
         document.getElementById("info").innerHTML = "Successfully logged out!";
     }else if(location.href.includes("?&id=1")){
         document.getElementById("info").innerHTML = "Please log in.";
+    }else if(location.href.includes("?&id=2")){
+        document.getElementById("info").innerHTML = "Account now deleted.";
     }
 </script>
 </body>
