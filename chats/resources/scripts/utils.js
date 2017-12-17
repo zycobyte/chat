@@ -1,6 +1,6 @@
 var DEV = window.location.hostname == "localhost"||window.location.hostname.includes("192.168");
 var SERVER = DEV ? window.location.hostname == "localhost" ? "localhost" : "192.168.0.18" : "servers.us-west.eiennochat.co.uk";
-var URL_PRE = DEV ? "/Eien.no%20Chat/" : "";
+var URL_PRE = DEV ? "/Eien.no%20Chat/" : "/";
 var LOGIN = "/servers0/login";
 var SEND = "/servers1/message";
 var PROFILE = "/servers2/editProfile";
