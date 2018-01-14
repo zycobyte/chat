@@ -1,0 +1,63 @@
+.box{
+    left: 15%;
+    width: 70%;
+    background-color: #42C0FF;
+    position: relative;
+    text-align: center;
+    word-wrap: normal;
+    opacity: 0;
+    -webkit-animation-name: fade;  /* Safari 4.0 - 8.0 */
+    -webkit-animation-duration: 2s;  /* Safari 4.0 - 8.0 */
+    -webkit-animation-fill-mode: forwards; /* Safari 4.0 - 8.0 */
+    animation-name: fade;
+    animation-duration: 2s;
+    animation-fill-mode: forwards;
+}
+
+#who{
+    top:100px;
+}
+#what{
+    top:150px;
+}
+#why{
+    top:200px;
+}
+#when{
+    top:250px;
+}
+#social{
+    top:300px;
+    margin-bottom: 5px;
+}
+
+
+/* Safari 4.0 - 8.0 */
+@-webkit-keyframes fade {
+    from {margin-top: -20px;}
+    to {margin-top: 0;
+        opacity: 1;
+        filter: alpha(opacity=100); /* For IE8 and earlier */
+    }
+}
+@keyframes fade {
+    from {margin-top: -20px;}
+    to {margin-top: 0;
+        opacity: 1;
+        filter: alpha(opacity=100); /* For IE8 and earlier */
+    }
+}
+
+a:link{
+    color: #0d03ff;
+    transition:0.5s;
+}
+a:visited{
+    color: #0d03ff;
+}
+a:hover{
+    color: #206bff;
+}
+a:active{
+    color: #206bff;
+}

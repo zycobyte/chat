@@ -1,0 +1,205 @@
+body{
+    background-color: #33A4C4;
+    position: absolute;
+}
+
+.box{
+    position: absolute;
+    width: 25%;
+    margin: 10px;
+    height: 500px;
+    background-color: rgb(66,192,255);
+    text-align: center;
+    word-wrap: normal;
+    font-size: 18px;
+    min-width: 369px;
+    opacity: 0;
+    filter: alpha(opacity=0); /* For IE8 and earlier */}
+
+.left{
+    left: 25px;
+    -webkit-animation-name: fade-left;  /* Safari 4.0 - 8.0 */
+    -webkit-animation-duration: 2s;  /* Safari 4.0 - 8.0 */
+    -webkit-animation-fill-mode: forwards; /* Safari 4.0 - 8.0 */
+    animation-name: fade-left;
+    animation-duration: 2s;
+    animation-fill-mode: forwards;
+}
+.right{
+    right: 25px;
+    -webkit-animation-name: fade-right;  /* Safari 4.0 - 8.0 */
+    -webkit-animation-duration: 2s;  /* Safari 4.0 - 8.0 */
+    -webkit-animation-fill-mode: forwards; /* Safari 4.0 - 8.0 */
+    animation-name: fade-right;
+    animation-duration: 2s;
+    animation-fill-mode: forwards;
+}
+
+/* Safari 4.0 - 8.0 */
+@-webkit-keyframes fade-left {
+    from {left: 0px;}
+    to {left: 50px;
+        opacity: 1;
+        filter: alpha(opacity=100); /* For IE8 and earlier */
+    }
+}
+
+@keyframes fade-left {
+    from {left: 0px;}
+    to {left: 50px;
+        opacity: 1;
+        filter: alpha(opacity=100); /* For IE8 and earlier */
+    }
+}
+
+/* Safari 4.0 - 8.0 */
+@-webkit-keyframes fade-right {
+    from {right: 0px;}
+    to {right: 50px;
+        opacity: 1;
+        filter: alpha(opacity=100); /* For IE8 and earlier */
+    }
+}
+
+@keyframes fade-right {
+    from {right: 0px;}
+    to {right: 50px;
+        opacity: 1;
+        filter: alpha(opacity=100); /* For IE8 and earlier */
+    }
+}
+
+/* Safari 4.0 - 8.0 */
+@-webkit-keyframes fade {
+    from {}
+    to {opacity: 1;
+        filter: alpha(opacity=100); /* For IE8 and earlier */
+    }
+}
+
+@keyframes fade {
+    from {}
+    to {opacity: 1;
+        filter: alpha(opacity=100); /* For IE8 and earlier */
+    }
+}
+
+
+
+#boxes{
+    position: relative;
+    height:1600px;
+}
+#welcome-box{
+    top: 100px;
+}
+#cost-box{
+    top: 350px;
+    animation-delay: 1s;
+    -webkit-animation-delay: 1s;
+}
+#age-box{
+    top: 750px;
+    animation-delay: 2s;
+    -webkit-animation-delay: 2s;
+}
+#why-box{
+    top: 1000px;
+    animation-delay: 3s;
+    -webkit-animation-delay: 3s;
+}
+
+
+.stick{
+    position: absolute;
+    opacity: 0;
+    filter: alpha(opacity=0); /* For IE8 and earlier */
+    -webkit-animation-name: fade;  /* Safari 4.0 - 8.0 */
+    -webkit-animation-duration: 2s;  /* Safari 4.0 - 8.0 */
+    -webkit-animation-fill-mode: forwards; /* Safari 4.0 - 8.0 */
+    animation-name: fade;
+    animation-duration: 2s;
+    animation-fill-mode: forwards;
+}
+#stick01{
+    width:200px;
+    height: 200px;
+    right: 25%;
+    margin-right: -12.5%;
+    top: 160px;
+    background: url("../imgs/stick 1.png") no-repeat;
+    background-size: contain;
+    -webkit-animation-delay: 2s;
+    animation-delay: 2s;
+
+}
+@media all and (max-width: 1493px) {
+    #stick01{
+        margin: 0;
+        right: 185px;
+    }
+}
+
+#stick02{
+    width:300px;
+    height: 300px;
+    margin-left: -90px;
+    left: 25%;
+    top: 610px;
+    background: url("../imgs/stick 2.png") no-repeat;
+    background-size: contain;
+    -webkit-animation-delay: 3s;
+    animation-delay: 3s;
+}
+@media all and (max-width: 1493px) {
+    #stick02{
+        left: 369px;
+    }
+}
+
+#stick03{
+    width:100px;
+    height: 100px;
+    right: 25%;
+    margin-right: -5px;
+    top: 915px;
+    background: url("../imgs/stick 3.png") no-repeat;
+    background-size: contain;
+    -webkit-animation-delay: 4s;
+    animation-delay: 4s;
+
+}
+
+@media all and (max-width: 1493px) {
+    #stick03{
+        right: 369px;
+    }
+}
+
+#stick04{
+    width:100px;
+    height: 100px;
+    left: 25%;
+    margin-left: 100px;
+    bottom: 0;
+    background: url("../imgs/stick 4.png") no-repeat;
+    background-size: contain;
+    -webkit-animation-delay: 5s;
+    animation-delay: 5s;
+}
+@media all and (max-width: 1493px) {
+    #stick04{
+        left: 369px;
+    }
+}
+
+#stick05{
+    width:150px;
+    height: 150px;
+    left: 10px;
+    bottom: 0;
+    background: url("../imgs/stick 5.png") no-repeat;
+    background-size: contain;
+    -webkit-animation-delay: 5s;
+    animation-delay: 5s;
+}

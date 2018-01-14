@@ -1,0 +1,14 @@
+body{
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    min-width: 1024px;
+}
+
+#scroll-appear-on-load{
+    height: 101%;
+    width:1px;
+    padding-bottom: 5px;
+    position: absolute;
+    top: 0;
+}

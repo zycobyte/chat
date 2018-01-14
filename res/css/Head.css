@@ -1,0 +1,53 @@
+body{
+    background-color: #33A4C4;
+    position: absolute;
+}
+.header-main{
+    height:60px;
+    width:100%;
+    background-color: #2B8BA5;
+    position: fixed;
+    z-index: 1000;
+}
+.dropdown-button{
+    position: absolute;
+    width: 25px;
+    left: 25px;
+    top: 50%;
+    height: 5px;
+    transition:1s; /* A 1 second transition. */
+    opacity: 1;
+    background: #0d3fa0 none;
+}
+.dropdown-button:hover{
+    top:0;
+    left:0;
+    width: 300px;
+    height: 500px;
+    background: #2B8BA5 url("../imgs/option menu.png");
+}
+.head-sign-up{
+    position: absolute;
+    right: 25px;
+    top: 40%;
+}
+.head-log-in{
+    position: absolute;
+    right: 100px;
+    top: 40%;
+
+}
+.head-opt{
+    color: #0d3fa0;
+    transition:1s; /* A 1 second transition. */
+}
+.head-opt:hover{
+    color: #d2d536
+}
+.head-logo{
+    position: absolute;
+    left:50%;
+    top: 0;
+    height: 60px;
+    margin-left: -75.455px;
+}
