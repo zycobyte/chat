@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.google.com/schemas/sitemap/0.84">
-	<url>	<loc>http://eiennochat.co.uk/</loc><lastmod>2018-02-13</lastmod><changefreq>Weekly</changefreq><priority>1</priority></url>
+	<url><loc>http://eiennochat.co.uk/</loc><lastmod>2018-02-13</lastmod><changefreq>Weekly</changefreq><priority>1</priority></url>
 	<url><loc>https://eiennochat.co.uk/</loc><lastmod>2018-02-13</lastmod><changefreq>Weekly</changefreq><priority>1</priority></url>
-	<url><loc>https://eiennochat.co.uk/features/</loc><lastmod>2018-02-13</lastmod><changefreq>Weekly</changefreq><priority>2</priority></url>
-	<url><loc>https://eiennochat.co.uk/about/</loc><lastmod>2018-02-13</lastmod><changefreq>Weekly</changefreq><priority>2</priority></url>
-	<url><loc>https://eiennochat.co.uk/contact/</loc><lastmod>2018-02-13</lastmod><changefreq>Weekly</changefreq><priority>3</priority></url>
-	<url><loc>https://eiennochat.co.uk/login/</loc><lastmod>2018-02-13</lastmod><changefreq>Weekly</changefreq><priority>2</priority></url>
-	<url><loc>https://eiennochat.co.uk/info/</loc><lastmod>2018-02-13</lastmod><changefreq>Weekly</changefreq><priority>3</priority></url>
+	<url><loc>https://eiennochat.co.uk/features/</loc><lastmod>2018-02-13</lastmod><changefreq>Weekly</changefreq><priority>1.1</priority></url>
+	<url><loc>https://eiennochat.co.uk/about/</loc><lastmod>2018-02-13</lastmod><changefreq>Weekly</changefreq><priority>1.1</priority></url>
+	<url><loc>https://eiennochat.co.uk/contact/</loc><lastmod>2018-02-13</lastmod><changefreq>Weekly</changefreq><priority>1.2</priority></url>
+	<url><loc>https://eiennochat.co.uk/login/</loc><lastmod>2018-02-13</lastmod><changefreq>Weekly</changefreq><priority>1.1</priority></url>
+	<url><loc>https://eiennochat.co.uk/info/</loc><lastmod>2018-02-13</lastmod><changefreq>Weekly</changefreq><priority>1.2</priority></url>
 </urlset>
