@@ -1,0 +1,11 @@
+User-Agent: *
+Disallow: 
+Allow: /
+Disallow: /server/
+Allow: /about/
+Allow: /contact/
+Allow: /login/
+Disallow: /verify/
+Disallow: /chats/
+Allow: /features/
+Allow: /info/
