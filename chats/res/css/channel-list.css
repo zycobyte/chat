@@ -1,0 +1,23 @@
+.channel-list{
+    position: relative;
+}
+.channel-list-edit{
+    height: 20px;
+}
+.channel-list-0{
+    left: 20px;
+    width: 280px;
+    padding-top: 10px;
+}
+.channel-list-1{
+    left: 40px;
+    width: 240px;
+}
+.channel-list-2{
+    left: 40px;
+    width: 200px;
+}
+.channel-list-3{
+    left: 40px;
+    width: 160px;
+}

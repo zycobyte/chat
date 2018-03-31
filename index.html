@@ -1,38 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-89302611-2"></script>
+    <script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-89302611-2"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-      gtag('config', 'UA-89302611-2');
+        gtag('config', 'UA-89302611-2');
     </script>
 
     <meta charset="UTF-8">
+    <meta name="description" content="Eien.no Chat is a free social chat website that aims to
+    bring the world closer together no matter how far people are apart."/>
 
     <link rel="icon" href="favicon.ico" type="image/x-icon"/>
 
     <link rel="stylesheet" type="text/css" href="res/css/Head.css">
     <link rel="stylesheet" type="text/css" href="res/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="res/css/login.css">
     <link rel="stylesheet" type="text/css" href="res/index/css/index.css">
 
     <script type="text/javascript" src="res/js/Head.js"></script>
     <script type="text/javascript" src="res/js/Utils.js"></script>
     <script type="text/javascript" src="res/js/Mouse.js"></script>
-
-    <meta name="description" content="Eien.no Chat is a chat website that aims to
-    bring the world closer together no matter how far people are apart.  And don't
-    worry! It's all for the low low price of nothing :D"/>
+    <script type="text/javascript" src="res/js/login.js"></script>
 
     <title>Eien.no Chat -- Home Page</title>
 </head>
 <body>
 
 <div class = "header-main">
-    <div class="dropdown-button" onclick="menu();"></div>
+    <div class="dropdown-button" onclick="openmenu();">
+        <div class="dropdown-bar" id="_0"></div>
+        <div class="dropdown-bar" id="_8"></div>
+        <div class="dropdown-bar" id="_16"></div>
+    </div>
+    <div class="hide-menu" id="menu" onclick="menu()"></div>
+    <div class="hide-e" id="e" onclick="closemenu()"></div>
 
     <img class="head-logo" src="res/imgs/Logo-wide.png" onclick="window.location.href=pre+'/';"/>
 
@@ -44,11 +49,26 @@
     </div>
 </div>
 
+<div class="hide" id="login-box">
+    <div id="title"><u>Login Below</u></div>
+    <div id="returnmsg"></div>
+    <div id="name">Username: </div>
+    <input id="username" class="show text"/>
+    <div id="pass">Password: </div>
+    <input id="password" class="show text" type="password"/>
+    <div id="em" class="hide">E-Mail: </div>
+    <input id="email" class="hide text"/>
+    <div id="message">By using Eien.no Chat you agree to our <a href="./terms/">terms and conditions</a><br><br>If you are younger than 13, please use your parents E-Mail</div>
+    <button class="hide login" id="login" onclick="prepare('login')">login</button>
+    <button class="hide login" id="signup" onclick="prepare('signup')">signup</button>
+</div>
+
+
     <div id="boxes">
         <div class="box left" id="welcome-box">
             <h1>Welcome to Eien.no Chat!</h1>
-            Eien.no Chat is under development and estimated to be released some time in mid to late March.  We are sorry for the wait, please contact us or follow our twitter via the <a href="eiennochat.co.uk/contact">contact</a> page for more info.  If you would like to help with Eien.no Chats Development, click <a href="https://www.gofundme.com/eienno-chat" target="_blank">here</a><br>
-            <br>
+            <!--Eien.no Chat is under development and estimated to be released some time in late February.  If you would like to help with Eien.no Chats Development, click <a href="https://www.gofundme.com/eienno-chat" target="_blank">here</a><br>-->
+            <!--<br>-->
             Eien.no Chat is a social media platform created for friends and families to keep in contact, meet new people and enjoy doing things they love!  It is designed so you can easily plan things in groups, meet new people, chill with friends and much more!<br>
             <br>
             And for those parents out there worried about their child's online safety, don't worry.  Safety is our number one priority.
@@ -71,7 +91,7 @@
             <br>
             You can be any age, because like we said safety is our number one priority.  If we believe you are being sent weird messages we will give you a prompt to let you know you shouldn't answer unless you know them in real life.  We also make it easy for you to block these users so they wont trouble you again.<br>
             <h3>What if I get these prompts because my friends send me weird messages as a joke?</h3>
-            Don't worry, you can add or remove anyone to from 'ignore' list at anytime to not receive these prompts from friends, or disable it all together if you know how to stay safe online.
+            Don't worry, you can add or remove anyone to your 'Close Friends' list at anytime to not receive these prompts from friends, or disable it all together if you know how to stay safe online.
         </div>
 
         <div id="stick03" class="stick"></div>

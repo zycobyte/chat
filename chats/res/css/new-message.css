@@ -1,0 +1,78 @@
+.new-message-area{
+    min-width: 100%;
+    max-width: 100%;
+    background-color: #6c98d2;
+    outline: none;
+    border: none;
+    max-height: 85%;
+    min-height: 85%;
+    color: black;
+    resize: none;
+}
+
+.chat-area{
+    width: 98%;
+    left: 1%;
+    height: max-content;
+    padding-top: 10px;
+    position: relative;
+    margin-top: 5px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    -ms-word-break: break-all;
+    /* This is the dangerous one in WebKit, as it breaks things wherever */
+    word-break: break-all;
+    /* Instead use this non-standard one: */
+    word-break: break-word;
+}
+.chat-area-pp{
+    width: 50px;
+    height: 50px;
+    left: 0;
+    position: relative;
+    border-radius: 15px;
+    background: darkred no-repeat;
+    background-size: contain;
+}
+.chat-area-username{
+    left: 55px;
+    width: auto;
+    height: 20px;
+    font-size: 20px;
+    letter-spacing: 0.1px;
+    position: absolute;
+    top: 5px;
+}
+.chat-area-rank-icon{
+    width: 20px;
+    height: 20px;
+    top: 2px;
+    right: -25px;
+    position: absolute;
+    background-color: green;
+}
+.chat-area-date{
+    top: 30px;
+    font-size: 12px;
+    letter-spacing: 0.1px;
+    position: absolute;
+    left: 55px;
+}
+.chat-area-content{
+    top: 55px;
+    left: 0;
+    font-size: 16px;
+    letter-spacing: -0.2mm;
+    width: 100%;
+    word-wrap: break-word;
+    height: auto;
+    position: relative;
+    display: table-row;
+}
+.chat-area-bar{
+    height: 1px;
+    width: 100%;
+    background-color: black;
+    position: absolute;
+    bottom: 0;
+}

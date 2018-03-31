@@ -1,33 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-89302611-2"></script>
+    <script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-89302611-2"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-      gtag('config', 'UA-89302611-2');
+        gtag('config', 'UA-89302611-2');
     </script>
+
     <meta charset="UTF-8">
+    <meta name="description" content="Eien.no Chat is a free social chat website that aims to
+    bring the world closer together no matter how far people are apart."/>
 
     <link rel="icon" href="../favicon.ico" type="image/x-icon"/>
 
     <link rel="stylesheet" type="text/css" href="../res/css/Head.css">
     <link rel="stylesheet" type="text/css" href="../res/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="../res/css/login.css">
     <link rel="stylesheet" type="text/css" href="res/css/about.css">
 
     <script type="text/javascript" src="../res/js/Head.js"></script>
     <script type="text/javascript" src="../res/js/Utils.js"></script>
     <script type="text/javascript" src="../res/js/Mouse.js"></script>
+    <script type="text/javascript" src="../res/js/login.js"></script>
 
     <title>Eien.no Chat -- About</title>
 
 </head>
 <body>
     <div class = "header-main">
-    <div class="dropdown-button" onclick="menu();"></div>
+        <div class="dropdown-button" onclick="openmenu();">
+            <div class="dropdown-bar" id="_0"></div>
+            <div class="dropdown-bar" id="_8"></div>
+            <div class="dropdown-bar" id="_16"></div>
+        </div>
+        <div class="hide-menu" id="menu" onclick="menu()"></div>
+        <div class="hide-e" id="e" onclick="closemenu()"></div>
 
     <img class="head-logo" src="../res/imgs/Logo-wide.png" onclick="window.location.href=pre+'/';"/>
 
@@ -38,6 +48,20 @@
         Log In
     </div>
 </div>
+
+    <div class="hide" id="login-box">
+        <div id="title"><u>Login Below</u></div>
+        <div id="returnmsg"></div>
+        <div id="name">Username: </div>
+        <input id="username" class="show text"/>
+        <div id="pass">Password: </div>
+        <input id="password" class="show text" type="password"/>
+        <div id="em" class="hide">E-Mail: </div>
+        <input id="email" class="hide text"/>
+        <div id="message">By using Eien.no Chat you agree to our <a href="../terms/">terms and conditions</a><br><br>If you are younger than 13, please use your parents E-Mail</div>
+        <button class="hide login" id="login" onclick="prepare('login')">login</button>
+        <button class="hide login" id="signup" onclick="prepare('signup')">signup</button>
+    </div>
 
     <div class="box" id="who">
         <h1>Who are we?</h1>

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-89302611-2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-89302611-2');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="description" content="Eien.no Chat is a free social chat website that aims to
+    bring the world closer together no matter how far people are apart."/>
+
+    <link rel="icon" href="../favicon.ico" type="image/x-icon"/>
+
+    <link rel="stylesheet" type="text/css" href="../res/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="res/css/index.css">
+    <link rel="stylesheet" type="text/css" href="res/css/chats-list.css">
+    <link rel="stylesheet" type="text/css" href="res/css/channel-list.css">
+    <link rel="stylesheet" type="text/css" href="res/css/new-message.css">
+
+    <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
+    <script type="text/javascript" src="../res/js/Utils.js"></script>
+    <script type="text/javascript" src="../res/js/Mouse.js"></script>
+    <script type="text/javascript" src="res/js/chats.js"></script>
+
+    <title>Eien.no Chat -- Chats</title>
+</head>
+<body>
+    <div id="menu-bar" class="animatable top">
+        <div id="logo-top-left"></div>
+        <div id="online-status" onclick="show(document.getElementById('online-status-popup'))">
+            <div class="profile-pic" id="your-profile-pic-top-right">
+                <div id="online-status-icon"></div>
+            </div>
+            <div id="online-status-text"></div>
+            <div id="status-text">TODO status here</div>
+        </div>
+        <div id="icon-area">
+            <div id="menu-chats" class="option-box" onmouseover="dropDownOpen('chat')" onmouseout="dropDownClose('chat')" onclick="showChats()">
+                <div class="align-vertical">
+                    <div id="i00" class="icon-tiny-center"></div>
+                    <div class="text">Chats</div>
+                </div>
+            </div>
+            <div id="menu-dms" class="option-box" onmouseover="dropDownOpen('DM')" onmouseout="dropDownClose('DM')" onclick="showDMs()">
+                <div class="align-vertical">
+                    <div id="i01" class="icon-tiny-center"></div>
+                    <div class="text">DMs</div>
+                </div>
+            </div>
+            <div id="menu-friends" class="option-box" onmouseover="dropDownOpen('friend')" onmouseout="dropDownClose('friend')" onclick="showUserList(friends)">
+                <div class="align-vertical">
+                    <div id="i02" class="icon-tiny-center"></div>
+                    <div class="text">Friends</div>
+                </div>
+            </div>
+            <div id="menu-trusted" class="option-box" onmouseover="dropDownOpen('close-friend')" onmouseout="dropDownClose('close-friend')" onclick="showUserList(closeFriends)">
+                <div class="align-vertical">
+                    <div id="i03" class="icon-tiny-center"></div>
+                    <div class="text">Close Friends</div>
+                </div>
+            </div>
+            <div id="menu-pending" class="option-box" onmouseover="dropDownOpen('pending')" onmouseout="dropDownClose('pending')" onclick="showUserList(pending)">
+                <div class="align-vertical">
+                    <div id="i04" class="icon-tiny-center"></div>
+                    <div class="text">Pending</div>
+                </div>
+            </div>
+            <div id="menu-blocked" class="option-box" onmouseover="dropDownOpen('blocked')" onmouseout="dropDownClose('blocked')" onclick="showUserList(blocked)">
+                <div class="align-vertical">
+                    <div id="i05" class="icon-tiny-center"></div>
+                    <div class="text">Blocked</div>
+                </div>
+            </div>
+            <div id="menu-bots" class="option-box" onmouseover="dropDownOpen('bots')" onmouseout="dropDownClose('bots')">
+                <div class="align-vertical">
+                    <div id="i06" class="icon-tiny-center"></div>
+                    <div class="text">Bots</div>
+                </div>
+            </div>
+            <div id="menu-8" class="option-box" onmouseover="dropDownOpen('help')" onmouseout="dropDownClose('help')" onclick="openHelp()">
+                <div class="align-vertical">
+                    <div id="i07" class="icon-tiny-center"></div>
+                    <div class="text">Help</div>
+                </div>
+            </div>
+            <div id="menu-account" class="option-box" onmouseover="dropDownOpen('settings')" onmouseout="dropDownClose('settings')"  onclick="openSettings()">
+                <div class="align-vertical">
+                    <div id="i08" class="icon-tiny-center"></div>
+                    <div class="text">Settings</div>
+                </div>
+            </div>
+            <div id="menu-donate" class="option-box" onmouseover="dropDownOpen('forever-eternal')" onmouseout="dropDownClose('forever-eternal')" onclick="show(document.getElementById('forever-eternal-popup'))">
+                <div class="align-vertical">
+                    <div id="i09" class="icon-tiny-center"></div>
+                    <div class="text">Become Forever Eternal</div>
+                </div>
+            </div>
+            <div id="close" class="option-box hide" onclick="safeClose()">
+                <div class="align-vertical">
+                    <div id="close-icon" class="icon-tiny-center"></div>
+                    <div class="text">Close Menus</div>
+                </div>
+            </div>
+        </div>
+        <div id="drop-down-area">
+            <div id="chat-drop-down" class="hide-shrink" onmouseover="dropDownOpen('chat')" onmouseout="dropDownClose('chat')" ></div>
+            <div id="DM-drop-down" class="hide-shrink" onmouseover="dropDownOpen('DM')" onmouseout="dropDownClose('DM')" ></div>
+            <div id="friend-drop-down" class="hide-shrink" onmouseover="dropDownOpen('friend')" onmouseout="dropDownClose('friend')" >TODO</div>
+            <div id="close-friend-drop-down" class="hide-shrink" onmouseover="dropDownOpen('close-friend')" onmouseout="dropDownClose('close-friend')" >TODO</div>
+            <div id="pending-drop-down" class="hide-shrink" onmouseover="dropDownOpen('pending')" onmouseout="dropDownClose('pending')" >TODO</div>
+            <div id="blocked-drop-down" class="hide-shrink" onmouseover="dropDownOpen('blocked')" onmouseout="dropDownClose('blocked')" >TODO</div>
+            <div id="bots-drop-down" class="hide-shrink" onmouseover="dropDownOpen('bots')" onmouseout="dropDownClose('bots')" >This is where you will be able to add public bots to your chats!<br>Bots, however, aren't
+            available yet but will be in the near future!</div>
+            <div id="help-drop-down" class="hide-shrink" onmouseover="dropDownOpen('help')" onmouseout="dropDownClose('help')" onclick="openHelp()">Welcome to Eien.no Chat<br><br>Need a little help sorting out your settings or using cool chat
+            features? Look no further because your answers are right here.</div>
+            <div id="settings-drop-down" class="hide-shrink" onmouseover="dropDownOpen('settings')" onmouseout="dropDownClose('settings')" onclick="openSettings()">Click here to edit your account settings!</div>
+            <div id="forever-eternal-drop-down" class="hide-shrink" onmouseover="dropDownOpen('forever-eternal')" onmouseout="dropDownClose('forever-eternal')" onclick="show(document.getElementById('forever-eternal-popup'))">Become Forever Eternal!<br>Click here to find out more info!</div>
+        </div>
+    </div>
+    <div id="users" class="below-bar animatable left">
+        <!--Users go here-->
+    </div>
+    <div id="message-area" class="below-bar animatable">
+        <!--width: calc(100% - 250px);-->
+        <!--width: calc(~"100% - 250px");-->
+        <div id="msgs">
+            <!--Messages added here-->
+        </div>
+        <div id="text-box">
+            <textarea rows="1" placeholder="Type here to chat..." class="new-message-area" maxlength="2000"></textarea>
+            <div class="chat-emoji-menu-open" onclick="openEmojiPopup()"></div>
+            <div class="hidden emoji-box">
+                <div class="button-blue top-right" onclick="$('.gif-box').addClass('show').removeClass('hidden')">Gifs</div>
+                <input id="emoji-search" class="input-field-dark" placeholder="Search emojis"/>
+                <div class=" scrollable container" id="emoji-display"></div>
+            </div>
+            <div class="hidden gif-box">
+                <div class="button-blue top-right" onclick="$('.gif-box').addClass('hidden').removeClass('show')">Emojis</div>
+                <div class="button-true top-right-left" onclick="getGiphyResults($('#gif-search').val())">Search</div>
+                <input id="gif-search" class="input-field-dark" placeholder="Search Gifs using Giphy!">
+                <div class=" scrollable container" id="gif-display"></div>
+            </div>
+        </div>
+    </div>
+    <div id="tabs" class="below-bar animatable right">
+        <div id="channels-list">
+            <!--Different channels etc go here-->
+        </div>
+        <div id="server-option-menu" onclick="show(document.getElementById('chat-settings-popup'))">Chat Settings<br><br>Change personal or global settings for this chat.</div>
+    </div>
+
+    <div id="chat-select" class="hide below-bar">
+        <div class="btn-area-select">
+            <div id="chat-select-button" class="l0 btn-33 btn-100-br-selected" onclick="yourChats()"><br><br>Your Chats</div>
+            <div id="browse-select-button" class="l33 btn-33 btn-100-off-br" onclick="browseChats()"><br><br>Browse Chats</div>
+            <div id="DM-select-button" class="r0 btn-33 btn-100-off-br" onclick="yourDms()"><br><br>Your DMs</div>
+        </div>
+        <div class="align-horizontal search-area">
+            <div class="search-bar-area">
+                Search: <input id="search-bar" class="search-bar" size="25" placeholder="Type key words or the chat name" maxlength="50"/>
+            </div>
+            <!--<div id="filter-icon"></div>-->
+            <div class="search-btn" onclick="searchChats()">Search!</div>
+        </div>
+        <div id="chat-list">
+            <div id="your-dm-list" class="hide scrollable">
+                You currently have no DMs
+            </div>
+            <div id="browse-chat-list" class="hide scrollable">
+                Type key words into the box above to search for a public chat.<br>
+                <br>
+                Eien.no Chat is new so there isn't that many public chats yet.
+                Why not create your own one?
+            </div>
+            <div id="current-chat-list" class="show">
+                <div id="title-starred"><b>Starred Chats</b></div>
+                <div id="starred-chats">Star your favourite chats and have them appear here to make it easier to find them!</div>
+                <div id="divider-chats"></div>
+                <div id="title-other"><b>Chats</b></div>
+                <div id="other-chats">Join public chats to meet new people by clicking the 'browse' button above, or create your own chat to talk to friends ☺</div>
+            </div>
+            <div id="create-new-chat" onclick="show(document.getElementById('create-chat'))">Want to create your own chat or DM?<br>Click Here!</div>
+        </div>
+    </div>
+    <div id="user-list" class="hide below-bar">
+        <div class="btn-area-select">
+            <div id="friend-select-button" class="btn-25 l0 btn-100-br-selected" onclick="friends()"><br><br>Your Friends</div>
+            <div id="close-select-button" class="btn-25 l25 btn-100-off-br" onclick="closeFriends()"><br><br>Your Close Friends</div>
+            <div id="pending-select-button" class="btn-25 r25 btn-100-off-br" onclick="pending()"><br><br>Pending Friends</div>
+            <div id="blocked-select-button" class="btn-25 r0 btn-100-off-br" onclick="blocked()"><br><br>Blocked Users</div>
+        </div>
+
+        <div class="align-horizontal search-area">
+            <div class="search-bar-area">
+                <input id="add-friend" class="search-bar" size="25" placeholder="Type username to add new friend" maxlength="16"/>
+            </div>
+            <!--<div id="filter-icon"></div>-->
+            <div class="search-btn" id="add-friend-btn" onclick="if($(this).html()==='Add!'){addSearchedFriend()}else{blockSearchedUser()}">Add!</div>
+        </div>
+
+        <div id="friend-list">
+            <div class="h100 profile">
+                <div class="profile-bg">
+                    <div class="title">Name</div>
+                    <div class="subtitle">Online Status and message<div class="subtitle">Profile Buttons</div></div>
+                </div>
+            </div>
+            <!--Friends etc are added here-->
+        </div>
+
+    </div>
+    <div id="help-menu" class="hide below-bar">
+        <div id="help-menu-content">
+            <script>
+                function scrollToHelp(id){
+                    $('#help-menu').animate({
+                        scrollTop: $("#"+id).offset().top+(-75)
+                    }, 2000);
+                }
+            </script>
+            <h1>Help menu</h1>
+                Here you can find info on all the commands, settings and features in Eien.no Chat and learn how to use them!
+            <h1>Contents</h1>
+            <b><u><div onclick="scrollToHelp('settings-help-menu')">Settings</div></u></b>
+            <div onclick="scrollToHelp('chat-setting-help-menu')">Chat Settings</div>
+            <div onclick="scrollToHelp('account-settings-help-menu')">Account Settings</div>
+            <br>
+            <b><div onclick="scrollToHelp('command-formating-help-menu')">Commands and formatting</div><br></b>
+            <br>
+            <b><div onclick="scrollToHelp('other-users-help-menu')">Other users</div><br></b>
+            <br>
+            Note, some settings may include features coming soon.
+            <h1 id="settings-help-menu">Settings</h1>
+            <h2 id="chat-setting-help-menu">Chat Settings</h2>
+                The chat settings may look difficult but once you get the hang of it, it's pretty easy.
+                <h3>Personal Chat Settings</h3>
+                Coming soon!
+                <h3>Global Chat Settings</h3>
+                Global Chat Settings are the settings that will change things that will have an effect on other users in the chat.<br><br><br>
+
+                First of all is the Name and Description.  This simply changes the text displayed to users.  Although having a description is optional, it is recommended having both be relevant to your chat because users may have many chats and not remember which chat is which if its just a generic name like 'chat here' with no description.  It also helps users when they are searching.<br><br>
+
+                Next is 'Generate Invite' and 'Manage Invites'.  Generate Invite is a button that can be clicked which allows users to generate their own invites without being able to manage the chat.  Manage Invites is where the managers can add or delete invites or view details on the ones that exist.<br><br>
+
+                Enable Join Message is an optional message that is automatically sent whenever anyone joins the chat.  You are able to select which channel it is sent to and what it says.  It also has custom variables like $user which is replaced with the username and $chat which is replaced with the chat name.<br><br>
+
+                Maintenance Mode is a mode you can turn on if you want to temporarily stop users from accessing your chat.  It displays them with a message that you set, and will activate as soon as you save your settings.  By default only the owner will be allowed to access the chat, however users can be added to the 'maintainers' list if you want them to be able to help you.<br><br>
+
+                [Coming soon]<br>Ranks is a list of all the ranks on your server.  You are able to create, remove or edit the permissions that users in a rank have.  The permissions all have a little help icon [!] by them which will inform you of what users with it can do.  You can add users to a rank via the user settings.<br><br>
+
+                [Coming soon]<br>Channels is a list of all the channels and catagories in the server.  This is the section that allows you to add, remove, or edit them by changing their position or the rank(s) required to view them, if any.<br><br>
+
+                User Settings allows you to search users and change their rank, or perform actions on them by opening their profile such as ban, kick, mute or simply send them a DM or friend request.<br><br>
+
+            <h2 id="account-settings-help-menu">Account Settings</h2>
+            Account settings is separated into 2 sections, the first requires you to put in your password to edit, and allows you to change your username, email and password.<br><br>
+            The second section allows you to change your notification settings, and message scanner option.<br><br>
+            The message scanner is what adds a little colour next to any messages sent, and determines whether they could be someone asking for personal info.  You can set this setting so as none, only some, or all sent messages are scanned.<br><br>
+
+            <h1 id="command-formating-help-menu">Commands and formatting</h1>
+            <h2>Commands</h2>
+                Coming soon!
+            <h2>Formatting</h2>
+                Using <b>Bold</b> <i>Italic</i> and <u>Underline</u> in messages can be done simply by wrapping the words you want to be effected with special symbols.<br><br>
+
+                <b>Bold</b> is done **Like this** And <i>Italics</i> is done with a single asterisk *Like this*.  They can also be combined ***Like this*** For <b><i>Bold Italics</i></b>.<br><br>
+
+                <u>Underline</u> is done with two underscored __Like this__, and in the event you want to type '*hi*' without italics, you can put a '\' before each character \*Like this\* (the backslash will disappear for you and works with bold and underline too!)<br><br>
+            <h1 id="other-users-help-menu">Other Users</h1>
+                If you click on a users name or profile picture, it will open a menu screen allowing you to send them a friend request, block them, start a DM etc.<br><br>
+                While you are waiting for a user to accept your friend request, there profile will appear in your 'pending' list.  Once they accept it it will move to your 'friends' list and you can add them as a close friend (which will appear in both lists).<br><br>
+                Users who send you a friend request will also appear under your 'pending' list, and you will have the option to either add them or not to add them.<br><br>
+                You can also block users who are being mean to you.  Simply hit block and Eien.no Chat will hide your messages from them and theirs from you!  And you can always unblock them just as easily if you didn't mean to do it.<br><br>
+                By starting a DM with a user, you can chat with them in a private place.  This can also be done with the profile, but it can also be done by searching their name into the 'Start DM' menu too!<br><br>
+        </div>
+    </div>
+    <div id="settings-menu" class="hide below-bar">
+        <div class="settings-box">
+            <div class="user-setting-text username-setting">Username:</div><input id="user-setting-val" class="input-field-dark setting username-setting"/>
+            <div class="user-setting-text email-setting">Email:</div><input id="email-setting-val" class="input-field-dark setting email-setting"/>
+            <div class="user-setting-text new-pass-setting">New Password:</div><input id="pass-new-setting-val" class="input-field-dark setting new-pass-setting" type="password"/>
+            <div class="user-setting-text pass-setting">Current Password:</div><input id="pass-old-setting-val" class="input-field-dark setting pass-setting" type="password"/>
+            <div style="height: 200px;"></div>
+            <button class="btn-true btn-cancel" onclick="saveSettings('1')">Update Settings</button>
+        </div>
+        <div class="settings-box">
+            <div class="user-setting-text username-setting">Enable Email notifications</div><input style="left:179px" class="setting username-setting" id="email-notif-setting-val" type="checkbox"/>
+
+            <u style="top: 35px;position:inherit;">Message Scanner</u>
+            <form id="scanners">
+                <div class="user-setting-text new-pass-setting">Scan all messages</div><input style="left: 123px;" class="setting new-pass-setting scanner-settings-val" type="radio" name="scanner" value="0"/>
+                <div class="user-setting-text radio2">Don't scan messages from close friends (recommended)</div><input style="left: 365px;" class="radio2 setting scanner-settings-val"  type="radio" name="scanner" value="1"/>
+                <div class="user-setting-text radio3">Don't scan messages from any friends</div><input style="left:250px;" class="setting radio3 scanner-settings-val" type="radio" name="scanner" value="2"/>
+                <div class="user-setting-text radio4">Don't scan any messages</div><input style="left:165px;" class="setting radio4 scanner-settings-val" type="radio" name="scanner" value="3"/>
+            </form>
+            <div style="height: 200px;"></div>
+            <button class="btn-true btn-cancel" onclick="saveSettings('2')">Update Settings</button>
+        </div>
+    </div>
+
+    <!--All the popup menus go here-->
+    <div class="popup-bg below-bar hidden hide-shrink" id="create-chat" onclick="hide(this)">
+        <div class="popup" onclick="toggle(this)">
+            <div id="create-chat-text">Create a new chat!</div>
+            <div id="create-chat-icon"></div>
+            <div id="create-chat-name-text">Chat Name:</div>
+            <input class="input-field-dark" id="create-chat-name" maxlength="32"/>
+            <div id="create-chat-description-text">Write a short description:</div>
+            <textarea class="input-field-dark" id="create-chat-description" maxlength="128"></textarea>
+            <button class="btn-true btn-create" onclick="createNewChat()">Create!</button>
+            <button class="btn-false btn-cancel" onclick="hide(document.getElementById('create-chat'))">Cancel</button>
+            <button class="btn-left btn-blue" onclick="hide(document.getElementById('create-chat'));show(document.getElementById('create-dm'))">Create DM</button>
+        </div>
+    </div>
+    <div class="popup-bg below-bar hidden hide-shrink" id="create-dm" onclick="hide(this)">
+        <div class="popup" onclick="toggle(this)">
+            <div class="title">Create a new chat!</div>
+            <div id="create-dm-name-text">Username:</div>
+            <input class="input-field-dark" id="create-dm-name" maxlength="16"/>
+            <button class="btn-true btn-create" onclick="createNewDM($('#create-dm-name').val());hide(document.getElementById('create-dm'))">Create!</button>
+            <button class="btn-false btn-cancel" onclick="hide(document.getElementById('create-dm'))">Cancel</button>
+            <button class="btn-left btn-blue" onclick="hide(document.getElementById('create-dm'));show(document.getElementById('create-chat'))">Create Chat</button>
+        </div>
+    </div>
+
+    <div class="popup-bg below-bar hidden hide-shrink" id="chat-settings-popup" onclick="hide(this)">
+        <div class="popup" onclick="toggle(this)">
+            <div class="title">Chat Settings</div>
+            <div class="subtitle">These are the settings that affect only you, such as notification settings etc.<br>(Currently we implement a simple notification system.  This page will be updated in the next update to give more control over notifications.)</div>
+            <div class="popup-scrollable" id="chat-settings">
+
+            </div>
+            <button class="btn-blue btn-left" onclick="toggle(document.getElementById('chat-settings-popup'));toggle(document.getElementById('chat-settings-popup-global'))">Switch to Global Settings</button>
+            <button class="btn-true btn-create" onclick="updateChatSettings()">Update Settings</button>
+            <button class="btn-false btn-cancel" onclick="hide(document.getElementById('chat-settings-popup'))">Cancel</button>
+        </div>
+    </div>
+    <div class="popup-bg below-bar hidden hide-shrink" id="chat-settings-popup-global" onclick="hide(this)">
+        <div class="popup" onclick="toggle(this)">
+            <div class="title">Global Chat Settings</div>
+            <div class="subtitle">These are the settings that affect all users, such as adding channels and changing the chat name etc.</div>
+            <div class="popup-scrollable" id="chat-settings-global">
+                <!--Settings
+                name
+                description
+                is public
+                catagory
+                in Maintenance
+                whitelist (for Maintenance)
+                join message enabled
+                join message text
+                join message channel
+                ranks
+                rank settings
+                channels
+                channel settings
+                users settings <- ie their rank etc
+                -->
+            </div>
+            <button class="btn-blue btn-left" onclick="toggle(document.getElementById('chat-settings-popup'));toggle(document.getElementById('chat-settings-popup-global'))">Switch to Settings</button>
+            <button class="btn-true btn-create" onclick="updateGlobalChatSettings()">Update Global Settings</button>
+            <button class="btn-false btn-cancel" onclick="hide(document.getElementById('chat-settings-popup-global'))">Cancel</button>
+        </div>
+    </div>
+    <div class="popup-bg below-bar hidden hide-shrink" id="invite-settings-popup" onclick="hide(this)">
+        <div class="popup" onclick="toggle(this)">
+            <div class="title">Manage invites</div>
+            <div class="subtitle">This is where you can view all invites, or remove any old invites you don't want by clicking them.</div>
+            <div class="popup-scrollable" id="invite-area">
+            </div>
+            <button class="btn-true btn-create" onclick="updateInviteSettings()">Update Settings</button>
+            <button class="btn-false btn-cancel" onclick="hide(document.getElementById('invite-settings-popup'))">Cancel</button>
+        </div>
+    </div>
+
+    <div class="popup-bg below-bar hidden hide-shrink" id="forever-eternal-popup" onclick="hide(this)">
+        <div class="popup" onclick="toggle(this)">
+            <div class="title">Become Forever Eternal!</div>
+            <div class="subtitle">Donate $1.99 a month to help Eien.no Chat continue development</div>
+            <div class="popup-scrollable">
+                <div class="container" style="text-align: center;">
+                    <b>Wanting to support Eien.no Chat?  Look no further!</b><br><br>
+                    Forever Eternal is Eien.no Chats way to let users who want to support us donate a small amount each month to
+                    help pay for things like servers and domains and *insert other technical things here*.  It is completely
+                    optional and isn't something that is required to use Eien.no Chat.<br><br>
+
+                    <u>What you get for donating</u><br>
+                    - A cool icon next to your name that people can hover over to see when you started supporting us.<br>
+                    - Upload custom icons for rank users on chats that you have created.<br>
+                    - Upload a banner instead of just an icon for your chats.<br>
+                    - Some extra custom emojis if I remember to add them before the main release.<br><br>
+
+                    Once again, it is completely optional to donate to us, please do not feel like you are inclined to.
+                    For more details email us at info@eiennochat.co.uk!
+                    <br>
+                    <br>
+                    <br>
+                    Fun fact: 永遠に永遠の is japanese for forever eternal, and its pronounced 'Eien Ni Eien No'.
+                </div>
+            </div>
+            <button class="btn-true btn-create" onclick="message('Oh hi there!  This will come sonnish,     don\'t worry')">Coming soon!</button><!--I want that!</button>-->
+            <button class="btn-false btn-cancel" onclick="hide(document.getElementById('forever-eternal-popup'))">Cancel</button>
+        </div>
+    </div>
+
+    <div id="prf" class="screen hidden" onclick="$('.contextmenu').addClass('hide');$('#profile-bg').addClass('hide-shrink').removeClass('show').css('top', -500);$(this).addClass('hidden')"></div>
+    <div class="hide-shrink" id="profile-bg" style="top: -500px"></div>
+
+    <div class="popup-bg below-bar hidden hide-shrink" id="online-status-popup" onclick="hide(this)">
+        <div class="popup" onclick="toggle(this)">
+            <div class="title">Online Status</div>
+            <div class="subtitle">Create, edit and delete online statuses here!</div>
+            <div class="popup-scrollable" id="online-status-popup-area">
+                <div class="container">
+                    <div class="online-status-box-popup" id="set-status-msg" style="height: 35px">
+                        <div style="top: 5px" class="reply-message-text">Status Message:</div>
+                        <textarea style="height: 20px;top: 5px" class="reply-message input-field-dark" maxlength="64" placeholder=""></textarea>
+                    </div>
+                    <!--["#15ff00", "#d6a800", "#d61e00", "#9cb2e4"];
+                        online away DND offline-->
+                    <div class="online-status-box-popup" id="stat-0" style="height: 120px">
+                        <div class="title"><b><u>Online</u></b></div>
+
+                        <div class="reply-message-text">Reply Message:</div>
+                        <textarea style="height: 20px" class="reply-message input-field-dark" maxlength="511" placeholder="Online can't be changed"disabled></textarea>
+
+                        <div class="online-status-colour-text">Status Colour:</div>
+                        <div class="online-status-colour" style="background-color: #15ff00"></div>
+
+                        <div class="online-status-times-text">Times:</div>
+                        <div class="online-status-times">
+                            From:<input type="time" class="input-field-dark online-status-from" disabled> To:<input type="time" class="input-field-dark online-status-to" disabled>
+                        </div>
+
+                        <button class="select-online-status" onclick="onlineStatus(0)">Select Status</button>
+                    </div>
+                    <div class="online-status-box-popup" id="stat-1" style="height: 120px">
+                        <div class="title"><b><u>Away</u></b></div>
+
+                        <div class="reply-message-text">Reply Message:</div>
+                        <textarea style="height: 20px" class="reply-message input-field-dark" maxlength="511" placeholder="Away can't be changed" disabled></textarea>
+
+                        <div class="online-status-colour-text">Status Colour:</div>
+                        <div class="online-status-colour" style="background-color: #d6a800"></div>
+
+                        <div class="online-status-times-text">Times:</div>
+                        <div class="online-status-times">
+                            From:<input type="time" class="input-field-dark online-status-from" disabled> To:<input type="time" class="input-field-dark online-status-to" disabled>
+                        </div>
+
+                        <button class="select-online-status" onclick="onlineStatus(1)">Select Status</button>
+                    </div>
+                    <div class="online-status-box-popup" id="stat-2" style="height: 120px">
+                        <div class="title"><b><u>Do Not Disturb</u></b></div>
+
+                        <div class="reply-message-text">Reply Message:</div>
+                        <textarea style="height: 20px" class="reply-message input-field-dark" maxlength="511" placeholder="Do Not Disturb can't be changed"disabled></textarea>
+
+                        <div class="online-status-colour-text">Status Colour:</div>
+                        <div class="online-status-colour" style="background-color: #d61e00"></div>
+
+                        <div class="online-status-times-text">Times:</div>
+                        <div class="online-status-times">
+                            From:<input type="time" class="input-field-dark online-status-from" disabled> To:<input type="time" class="input-field-dark online-status-to" disabled>
+                        </div>
+
+                        <button class="select-online-status" onclick="onlineStatus(2)">Select Status</button>
+                    </div>
+                    <div class="online-status-box-popup" id="stat-3" style="height: 120px">
+                        <div class="title"><b><u>Invisible</u></b></div>
+
+                        <div class="reply-message-text">Reply Message:</div>
+                        <textarea style="height: 20px" class="reply-message input-field-dark" maxlength="511" placeholder="Invisible can't be changed"disabled></textarea>
+
+                        <div class="online-status-colour-text">Status Colour:</div>
+                        <div class="online-status-colour" style="background-color: #9cb2e4"></div>
+
+                        <div class="online-status-times-text">Times:</div>
+                        <div class="online-status-times">
+                            From:<input type="time" class="input-field-dark online-status-from" disabled> To:<input type="time" class="input-field-dark online-status-to" disabled>
+                        </div>
+
+                        <button class="select-online-status" onclick="onlineStatus(3)">Select Status</button>
+                    </div>
+                </div>
+                <div id="custom-status-popups" class="container">
+                    <!--Custom ones go here-->
+                </div>
+            </div>
+            <button class="btn-left btn-blue" onclick="createOnlineStatus()">Create New Status</button>
+            <button class="btn-true btn-create" onclick="saveOnline()">Save</button>
+            <button class="btn-false btn-cancel" onclick="hide(document.getElementById('online-status-popup'))">Cancel</button>
+        </div>
+    </div>
+
+    <div id="help-tag" class="hidden"></div>
+    <div class="message hide"></div>
+    <div class="contextmenu hide">
+
+    </div>
+    <div id="image-area">
+        <!--All images that are required are stored here-->
+    </div>
+</body>
+</html>

@@ -14,7 +14,9 @@ body{
     font-size: 18px;
     min-width: 369px;
     opacity: 0;
-    filter: alpha(opacity=0); /* For IE8 and earlier */}
+    filter: alpha(opacity=0); /* For IE8 and earlier */
+    border-radius: 10px;
+}
 
 .left{
     left: 25px;
@@ -161,7 +163,7 @@ body{
     width:100px;
     height: 100px;
     right: 25%;
-    margin-right: -5px;
+    margin-right: -9px;
     top: 915px;
     background: url("../imgs/stick 3.png") no-repeat;
     background-size: contain;

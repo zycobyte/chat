@@ -1,33 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-89302611-2"></script>
+    <script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-89302611-2"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-      gtag('config', 'UA-89302611-2');
+        gtag('config', 'UA-89302611-2');
     </script>
+
     <meta charset="UTF-8">
+    <meta name="description" content="Eien.no Chat is a free social chat website that aims to
+    bring the world closer together no matter how far people are apart."/>
 
     <link rel="icon" href="../favicon.ico" type="image/x-icon"/>
 
     <link rel="stylesheet" type="text/css" href="../res/css/Head.css">
     <link rel="stylesheet" type="text/css" href="../res/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="../res/css/login.css">
     <link rel="stylesheet" type="text/css" href="res/css/info.css">
 
     <script type="text/javascript" src="../res/js/Head.js"></script>
     <script type="text/javascript" src="../res/js/Utils.js"></script>
     <script type="text/javascript" src="../res/js/Mouse.js"></script>
+    <script type="text/javascript" src="../res/js/login.js"></script>
 
-    <title>Eien.no Chat -- About</title>
+    <title>Eien.no Chat -- Info</title>
 
 </head>
 <body>
     <div class = "header-main">
-    <div class="dropdown-button" onclick="menu();"></div>
+        <div class="dropdown-button" onclick="openmenu();">
+            <div class="dropdown-bar" id="_0"></div>
+            <div class="dropdown-bar" id="_8"></div>
+            <div class="dropdown-bar" id="_16"></div>
+        </div>
+        <div class="hide-menu" id="menu" onclick="menu()"></div>
+        <div class="hide-e" id="e" onclick="closemenu()"></div>
 
     <img class="head-logo" src="../res/imgs/Logo-wide.png" onclick="window.location.href=pre+'/';"/>
 
@@ -39,9 +49,41 @@
     </div>
 </div>
 
+    <div class="hide" id="login-box">
+        <div id="title"><u>Login Below</u></div>
+        <div id="returnmsg"></div>
+        <div id="name">Username: </div>
+        <input id="username" class="show text"/>
+        <div id="pass">Password: </div>
+        <input id="password" class="show text" type="password"/>
+        <div id="em" class="hide">E-Mail: </div>
+        <input id="email" class="hide text"/>
+        <div id="message">By using Eien.no Chat you agree to our <a href="../terms/">terms and conditions</a><br><br>If you are younger than 13, please use your parents E-Mail</div>
+        <button class="hide login" id="login" onclick="prepare('login')">login</button>
+        <button class="hide login" id="signup" onclick="prepare('signup')">signup</button>
+    </div>
+
     <div class="box"></div>
     <div class="box">Please note that dates are in the format DD/MM/YY.</div>
 
+    <div class="box">
+        <u>31/03/18</u><br>
+        <h6>Version 1.0.0B</h6>
+        Release of chat pages, login and signup pages, terms of service and privacy policy.<br>
+        A lot of stuff was released so this is just a brief overview.<br>
+        -You can now login and sign up<br>
+        -You can now create Public chats, normal chats and DMs<br>
+        -You can now search chats to easily find them<br>
+        -You can now edit settings for your chats<br>
+        -You can now update your account settings<br>
+        -You can now add or remove other users as friends<br>
+        -You can now block and unblock other users<br>
+        -You can now create custom online statuses<br>
+        -Released help menu to help with using our site (on the chats page)<br>
+        -Fixed a bug with the home page menu<br>
+        -And much more!<br>
+        <h6>Please report any bugs to bugs@eiennochat.co.uk.  Thanks!</h6>
+    </div>
     <div class="box">
         <u>14/01/18</u><br>
         <h6>Version 1.0.0A</h6>

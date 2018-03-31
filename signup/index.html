@@ -1,7 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-89302611-2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-89302611-2');
+    </script>
+
     <meta charset="UTF-8">
+    <meta name="description" content="Eien.no Chat is a free social chat website that aims to
+    bring the world closer together no matter how far people are apart."/>
 
     <link rel="icon" href="../favicon.ico" type="image/x-icon"/>
 
@@ -31,15 +42,17 @@
 </div>
 
 <div class="show" id="login-box" style="right: 50%;margin-right: -150px;top: 50%;margin-top: -200px;position: absolute;">
-    <div id="title"><u>Login Below</u></div>
+    <div id="title"><u>Signup Below</u></div>
     <div id="returnmsg"></div>
     <div id="name">Username: </div>
     <input id="username" class="show text"/>
     <div id="pass">Password: </div>
     <input id="password" class="show text" type="password"/>
+    <div id="em" class="show">E-Mail: </div>
+    <input id="email" class="show text"/>
     <div id="message">By using Eien.no Chat you agree to our <a href="../terms/">terms and conditions</a><br><br>If you are younger than 13, please use your parents E-Mail</div>
-    <button class="login" id="login" onclick="prepare('login')">login</button>
-    <button class="login" id="signup" onclick="window.location.href='../signup/'" style="right:70px">signup</button>
+    <button class="login" id="login" onclick="window.location.href='../login/'">login</button>
+    <button class="login" id="signup" onclick="prepare('signup')" style="right:70px">signup</button>
 </div>
 
 <script>

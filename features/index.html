@@ -1,21 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-89302611-2"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-89302611-2');
-    </script>
     <meta charset="UTF-8">
 
     <link rel="icon" href="../favicon.ico" type="image/x-icon"/>
 
     <link rel="stylesheet" type="text/css" href="../res/css/Head.css">
     <link rel="stylesheet" type="text/css" href="../res/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="../res/css/login.css">
     <link rel="stylesheet" type="text/css" href="res/css/features.css">
 
     <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
@@ -23,13 +15,20 @@
     <script type="text/javascript" src="../res/js/Utils.js"></script>
     <script type="text/javascript" src="../res/js/Mouse.js"></script>
     <script type="text/javascript" src="res/js/features.js"></script>
+    <script type="text/javascript" src="../res/js/login.js"></script>
 
-    <title>Eien.no Chat -- About</title>
+    <title>Eien.no Chat -- Features</title>
 
 </head>
 <body>
     <div class = "header-main">
-    <div class="dropdown-button" onclick="menu();"></div>
+        <div class="dropdown-button" onclick="openmenu();">
+            <div class="dropdown-bar" id="_0"></div>
+            <div class="dropdown-bar" id="_8"></div>
+            <div class="dropdown-bar" id="_16"></div>
+        </div>
+        <div class="hide-menu" id="menu" onclick="menu()"></div>
+        <div class="hide-e" id="e" onclick="closemenu()"></div>
 
     <img class="head-logo" src="../res/imgs/Logo-wide.png" onclick="window.location.href=pre+'/';"/>
 
@@ -40,6 +39,21 @@
         Log In
     </div>
 </div>
+
+    <div class="hide" id="login-box">
+        <div id="title"><u>Login Below</u></div>
+        <div id="returnmsg"></div>
+        <div id="name">Username: </div>
+        <input id="username" class="show text"/>
+        <div id="pass">Password: </div>
+        <input id="password" class="show text" type="password"/>
+        <div id="em" class="hide">E-Mail: </div>
+        <input id="email" class="hide text"/>
+        <div id="message">By using Eien.no Chat you agree to our <a href="../terms/">terms and conditions</a><br><br>If you are younger than 13, please use your parents E-Mail</div>
+        <button class="hide login" id="login" onclick="prepare('login')">login</button>
+        <button class="hide login" id="signup" onclick="prepare('signup')">signup</button>
+    </div>
+
     <div class="slide-right box" id="intro">
         <h3>Curious whether Eien.no Chat has the features you need?</h3>
         Look no further!  Here is a list of some of our main features.
@@ -62,12 +76,12 @@
         <h2>Modern style</h2>
         We have worked hard to try and provide a nice modern design that doesn't hurt your eyes after you have been looking at it for a while.  Many services seem to just throw everything together into a website or file
         and say 'here you go now give us money', whereas we have actually put effort into something that you will enjoy using and not get a headache from looking at.<br>
-        Not only have we made the design look nice but we have organised everything in so that you can easily access it without needing to resort to using google or some other browser.
+        Not only have we made the design look nice but we have organised everything in so that you can easily access it without needing to resort to using google or some other search engine.
     </div>
     <!--Criss cross-->
     <div class="slide-right box" id="friends">
         <h2>Add friends</h2>
-        Life is better with friends, so you can add as many as you want with no limit whatsoever.  Whether you have been friends for 10 days or 10 years or live next door or on opposite sides of the globe there is nothing stopping
+        Life is better with friends, so you can add as many as you want with no limit whatsoever.  Whether you have been friends for 10 days or 10 years or live across the road or across the globe there is nothing stopping
         you from adding your friends and having a nice chat with them any time you feel like it.  You can even add your closest of friends to a special list which allows you to keep them closer and puts a little symbol of your
         choice next to their name!
     </div>
@@ -75,9 +89,8 @@
     <div class="slide-left box" id="chats">
         <h2>Different ways to chat</h2>
         Create Chat Groups for you and your friends to have fun, join public Chat Groups based around the things that you love and meet like-minded people or simply start a DM if you just want a private place to chat with 1 other
-        person.  You can do all of these with the press of a button and if you find yourself searching through 50 different servers just to find the one you want to talk in, don't worry.  You can easily search for the chat you
-        want to use by typing its name into the search area, or by simply using our channel organising system that allows you to put your chats under any category you want with a couple clicks.  And yes, you <i>can</i> make
-        sub categories too.
+        person.  You can do all of these with the press of a button and if you find yourself searching through 50 different chats just to find the one you want to talk in, don't worry.  You can easily search for the chat you
+        want to use by typing its name into the search area or adding it to your favourites.
 
     </div>
     <!--Every body clap your hands-->
@@ -85,7 +98,7 @@
         <h2>Advanced appear online options</h2>
         The majority of services out there force you to only choose from online, do not disturb or invisible, maybe with one or 2 more.  This doesn't always allow you to set the correct mode, for example what if you're playing
         a game and you want to let people know that you will take a while to reply.  You can't.  You either need to tell them you're online and responding to messages or you are not replying to anything.  There are many other times
-        where this can be a problem so that's why we have given you an option to create your own ones!  That's right, you can set your online status to be any colour with any message you want.  Not only that but you can also
+        where this can be a problem so that's why we have given you an option to create your own ones!  That's right, you can set your online status to be any colour with any name you want.  Not only that but you can also
         add custom messages to be send when someone DM's you or @'s you.  You can even set it to automatically change your online status throughout the day if you leave your pc on 24/7.  This means everyday while at school or
         work you can set it so if anyone messages you they will be sent the message 'Sorry, I'm at school/work rn.  I'll get back to you later' without you needing to take precious time out of your morning to set it up each day.
     </div>
