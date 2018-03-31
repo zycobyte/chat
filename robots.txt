@@ -6,5 +6,8 @@ Allow: /contact/
 Allow: /login/
 Disallow: /verify/
 Disallow: /chats/
+Disallow: /chats/join
 Allow: /features/
 Allow: /info/
+Allow: /terms/
+Allow: /privacy-policy/
