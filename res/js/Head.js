@@ -27,6 +27,8 @@ function menu(){
 
 function getPage(option) {
     switch(option){
+        case 0:
+            return pre+"/";
         case 1:
             return pre+"/about/";
         case 2:
