@@ -25,7 +25,8 @@
     top: 75px;
     font-size: 18px;
     /*margin-bottom: 25px;*/
-    height:400px;
+    min-height: 400px;
+    height: auto;
     border-radius: 10px;
 }
 
@@ -40,7 +41,7 @@
 }
 
 @-webkit-keyframes fade-right {
-    from {left: 0px;}
+    from {left: 0;}
     to {left: 50px;
         opacity: 1;
         filter: alpha(opacity=100); /* For IE8 and earlier */
@@ -86,7 +87,7 @@
     top:1470px;
 }
 #edit{
-    top:1715px;
+    top:1735px;
 }
 #much-more{
     top:1880px;
