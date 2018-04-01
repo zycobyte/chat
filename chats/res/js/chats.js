@@ -35,15 +35,16 @@ window.onload = function () {
     requestData();
     init_data_socket();
 
+    //Emojis should always be last
     loadEmojis();
     $('#emoji-search').on( "keyup", function () {
-       searchEmojis($(this).val());
+        searchEmojis($(this).val());
     })
 };
 
 function message(message){
     console.log(message);
-    $('.message').html(split(message, 40)).addClass('show').removeClass('hide');
+    $('.message#msg').html(split(message, 40)).addClass('show').removeClass('hide');
 
     setTimeout(function () {
         $('.message').removeClass('show').addClass('hide');
@@ -361,6 +362,7 @@ function handleEmojiData(data) {
             .append(`<img src="${emojiData[key]}" style="width:20px;height:20px" title=":${key}:" alt=":${key}:"/>`);
 
     }
+    $('#loading-message').removeClass("show").addClass("hidden");
 }
 function searchEmojis(query){
     if(!emojiData){
@@ -1340,7 +1342,7 @@ function updateChatUser(id, userData){
         col = '#'+col;
     }
 
-    area_to_add_user.append(`<div class="chat-user" id="${id}" onclick="openProfile('${userData["username"]}', ${"'"+id+"'"})">
+    area_to_add_user.append(`<div class="chat-user" id="${id}" onclick="openProfile('${userData["username"].split("'").join("\\'")}', ${"'"+id+"'"})">
                                     <div class="chat-user-pp" style="background-image: url(${userData["avitar"]})"></div>
                                     <div class="chat-user-online" style="background-color: ${col}"></div>
                                     <div class="chat-user-name">${userData["username"]}
@@ -1426,7 +1428,7 @@ function handleOpenChat(data){//adds things to the storage when you select a cha
             }else{
                 col = '#' + col;
             }
-            area_to_add_user.append(`<div class="chat-user" id="${user}" onclick="openProfile('${userData["username"]}', ${"'"+user+"'"})">
+            area_to_add_user.append(`<div class="chat-user" id="${user}" onclick="openProfile('${userData["username"].split("'").join("\\'")}', ${"'"+user+"'"})">
                                     <div class="chat-user-pp" style="background-image: url(${userData["avitar"]})"></div>
                                     <div class="chat-user-online" style="background-color: ${col}"></div>
                                     <div class="chat-user-name">${userData["username"]}
@@ -1501,7 +1503,7 @@ function handleOpenChat(data){//adds things to the storage when you select a cha
             }else{
                 col = '#' + col;
             }
-            area_to_add_user.append(`<div class="chat-user" id="${user}" onclick="openProfile('${userData["username"]}', ${"'"+user+"'"})">
+            area_to_add_user.append(`<div class="chat-user" id="${user}" onclick="openProfile('${userData["username"].split("'").join("\\'")}', ${"'"+user+"'"})">
                                     <div class="chat-user-pp" style="background-image: url(${userData["avitar"]})"></div>
                                     <div class="chat-user-online" style="background-color: ${col}"></div>
                                     <div class="chat-user-name">${userData["username"]}
@@ -1611,8 +1613,8 @@ function addMessage(message){
 
 
     area.append(`<div class="chat-area">
-                    ${!message["sender_name"]?`<div style="width:1px;height:30px;"></div>`:`<div class="chat-area-pp" style="background-image: url(${message["avitar"]})" onclick="openProfile('${message["sender_name"]+"', '"+message["sender_id"]+"'"})"></div>
-                    <div class="chat-area-username" onclick="openProfile('${message["sender_name"]+"', '"+message["sender_id"]+"'"})">${message["sender_name"]}${!currentChatUsers[message["sender_id"]]?"":(JSON.parse(currentChatUsers[message["sender_id"]])["display-rank"])?`${!JSON.parse(currentChatRoles[JSON.parse(currentChatUsers[message["sender_id"]])["display-rank"]])["icon"] ?``:`<div class="chat-user-icon" style="url(${JSON.parse(currentChatRoles[JSON.parse(currentChatUsers[message["sender_id"]])["display-rank"]])["icon"]})"></div>`}`:""}</div>`}
+                    ${!message["sender_name"]?`<div style="width:1px;height:30px;"></div>`:`<div class="chat-area-pp" style="background-image: url(${message["avitar"]})" onclick="openProfile('${message["sender_name"].split("'").join("\\'")+"', '"+message["sender_id"]+"'"})"></div>
+                    <div class="chat-area-username" onclick="openProfile('${message["sender_name"].split("'").join("\\'")+"', '"+message["sender_id"]+"'"})">${message["sender_name"]}${!currentChatUsers[message["sender_id"]]?"":(JSON.parse(currentChatUsers[message["sender_id"]])["display-rank"])?`${!JSON.parse(currentChatRoles[JSON.parse(currentChatUsers[message["sender_id"]])["display-rank"]])["icon"] ?``:`<div class="chat-user-icon" style="url(${JSON.parse(currentChatRoles[JSON.parse(currentChatUsers[message["sender_id"]])["display-rank"]])["icon"]})"></div>`}`:""}</div>`}
                     <div class="warning" style="background-color:${warn}"  onmouseover="openHelpTag('${tagmsg}')" onmouseleave="closeHelpTag()"></div>
                     <div class="chat-area-date">${d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear()+" at "+((""+d.getHours()).length==1?0+""+d.getHours():d.getHours())+":"+((""+d.getMinutes()).length==1?0+""+d.getMinutes():d.getMinutes())}</div>
                     <div class="chat-area-content">${emojify(linkify(message["content"]))}</div>

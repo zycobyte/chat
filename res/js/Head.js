@@ -78,3 +78,22 @@ function signup(){
     let e = document.getElementById("e");
     e.classList = "show-e";
 }
+
+function alert(message){
+    let bg = document.getElementById("notification");
+    let messageArea = document.getElementById("message-content");
+    messageArea.innerHTML=message;
+    bg.classList = "screen";
+    setTimeout(function () {
+        bg.classList = "screen hide";
+    }, 1000);
+}
+
+document.onload = (function () {
+   let ua = navigator.userAgent.toLowerCase();
+   let isAndroid = ua.indexOf("android") > -1;
+
+   if(isAndroid){
+        alert("Android is not completely supported yet.  Sorry.")
+   }
+});

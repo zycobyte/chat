@@ -39,7 +39,9 @@ function init_data_socket(){
 
             dataSocket.onopen = function (event) {
                 console.log("[Connect] Connected to Eien.no Chat servers");
-                let s = JSON.stringify({"id": `${read("id")}`});
+                if(!$('#loading-message-box').html().includes("Loading")) {
+                    $('#loading-message').removeClass("show").addClass("hidden");
+                }                let s = JSON.stringify({"id": `${read("id")}`});
                 dataSocket.send(s);
                 fails = 0;
             };
@@ -48,6 +50,8 @@ function init_data_socket(){
             };
             dataSocket.onclose = function (event) {
                 console.log("[Close] The connection to the Eien.no Chat servers has been closed");
+                $('#loading-message').removeClass("hidden").addClass("show");
+                $('#loading-message-box').html("Attempting to establish a secure connection to the Eien.no Chat Servers");
                 dataSocket = null;
                 fails++;
                 if(fails > 4)canConnect = false;
@@ -168,6 +172,9 @@ function send(data, method) {
 
         socket.onopen = function (event) {
             console.log("[Connect] Connected to Eien.no Chat servers");
+            if(!$('#loading-message-box').html().includes("Loading")) {
+                $('#loading-message').removeClass("show").addClass("hidden");
+            }
             open = true;
             for (let i = 0; i < toSend.length; i++) {
                 let s = JSON.stringify(toSend[i]);
@@ -180,6 +187,8 @@ function send(data, method) {
         };
         socket.onclose = function (event) {
             console.log("[Close] The connection to the Eien.no Chat servers has been closed");
+            $('#loading-message').removeClass("hidden").addClass("show");
+            $('#loading-message-box').html("Attempting to establish a secure connection to the Eien.no Chat Servers");
             socket = null;
             open = false;
             fails++;
