@@ -172,8 +172,10 @@ function send(data, method) {
 
         socket.onopen = function (event) {
             console.log("[Connect] Connected to Eien.no Chat servers");
-            if(!$('#loading-message-box').html().includes("Loading")) {
-                $('#loading-message').removeClass("show").addClass("hidden");
+            if(window.location.href.includes("chats")) {
+                if (!$('#loading-message-box').html().includes("Loading")) {
+                    $('#loading-message').removeClass("show").addClass("hidden");
+                }
             }
             open = true;
             for (let i = 0; i < toSend.length; i++) {
@@ -187,8 +189,10 @@ function send(data, method) {
         };
         socket.onclose = function (event) {
             console.log("[Close] The connection to the Eien.no Chat servers has been closed");
-            $('#loading-message').removeClass("hidden").addClass("show");
-            $('#loading-message-box').html("Attempting to establish a secure connection to the Eien.no Chat Servers");
+            if(window.location.href.includes("chats")) {
+                $('#loading-message').removeClass("hidden").addClass("show");
+                $('#loading-message-box').html("Attempting to establish a secure connection to the Eien.no Chat Servers");
+            }
             socket = null;
             open = false;
             fails++;
