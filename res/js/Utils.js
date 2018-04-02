@@ -5,7 +5,7 @@ let dataserver = (window.location.hostname==="localhost"?"ws://localhost":"ws://
 allowStorage = (typeof(Storage) !== "undefined");
 messages = 0;
 getChatMsgs=true;
-messageStore = {"false":0, "true":0};
+messageStore = [];
 
 let socket;//sockets should only be accessed from here to ensure data is encrypted and handled properly
 let dataSocket;
