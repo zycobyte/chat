@@ -36,7 +36,7 @@ function init_data_socket(){
                 if(fails > 4)canConnect = false;
                 return;
             }
-
+            
             dataSocket.onopen = function (event) {
                 console.log("[Connect] Connected to Eien.no Chat servers");
                 if(!$('#loading-message-box').html().includes("Loading")) {
