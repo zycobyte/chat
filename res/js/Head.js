@@ -88,12 +88,3 @@ function alert(message){
         bg.classList = "screen hide";
     }, 1000);
 }
-
-document.onload = (function () {
-   let ua = navigator.userAgent.toLowerCase();
-   let isAndroid = ua.indexOf("android") > -1;
-
-   if(isAndroid){
-        alert("Android is not completely supported yet.  Sorry.")
-   }
-});
