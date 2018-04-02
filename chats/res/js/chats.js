@@ -38,6 +38,9 @@ window.onload = function () {
     let store = $('#image-area');
     store.append("<audio src='res/audio/new_message.wav' id='message_new_wav'></audio>")
 
+    messageStore["false"]=0;
+    messageStore["true"]=0;
+
     //Emojis should always be last
     loadEmojis();
     $('#emoji-search').on( "keyup", function () {
@@ -1306,10 +1309,13 @@ function switchChat(chatID, dm){
     }
     isdm = dm;
     currentChatID = chatID+"";
-    let amount = messageStore[isdm];
-    amount -= messageStore[currentChatID];
-    messageStore[isdm] = amount;
+    if(!messageStore[currentChatID]){
 
+    }else {
+        let amount = messageStore[isdm];
+        amount -= messageStore[currentChatID];
+        messageStore[isdm] = amount;
+    }
     isDmMessageStore();
 
     messageStore[currentChatID]="";
