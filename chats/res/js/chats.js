@@ -35,6 +35,9 @@ window.onload = function () {
     requestData();
     init_data_socket();
 
+    let store = $('#image-area');
+    store.append("<audio src='res/audio/new_message.wav' id='message_new_wav'></audio>")
+
     //Emojis should always be last
     loadEmojis();
     $('#emoji-search').on( "keyup", function () {
@@ -362,6 +365,7 @@ function handleEmojiData(data) {
             .append(`<img src="${emojiData[key]}" style="width:20px;height:20px" title=":${key}:" alt=":${key}:"/>`);
 
     }
+
     $('#loading-message').removeClass("show").addClass("hidden");
 }
 function searchEmojis(query){
@@ -1302,10 +1306,28 @@ function switchChat(chatID, dm){
     }
     isdm = dm;
     currentChatID = chatID+"";
+    let amount = messageStore[isdm];
+    amount -= messageStore[currentChatID];
+    messageStore[isdm] = amount;
+
+    isDmMessageStore();
+
+    messageStore[currentChatID]="";
     safeClose();
     let json = {"username":read("username"), "token":read("token"), "data":"request", "requests":"chat-data", "chatID": ""+chatID, "isdm":""+dm};
     getChatMsgs = true;
     send(json, handleOpenChat);
+}
+
+function isDmMessageStore() {
+    let dms = messageStore["true"];
+    let chats = messageStore["false"];
+
+    $('#chat-select-button-count').html(chats);
+    $('#chat-button-count').html(chats);
+
+    $('#dm-select-button-count').html(dms);
+    $('#dm-button-count').html(dms);
 }
 
 function updateChatUser(id, userData){
@@ -1363,6 +1385,7 @@ function updateChatUser(id, userData){
 
 function handleOpenChat(data){//adds things to the storage when you select a chat
     if(invalid(data))return;
+
     //TODO stuff like users and channels
     currentChatData = data;
     if(getChatMsgs) {
@@ -1991,6 +2014,7 @@ function addChat(chatID, isdm){
              <div class="chats-list-name-owner">${d['name']} | ${d['owner']}</div>
              ${isdm?"":`<div class="chats-list-starred" onclick="star('${chatID}')">Star chat<div class="chats-list-star-false chats-list-star"></div></div>`}
              <div class="chats-list-description">${split(d['desc'], 50)}</div>
+             ${!messageStore[chatID]?'':`<div class="chat-mmessage-count">${messageStore[chatID]}</div>`}
         </div>`)
 
     }else if(d.starred === "true"){
@@ -2000,7 +2024,8 @@ function addChat(chatID, isdm){
                  <div class="chats-list-name-owner">${d['name']} | ${d['owner']}</div>
                  <div class="chats-list-starred" onclick="unstar('${chatID}')">Starred<div class="chats-list-star-true chats-list-star"></div></div>
                  <div class="chats-list-description">${split(d['desc'], 50)}</div>
-            </div>`)
+                 ${!messageStore[chatID] ? '' :`<div class="chat-mmessage-count">${messageStore[chatID]}</div>`}
+                </div>`)
     }
     if(!isdm) {
         $('#' + chatID).bind("contextmenu", (function (e) {

@@ -68,9 +68,9 @@ function init_data_socket(){
 }
 function handleRecieveDataFromServer(data){
     if(data["type"] === "newmessage"){
+        let online = JSON.parse(read("online"));
         if(data["mentions"].split(";").includes(read("id")) || data["is_dm"]==="true"){
             if(!(data["sender_id"]===read("id"))) {
-                let online = JSON.parse(read("online"));
                 let status = online["id"];
                 let message = JSON.parse(online["message"])[status];
                 if (message) {
@@ -114,15 +114,31 @@ function handleRecieveDataFromServer(data){
                 $('#msgs').children().eq(0).remove();
             }
         }else{
+            if(!(online["id"]==="3")){
+                document.getElementById('message_new_wav').play()
+            }
+
             let amount = messageStore[data["chat_id"]];
             if(!amount)amount = 0;
             amount += 1;
             messageStore[data["chat_id"]] = amount;
-            let am = 0;
-            for(let i in messageStore){
-                am++;
+
+            amount = messageStore[data["is_dm"]];
+            if(!amount)amount = 0;
+            amount += 1;
+            messageStore[data["is_dm"]] = amount;
+
+            let d = JSON.parse(read("dms"));
+            if(Object.keys(d).length === 0){
+                $('#your-dm-list').html("You currently have no DMs");
+            }else{
+                $('#your-dm-list').html("");
             }
-            console.log(am);
+            for(let chat in d){
+                addChat(chat, true);
+            }
+            reorderChats();
+            isDmMessageStore();
         }
     }else if(data["type"]==="chatsettings"){
         if(currentChatID===data["chatID"]) {
@@ -172,7 +188,7 @@ function send(data, method) {
 
         socket.onopen = function (event) {
             console.log("[Connect] Connected to Eien.no Chat servers");
-            if(window.location.href.includes("chats") && !window.location.href.includes("join")) {
+            if(window.location.href.includes("chats")) {
                 if (!$('#loading-message-box').html().includes("Loading")) {
                     $('#loading-message').removeClass("show").addClass("hidden");
                 }
@@ -189,7 +205,7 @@ function send(data, method) {
         };
         socket.onclose = function (event) {
             console.log("[Close] The connection to the Eien.no Chat servers has been closed");
-            if(window.location.href.includes("chats") && !window.location.href.includes("join")) {
+            if(window.location.href.includes("chats")) {
                 $('#loading-message').removeClass("hidden").addClass("show");
                 $('#loading-message-box').html("Attempting to establish a secure connection to the Eien.no Chat Servers");
             }

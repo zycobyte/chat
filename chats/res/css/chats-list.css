@@ -60,6 +60,18 @@
     background-image: url("../../res/icons/chats/star-false.png");
 }
 
+.chat-mmessage-count{
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    background-color: #971c20;
+    color: white;
+    border-radius: 7px;
+    text-align: center;
+}
+
 .chat-rank{
     width: 250px;
     font-size: 16px;

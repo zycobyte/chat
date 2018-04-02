@@ -51,12 +51,14 @@
                     <div id="i00" class="icon-tiny-center"></div>
                     <div class="text">Chats</div>
                 </div>
+                <div class="chat-mmessage-count" id="chat-button-count">0</div>
             </div>
             <div id="menu-dms" class="option-box" onmouseover="dropDownOpen('DM')" onmouseout="dropDownClose('DM')" onclick="showDMs()">
                 <div class="align-vertical">
                     <div id="i01" class="icon-tiny-center"></div>
                     <div class="text">DMs</div>
                 </div>
+                <div class="chat-mmessage-count" id="dm-button-count">0</div>
             </div>
             <div id="menu-friends" class="option-box" onmouseover="dropDownOpen('friend')" onmouseout="dropDownClose('friend')" onclick="showUserList(friends)">
                 <div class="align-vertical">
@@ -162,9 +164,9 @@
 
     <div id="chat-select" class="hide below-bar">
         <div class="btn-area-select">
-            <div id="chat-select-button" class="l0 btn-33 btn-100-br-selected" onclick="yourChats()"><br><br>Your Chats</div>
+            <div id="chat-select-button" class="l0 btn-33 btn-100-br-selected" onclick="yourChats()"><br><br>Your Chats<div class="chat-mmessage-count" id="chat-select-button-count">0</div></div>
             <div id="browse-select-button" class="l33 btn-33 btn-100-off-br" onclick="browseChats()"><br><br>Browse Chats</div>
-            <div id="DM-select-button" class="r0 btn-33 btn-100-off-br" onclick="yourDms()"><br><br>Your DMs</div>
+            <div id="DM-select-button" class="r0 btn-33 btn-100-off-br" onclick="yourDms()"><br><br>Your DMs<div class="chat-mmessage-count" id="dm-select-button-count">0</div></div>
         </div>
         <div class="align-horizontal search-area">
             <div class="search-bar-area">
