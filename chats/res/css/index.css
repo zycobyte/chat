@@ -1,8 +1,14 @@
+@font-face {
+    font-family: "main";
+    src: url("../../../res/fonts/main-font.otf");
+}
+
 body{
     background-color: #6b99c9;
     min-height: 700px;
+    font-family: 'main', Arial, sans-serif;
+    letter-spacing: -1.5px;
 }
-
 .hide{
     transition-duration: 1s;
     opacity:0;
@@ -596,6 +602,7 @@ body{
 .user-setting-text{
     left: 10px;
     position: absolute;
+    font-size: 15.5px;
 }
 .username-setting{
     top: 10px;
@@ -986,7 +993,7 @@ body{
 }
 
 .setting-text{
-    font-size: 20px;
+    font-size: 19px;
     width: auto;
     height: auto;
     position: absolute;

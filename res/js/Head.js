@@ -1,16 +1,23 @@
+$(document).ready(function(){
+    if (navigator.appName == 'Microsoft Internet Explorer' ||  !!(navigator.userAgent.match(/Trident/) || navigator.userAgent.match(/rv:11/)) || (typeof $.browser !== "undefined" && $.browser.msie == 1)){
+        alert("Eien.no Chat does not currently support Internet Explorer.  Sorry.");
+    }
+});
+
+
 function openmenu(){
-    let m = document.getElementById("menu");
-    m.classList = "show-menu";
-    let e = document.getElementById("e");
-    e.classList = "show-e";
+    let m = $("#menu");
+    m.addClass("show-menu").removeClass("hide-menu");
+    let e = $("#e");
+    e.addClass("show-e").removeClass("hide-e");
 }
 function closemenu(){
-    let m = document.getElementById("menu");
-    m.classList = "hide-menu";
-    let l = document.getElementById("login-box");
-    l.classList = "hide";
-    let e = document.getElementById("e");
-    e.classList = "hide-e";
+    let m = $("#menu");
+    m.addClass("hide-menu").removeClass("show-menu");
+    let l = $("#login-box");
+    l.addClass("hide").removeClass("show");
+    let e = $("#e");
+    e.addClass("hide-e").removeClass("show-e");
 }
 
 function menu(){
@@ -47,44 +54,44 @@ function getPage(option) {
 }
 
 function login(){
-    let box = document.getElementById("login-box");
-    box.classList = "show";
-    let em = document.getElementById("em");
-    em.classList = "hide";
-    let email = document.getElementById("email");
-    email.classList = "hide text";
-    let login = document.getElementById("login");
-    login.classList = "show login";
-    let signup = document.getElementById("signup");
-    signup.classList = "hide login";
-    let title = document.getElementById("title");
-    title.innerHTML = "<u>Login Below</u>";
-    let e = document.getElementById("e");
-    e.classList = "show-e";
+    let box = $("#login-box");
+    box.addClass("show").removeClass("hide");
+    let em = $("#em");
+    em.addClass("hide").removeClass("show");
+    let email = $("#email");
+    email.addClass("hide").removeClass("show");
+    let login = $("#login");
+    login.addClass("show").removeClass("hide");
+    let signup = $("#signup");
+    signup.addClass("hide").removeClass("show");
+    let title = $("#title");
+    title.html("<u>Login Below</u>");
+    let e = $("#e");
+    e.addClass("show-e").removeClass("hide-e");
 }
 function signup(){
-    let box = document.getElementById("login-box");
-    box.classList = "show";
-    let em = document.getElementById("em");
-    em.classList = "show";
-    let email = document.getElementById("email");
-    email.classList = "show text";
-    let login = document.getElementById("login");
-    login.classList = "hide login";
-    let signup = document.getElementById("signup");
-    signup.classList = "show login";
-    let title = document.getElementById("title");
-    title.innerHTML = "<u>Signup Below</u>";
-    let e = document.getElementById("e");
-    e.classList = "show-e";
+    let box = $("#login-box");
+    box.addClass("show").removeClass("hide");
+    let em = $("#em");
+    em.addClass("show").removeClass("hide");
+    let email = $("#email");
+    email.addClass("show").removeClass("hide");
+    let login = $("#login");
+    login.addClass("hide").removeClass("show");
+    let signup = $("#signup");
+    signup.addClass("show").removeClass("hide");
+    let title = $("#title");
+    title.html("<u>Signup Below</u>");
+    let e = $("#e");
+    e.addClass("show-e").removeClass("hide-e");
 }
 
 function alert(message){
-    let bg = document.getElementById("notification");
-    let messageArea = document.getElementById("message-content");
-    messageArea.innerHTML=message;
-    bg.classList = "screen";
+    let bg = $("#notification");
+    let messageArea = $("#message-content");
+    messageArea.html(message);
+    bg.removeClass("hide");
     setTimeout(function () {
-        bg.classList = "screen hide";
+        bg.addClass("#hide");
     }, 1000);
 }

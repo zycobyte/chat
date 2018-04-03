@@ -1,19 +1,19 @@
 function prepare(data){
-    let username = document.getElementById("username").value;
-    let password = document.getElementById("password").value;
+    let username = $("#username").val();
+    let password = $("#password").val();
 
     if(username.length < 4 || username.length > 16){
-        document.getElementById("returnmsg").innerHTML = "Username must be between 4 and 16 characters.";
+        $("#returnmsg").html("Username must be between 4 and 16 characters.");
         return
     }
     if(password.length < 6 || password.length > 16){
-        document.getElementById("returnmsg").innerHTML = "Password must be between 6 and 16 characters.";
+        $("#returnmsg").html("#returnmsg").html("Password must be between 6 and 16 characters.");
         return
     }
 
     let json = {"data":data, "username": username, "password": password};
     if(data === "signup"){
-        let email = document.getElementById("email").value;
+        let email = $("#email").val();
         //TODO check email is valid
         json["email"] = email;
     }
@@ -28,6 +28,6 @@ function loginDataRecieved(reply){
         save("token", reply.token);
         window.location.href = pre+"/chats/"
     }else{
-        document.getElementById("returnmsg").innerHTML = reply.message;
+        $("#returnmsg").html(reply.message);
     }
 }

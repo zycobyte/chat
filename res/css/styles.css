@@ -1,9 +1,16 @@
+@font-face {
+    font-family: "main";
+    src: url("../../res/fonts/main-font.otf");
+}
+
 body{
     margin: 0;
     height: 100%;
     width: 100%;
     min-width: 1024px;
     position: absolute;
+    font-family: 'main', Arial, sans-serif;
+    letter-spacing: -1.5px;
 }
 
 #scroll-appear-on-load{
