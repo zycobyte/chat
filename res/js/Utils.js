@@ -16,6 +16,15 @@ let recieved = 0;
 let canConnect = true;
 let fails = 0;
 
+let focused = true;
+
+window.onfocus = function() {
+    focused = true;
+};
+window.onblur = function() {
+    focused = false;
+};
+
 setInterval(function () {
     canConnect = true;
 }, 10000);
@@ -92,6 +101,11 @@ function handleRecieveDataFromServer(data){
         }
         //add message
         if(data["chat_id"]===currentChatID) {
+            if(!focused){
+                if(!(online["id"]==="3")){
+                    document.getElementById('message_new_wav').play()
+                }
+            }
             messages++;
             let scrollArea = $('#message-area');
             let autoScroll = scrollArea.scrollTop() + scrollArea.innerHeight() >= scrollArea[0].scrollHeight;
