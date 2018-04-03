@@ -38,8 +38,8 @@ window.onload = function () {
     let store = $('#image-area');
     store.append("<audio src='res/audio/new_message.wav' id='message_new_wav'></audio>")
 
-    messageStore["false"]=0;
-    messageStore["true"]=0;
+    if(!messageStore["false"])messageStore["false"]=0;
+    if(!messageStore["true"])messageStore["true"]=0;
 
     //Emojis should always be last
     loadEmojis();
@@ -1094,7 +1094,7 @@ function userMenuButton(button){
 
 function requestData(data){
     if(!data){
-        data = "chats;dms;avitar;friends;close;blocked;online;settings;id;pending;outgoing;email;";
+        data = "chats;dms;avitar;friends;close;blocked;online;settings;id;pending;outgoing;email;unread;";
     }
     let json = {"username":read("username"), "token":read("token"), "data":"request", "requests":data};
     send(json, handleRequest);
@@ -1103,6 +1103,10 @@ function requestData(data){
 function handleRequest(data){
     if(invalid(data))return;
     for(let key in data) save(key, data[key]);
+    if(data["unread"]){
+        messageStore=JSON.parse(data["unread"]);
+        messageStoreDisply();
+    }
     method();
     method = none;
     onlineStatusUpdate();
@@ -1316,7 +1320,7 @@ function switchChat(chatID, dm){
         amount -= messageStore[currentChatID];
         messageStore[isdm] = amount;
     }
-    isDmMessageStore();
+    messageStoreDisply();
 
     messageStore[currentChatID]="";
     safeClose();
@@ -1325,7 +1329,7 @@ function switchChat(chatID, dm){
     send(json, handleOpenChat);
 }
 
-function isDmMessageStore() {
+function messageStoreDisply() {
     let dms = messageStore["true"];
     let chats = messageStore["false"];
 

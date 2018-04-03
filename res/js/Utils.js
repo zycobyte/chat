@@ -138,7 +138,7 @@ function handleRecieveDataFromServer(data){
                 addChat(chat, true);
             }
             reorderChats();
-            isDmMessageStore();
+            messageStoreDisply();
         }
     }else if(data["type"]==="chatsettings"){
         if(currentChatID===data["chatID"]) {
