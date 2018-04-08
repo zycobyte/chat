@@ -1,6 +1,6 @@
 pre = (window.location.hostname==="localhost"?"/Website":"");
 let server = (window.location.hostname==="localhost"?"ws://localhost":"ws://eiennochat.uk")+":2087/eiennosocket/data";
-let dataserver = (window.location.hostname==="localhost"?"ws://localhost":"ws://eiennochat.uk")+":25001/datasocket/data";
+let dataserver = (window.location.hostname==="localhost"?"ws://localhost":"ws://eiennochat.uk")+":2088/datasocket/data";
 
 allowStorage = (typeof(Storage) !== "undefined");
 messages = 0;
