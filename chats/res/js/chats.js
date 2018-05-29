@@ -275,7 +275,7 @@ function linkify(inputText) {//TODO upgrades
 
     //URLs starting with http://, https://, or ftp://
     replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
-    replacedText = inputText.replace("<br>", "").replace(replacePattern1, ' <a href="$1" target="_blank"> $1</a> ');
+    replacedText = inputText.split("<br>").join(" ").replace(replacePattern1, ' <a href="$1" target="_blank"> $1</a> ');
 
     //URLs starting with "www." (without // before it, or it'd re-link the ones done above).
     replacePattern2 = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
@@ -2058,11 +2058,11 @@ function split(text, repeat){
 function chatContext(chatID){
     let menu = $('.contextmenu');
     menu.html("");
-    menu.append(`<div id="leaveChat" onclick="$('.screen').click();leaveChat('${chatID}')">Leave Chat</div>`)
+    menu.append(`<div id="leaveChat" onclick="$('#prf').click();leaveChat('${chatID}')">Leave Chat</div>`)
     menu.removeClass("hide");
     menu.css('left', getRelativeMouseX());
     menu.css('top', getRelativeMouseY());
-    $('.screen').removeClass("hidden");
+    $('#prf').removeClass("hidden");
 }
 function leaveChat(chatID) {
     let json = {"username":read("username"), "token":read("token"), "data":"leave", "chatID":""+chatID};

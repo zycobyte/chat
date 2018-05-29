@@ -1461,3 +1461,25 @@ body{
 #image-area{
     display: none;
 }
+
+.loading-rotate-1:before{
+    content: "";
+    box-sizing: border-box;
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    left: 50%;
+    top: 120px;
+    margin-left: -15px;
+    border-radius: 50%;
+    border: 2px solid #a5b4c5;
+    border-top-color: #2090ff;
+    animation: rotate 1s linear;
+    animation-iteration-count: infinite;
+}
+
+@keyframes rotate {
+    to {
+        transform: rotate(360deg);
+    }
+}
