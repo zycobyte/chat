@@ -10,6 +10,7 @@ messageStore = [];
 let socket;//sockets should only be accessed from here to ensure data is encrypted and handled properly
 let dataSocket;
 let open = false;
+let open_data = false;
 let toSend = [];
 let recieved = 0;
 
@@ -24,56 +25,77 @@ window.onfocus = function() {
 window.onblur = function() {
     focused = false;
 };
-
 setInterval(function () {
-    canConnect = true;
-}, 10000);
-
-
+    if(!window.location.href.includes("chats") || window.location.href.includes("join")) return;
+    if(!open || !open_data){
+        if(!($('#loading-message-box').html()==="Attempting to establish a secure connection to the Eien.no Chat Servers")) {
+            $('#loading-message').removeClass("hidden").addClass("show");
+            $('#loading-message-box').html("Attempting to establish a secure connection to the Eien.no Chat Servers");
+        }
+    }else{
+        if($('#loading-message-box').html()==="Attempting to establish a secure connection to the Eien.no Chat Servers"){
+            fails = 0;
+            $('#loading-message').removeClass("show").addClass("hidden");
+            $('#loading-message-box').html("Loading");
+        }
+    }
+    if(!dataSocket && canConnect){
+        init_data_socket();
+    }
+    if(!socket && canConnect){
+        let json = {"username":read("username"), "token":read("token"), "data":"request", "requests":""};
+        send(json, handleRequest);
+    }
+    if(fails >= 4 && canConnect){
+        canConnect = false;
+        setTimeout(function () {
+            canConnect = true;
+        }, 10000)
+    }
+}, 100);
 
 function init_data_socket(){
-    setTimeout(function() {
-        if(recieved < 1 && open){//Ensures first message is recieved, containing the id
-            init_data_socket();
-            return;
-        }
-        if (!dataSocket && canConnect) {
+    // setTimeout(function() {
+    //     if(recieved < 1 && open){//Ensures first message is recieved, containing the id
+    //         init_data_socket();
+    //         return;
+    //     }
+    //     if (!dataSocket && canConnect) {
             try{
                 dataSocket = new WebSocket(dataserver);
             }catch(err){
                 fails++;
-                if(fails > 4)canConnect = false;
+                // if(fails > 4)canConnect = false;
                 return;
             }
 
             dataSocket.onopen = function (event) {
                 console.log("[Connect] Connected to Eien.no Chat servers");
-                if(!$('#loading-message-box').html().includes("Loading")) {
-                    $('#loading-message').removeClass("show").addClass("hidden");
-                }                let s = JSON.stringify({"id": `${read("id")}`});
+                open_data = true;
+                let s = JSON.stringify({"id": `${read("id")}`});
                 dataSocket.send(s);
-                fails = 0;
             };
             dataSocket.onerror = function (error) {
                 console.log('[Error] A secure connection couldn\'t be made with the Eien.no Chat servers');
+                // dataSocket = null;
+                // fails++;
             };
             dataSocket.onclose = function (event) {
                 console.log("[Close] The connection to the Eien.no Chat servers has been closed");
-                $('#loading-message').removeClass("hidden").addClass("show");
-                $('#loading-message-box').html("Attempting to establish a secure connection to the Eien.no Chat Servers");
                 dataSocket = null;
                 fails++;
-                if(fails > 4)canConnect = false;
-                init_data_socket()//re open the socket
+                open_data = false;
+                // if(fails > 4)canConnect = false;
+                // init_data_socket()//re open the socket
             };
             dataSocket.onmessage = function (event) {
                 let reply = JSON.parse(event.data);
                 handleRecieveDataFromServer(reply);
             };
-        }else{
-            init_data_socket()
-        }
-    }, 100);
+        // }else{
+        //     init_data_socket()
+        // }
+    // }, 100);
 }
 function handleRecieveDataFromServer(data){
     if(data["type"] === "newmessage"){
@@ -184,29 +206,29 @@ function handleRecieveDataFromServer(data){
     }else if(data["data"]==="request"){
         requestData(data["requests"]);
     }
-    // console.log(data);//TODO anything else I add
+    // console.log(data);//TODO anything else added
 }
 
 function send(data, method) {
     //Data should ALWAYS be in a JSON format.  There will be errors if its not.
     //If no socket connected, then make a new one
-    if (!socket && canConnect) {
+    if (!socket) {
         try{
             socket = new WebSocket(server);
         }catch(err){
             fails++;
-            if(fails > 4)canConnect = false;
-            requestData(" ");
+            // if(fails > 4)canConnect = false;
+            // requestData(" ");
             return;
         }
 
         socket.onopen = function (event) {
             console.log("[Connect] Connected to Eien.no Chat servers");
-            if(window.location.href.includes("chats")&&!window.location.href.includes("join")) {
-                if (!$('#loading-message-box').html().includes("Loading")) {
-                    $('#loading-message').removeClass("show").addClass("hidden");
-                }
-            }
+            // if(window.location.href.includes("chats")&&!window.location.href.includes("join")) {
+            //     if (!$('#loading-message-box').html().includes("Loading")) {
+            //         $('#loading-message').removeClass("show").addClass("hidden");
+            //     }
+            // }
             open = true;
             for (let i = 0; i < toSend.length; i++) {
                 let s = JSON.stringify(toSend[i]);
@@ -219,18 +241,17 @@ function send(data, method) {
         };
         socket.onclose = function (event) {
             console.log("[Close] The connection to the Eien.no Chat servers has been closed");
-            if(window.location.href.includes("chats")&&!window.location.href.includes("join")) {
-                $('#loading-message').removeClass("hidden").addClass("show");
-                $('#loading-message-box').html("Attempting to establish a secure connection to the Eien.no Chat Servers");
-            }
+            // if(window.location.href.includes("chats")&&!window.location.href.includes("join")) {
+            //     $('#loading-message').removeClass("hidden").addClass("show");
+            //     $('#loading-message-box').html("Attempting to establish a secure connection to the Eien.no Chat Servers");
+            // }
             socket = null;
             open = false;
-            fails++;
-            if(fails > 4)canConnect = false;
-            if(window.location.href.includes("chats")){
-                // redirLogin("An error has occoured")
-                requestData(" ");
-            }
+            // fails++;
+            // if(fails > 4)canConnect = false;
+            //     redirLogin("An error has occoured")
+                // requestData(" ");
+            // }
         };
     }
 
