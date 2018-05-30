@@ -1634,20 +1634,20 @@ function addMessage(message){
     let area = $('#msgs');
     let num = message["warning_value"];
     let warn = '#a53028';
-    let tagmsg = 'This message has a '+num+'% chance of<br>asking you for personal information.<br>';
+    let tagmsg = 'This message has a '+num+'% chance of<br>asking you for personal information or saying something bad.<br>';
     if(num<=33){
         warn = '#5fc069';
-        tagmsg+='This message should be fine';
+        tagmsg+='This message should be fine.';
     }else
     if(num<=50){
         warn = '#e28e4f';
-        tagmsg+='If it is, you shouldn\\\'t tell them, <br> however there are many safe messages in this catagory.';
+        tagmsg+='If it is, you shouldn\\\'t tell them, <br> however this catagory of messages contains many safe ones.';
     }else
     if(num<=75){
         warn='#e25b54';
-        tagmsg+='If it is asking for personal information,<br>you shouldn\\\'t reply and should block them.';
+        tagmsg+='If it is, then you shouldn\\\'t<br>reply and should either block them or tell someone.';
     }else{
-        tagmsg+='If it is asking for personal information,<br>you shouldn\\\'t reply and should block them.';
+        tagmsg+='If it is, then you shouldn\\\'t<br>reply and should either block them or tell someone.';
     }
     let scanID = JSON.parse(read("settings"))["scan-id"];
     if(!scanID)scanID=1;
@@ -1794,7 +1794,7 @@ jQuery(function($) {
     });
     $('#message-area').scroll(function (event){
         let area = $(this);
-        let bottom = area.scrollTop() + area.innerHeight() >= area[0].scrollHeight;
+        let bottom = area.scrollTop() + area.innerHeight() >= area[0].scrollHeight-1;;
         if(bottom){
             $('#text-box').css("box-shadow", "none");
         }else{

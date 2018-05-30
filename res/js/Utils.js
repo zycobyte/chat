@@ -140,7 +140,7 @@ function handleRecieveDataFromServer(data){
             }
             messages++;
             let scrollArea = $('#message-area');
-            let autoScroll = scrollArea.scrollTop() + scrollArea.innerHeight() >= scrollArea[0].scrollHeight;
+            let autoScroll = scrollArea.scrollTop() + scrollArea.innerHeight() >= scrollArea[0].scrollHeight-1;
             // let area = $('#msgs');
             addMessage(data);
             // let d = new Date(Number(data["date"]));
