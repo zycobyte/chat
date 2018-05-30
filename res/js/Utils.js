@@ -1,6 +1,6 @@
 pre = (window.location.hostname==="localhost"?"/Website":"");
-let server = (window.location.hostname==="localhost"?"ws://localhost":"wss://eiennochat.uk")+":2096/eiennosocket/data";
-let dataserver = (window.location.hostname==="localhost"?"ws://localhost":"wss://eiennochat.uk")+":2087/datasocket/data";
+let server = (window.location.hostname==="localhost-"?"ws://localhost":"wss://eiennochat.uk")+":2096/eiennosocket/data";
+let dataserver = (window.location.hostname==="localhost-"?"ws://localhost":"wss://eiennochat.uk")+":2087/datasocket/data";
 
 allowStorage = (typeof(Storage) !== "undefined");
 messages = 0;
@@ -39,7 +39,7 @@ setInterval(function () {
             $('#loading-message-box').html("Loading");
         }
     }
-    if(!dataSocket && canConnect){
+    if(!open_data && canConnect){
         // dataSocket.close();
         init_data_socket();
     }
@@ -85,7 +85,7 @@ function init_data_socket(){
             };
             dataSocket.onclose = function (event) {
                 console.log("[Close] The connection to the Eien.no Chat servers has been closed");
-                dataSocket = null;
+                //dataSocket = null;
                 fails++;
                 open_data = false;
                 // if(fails > 4)canConnect = false;
