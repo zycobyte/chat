@@ -44,7 +44,7 @@ setInterval(function () {
     }
     if(!socket && canConnect){
         let json = {"username":read("username"), "token":read("token"), "data":"request", "requests":""};
-        send(json, handleRequest);
+        send(json, none);
     }
     if(fails >= 4 && canConnect){
         canConnect = false;
