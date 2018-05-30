@@ -40,11 +40,11 @@ setInterval(function () {
         }
     }
     if(!dataSocket && canConnect){
-        dataSocket.close();
+        // dataSocket.close();
         init_data_socket();
     }
     if(!socket && canConnect){
-        socket.close();
+        // socket.close();
         let json = {"username":read("username"), "token":read("token"), "data":"request", "requests":""};
         send(json, none);
     }
