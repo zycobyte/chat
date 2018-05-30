@@ -64,7 +64,7 @@ function init_data_socket(){
     //     }
     //     if (!dataSocket && canConnect) {
             try{
-                dataSocket.close();
+                // dataSocket.close();
                 dataSocket = new WebSocket(dataserver);
             }catch(err){
                 fails++;
@@ -217,7 +217,7 @@ function send(data, method) {
     //If no socket connected, then make a new one
     if (!socket) {
         try{
-            socket.close();
+            // socket.close();
             socket = new WebSocket(server);
         }catch(err){
             fails++;
