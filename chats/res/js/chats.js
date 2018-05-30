@@ -33,7 +33,7 @@ window.onload = function () {
     }
 
     requestData();
-    init_data_socket();
+    init_socket_connecter();
 
     let store = $('#image-area');
     store.append("<audio src='res/audio/new_message.wav' id='message_new_wav'></audio>")
