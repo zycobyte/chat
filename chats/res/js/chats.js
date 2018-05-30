@@ -285,7 +285,30 @@ function linkify(inputText) {//TODO upgrades
     replacePattern3 = /(\w+@[a-zA-Z_]+?(\.[a-zA-Z]{2,6})+)/gim;
     replacedText = replacedText.replace(replacePattern3, ' <a href="mailto:$1">$1</a> ');
 
-    return replacedText;
+    return addImages(replacedText);
+}
+
+function addImages(text){
+    let imgs = 0;
+    let hrefs = text.split("href=\"");
+    let imageTypes = ['jpg','jpeg','tiff','png','gif','bmp'];
+    for(let i = 0; i < hrefs.length; i++) {
+        let url = hrefs[i];
+        url = url.split("\"")[0];
+        let split_url = url.split(".");
+        let type = split_url[split_url.length-1];
+        if(imageTypes.indexOf(type) != -1) {
+            // $.get(url)
+            //     .done(function () {
+                    text+= '<br><img src="'+url+'" style="max-width: 75%;max-height: 256px"/>'
+                    imgs ++;
+                    if(imgs >= 5) return text;
+                    // console.log(text)
+                // }).fail(function () {
+            // })
+        }
+    }
+    return text;
 }
 
 setInterval(function () {

@@ -92,6 +92,6 @@ function alert(message){
     messageArea.html(message);
     bg.removeClass("hide");
     setTimeout(function () {
-        bg.addClass("#hide");
-    }, 1000);
+        bg.addClass("hide");
+    }, 1500);
 }
