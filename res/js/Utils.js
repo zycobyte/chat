@@ -1,6 +1,6 @@
 pre = (window.location.hostname==="localhost"?"/Website":"");
-let server = (window.location.hostname==="localhost-"?"ws://localhost":"wss://eiennochat.uk")+":2096/eiennosocket/data";
-let dataserver = (window.location.hostname==="localhost-"?"ws://localhost":"wss://eiennochat.uk")+":2087/datasocket/data";
+let server = (window.location.hostname==="localhost"?"ws://localhost":"wss://eiennochat.uk")+":2096/eiennosocket/data";
+let dataserver = (window.location.hostname==="localhost"?"ws://localhost":"wss://eiennochat.uk")+":2087/datasocket/data";
 
 allowStorage = (typeof(Storage) !== "undefined");
 messages = 0;
@@ -62,6 +62,7 @@ function init_data_socket(){
     //     }
     //     if (!dataSocket && canConnect) {
             try{
+                dataSocket.close();
                 dataSocket = new WebSocket(dataserver);
             }catch(err){
                 fails++;
@@ -214,6 +215,7 @@ function send(data, method) {
     //If no socket connected, then make a new one
     if (!socket) {
         try{
+            socket.close();
             socket = new WebSocket(server);
         }catch(err){
             fails++;
