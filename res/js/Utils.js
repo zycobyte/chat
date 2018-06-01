@@ -1,6 +1,6 @@
 pre = (window.location.hostname==="localhost"?"/Website":"");
-let server = (window.location.hostname==="localhost-"?"ws://localhost":"wss://eiennochat.uk")+":2096/eiennosocket/data";
-let dataserver = (window.location.hostname==="localhost-"?"ws://localhost":"wss://eiennochat.uk")+":2087/datasocket/data";
+let server = (window.location.hostname==="localhost"?"ws://localhost:2089":"wss://eiennochat.uk:2096")+"/eiennosocket/data";
+let dataserver = (window.location.hostname==="localhost"?"ws://localhost:2090":"wss://eiennochat.uk:2087")+"/datasocket/data";
 
 allowStorage = (typeof(Storage) !== "undefined");
 messages = 0;
@@ -83,6 +83,9 @@ function init_data_socket(){
                 open_data = true;
                 let s = JSON.stringify({"id": `${read("id")}`});
                 dataSocket.send(s);
+                if(currentChatID){
+                    switchChat(currentChatID, isdm);
+                }
             };
             dataSocket.onerror = function (error) {
                 console.log('[Error] A secure connection couldn\'t be made with the Eien.no Chat servers');
@@ -155,9 +158,11 @@ function handleRecieveDataFromServer(data){
                 //If at bottom before new message
                 let height = scrollArea[0].scrollHeight;
                 scrollArea.scrollTop(height);
-            }
-            if (messages > 50) {
-                $('#msgs').children().eq(0).remove();
+                while (messages > 50) {
+                    $('#msgs').children().eq(0).remove();
+                    messages--;
+                }
+                oldest = $('#msgs').children().eq(0).children().filter('.chat-area-date').attr('id');
             }
         }else{
             if(!(online["id"]==="3")){

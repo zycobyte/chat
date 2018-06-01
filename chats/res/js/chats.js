@@ -1,5 +1,6 @@
 let currentChatID = 0;
 let currentChannelID = 0;
+let oldest = 0;
 let nextChatID = false;
 let nextChatDM = false;
 let currentChatData = {};
@@ -1614,6 +1615,36 @@ function handleOpenChat(data){//adds things to the storage when you select a cha
     }
 }
 
+function getOlderMessages(date, num){
+    let json = {
+        "username": read("username"),
+        "token": read("token"),
+        "data": "request",
+        "requests": "messages",
+        "chatID": "" + currentChatID,
+        "isdm": "" + isdm,
+        "channelID": "" + currentChannelID,
+        "latest":""+date,
+        "amount":""+num
+    };
+    send(json, handleGetOlderMessages);
+}
+
+function handleGetOlderMessages(data){
+    if(invalid(data))return;
+    let scrollArea = $('#message-area');
+    scrollArea.scrollTop(1);
+    let data_ = [];
+    for(let message_id in data) {
+        data_.push(data[message_id]);
+    }
+    for(let i = data_.length-1; i >= 0; i--){
+        let message = JSON.parse(data_[i]);
+        addMessage(message, true);
+        messages ++;
+    }
+}
+
 function getMessages(data){
     if(invalid(data))return;
     let area = $('#msgs');
@@ -1627,11 +1658,50 @@ function getMessages(data){
     scrollArea.scrollTop(height);
     messages = 25;
 }
-
-function addMessage(message){
+function th(num) {
+    num = num + "";
+    if (num == "11" || num == "12" || num == "13")
+        return num + "th";
+    if (num[num.length-1] == 1)
+        return num + "st";
+    else if (num[num.length-1] == 2)
+        return num + "nd";
+    else if (num[num.length-1] == 3)
+        return num + "rd";
+    else
+        return num + "th";
+}
+function addMessage(message, top){
 //                                        ${!JSON.parse(roles[user["display-rank"]])["icon"]?``:`<div class="chat-user-icon" style="url(${JSON.parse(roles[user["display-rank"]])["icon"]})"></div>`}</div>
+    if(Number(message["date"]) < oldest || oldest == 0){
+        oldest = Number(message["date"]);
+    }
+
     let d = new Date(Number(message["date"]));
     let area = $('#msgs');
+    let last = null;
+    if(!top)
+        last = $('.chat-area').eq($('.chat-area').length-1).children().filter('.chat-area-date').html();
+    else
+        last = $('.chat-area').eq(0).children().filter('.chat-area-date').html();
+
+    if(last) {
+        if (!(last.split(" at ")[0] == d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear())) {
+            if(top)
+                d = new Date(Number($('.chat-area').eq(0).children().filter('.chat-area-date').attr('id')));
+            let list = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+            let msg = list[d.getDay()] + " " + th(d.getDate()) + " of " + months[d.getMonth()] + " " + d.getFullYear();
+            let content = `<div style="border-top: 2px dashed black;border-bottom: 2px dashed black;text-align: center;position:relative;height: 25px;width:98%;left:1%;">${msg}</div>`;
+            if(!top){
+                area.append(content);
+            }else{
+                area.prepend(content);
+            }
+        }
+    }
+    d = new Date(Number(message["date"]));
+
     let num = message["warning_value"];
     let warn = '#a53028';
     let tagmsg = 'This message has a '+num+'% chance of<br>asking you for personal information or saying something bad.<br>';
@@ -1666,16 +1736,19 @@ function addMessage(message){
     if(message["sender_id"]===read("id")){
         warn='argb(1,0,0,0)';
     }
-
-
-    area.append(`<div class="chat-area">
-                    ${!message["sender_name"]?`<div style="width:1px;height:30px;"></div>`:`<div class="chat-area-pp" style="background-image: url(${message["avitar"]})" onclick="openProfile('${message["sender_name"].split("'").join("\\'")+"', '"+message["sender_id"]+"'"})"></div>
-                    <div class="chat-area-username" onclick="openProfile('${message["sender_name"].split("'").join("\\'")+"', '"+message["sender_id"]+"'"})">${message["sender_name"]}${!currentChatUsers[message["sender_id"]]?"":(JSON.parse(currentChatUsers[message["sender_id"]])["display-rank"])?`${!JSON.parse(currentChatRoles[JSON.parse(currentChatUsers[message["sender_id"]])["display-rank"]])["icon"] ?``:`<div class="chat-user-icon" style="url(${JSON.parse(currentChatRoles[JSON.parse(currentChatUsers[message["sender_id"]])["display-rank"]])["icon"]})"></div>`}`:""}</div>`}
+    let messageContentData = `<div class="chat-area">
+                    ${!message["sender_name"] ? `<div style="width:1px;height:30px;"></div>` : `<div class="chat-area-pp" style="background-image: url(${message["avitar"]})" onclick="openProfile('${message["sender_name"].split("'").join("\\'") + "', '" + message["sender_id"] + "'"})"></div>
+                    <div class="chat-area-username" onclick="openProfile('${message["sender_name"].split("'").join("\\'") + "', '" + message["sender_id"] + "'"})">${message["sender_name"]}${!currentChatUsers[message["sender_id"]] ? "" : (JSON.parse(currentChatUsers[message["sender_id"]])["display-rank"]) ? `${!JSON.parse(currentChatRoles[JSON.parse(currentChatUsers[message["sender_id"]])["display-rank"]])["icon"] ? `` : `<div class="chat-user-icon" style="url(${JSON.parse(currentChatRoles[JSON.parse(currentChatUsers[message["sender_id"]])["display-rank"]])["icon"]})"></div>`}` : ""}</div>`}
                     <div class="warning" style="background-color:${warn}"  onmouseover="openHelpTag('${tagmsg}')" onmouseleave="closeHelpTag()"></div>
-                    <div class="chat-area-date">${d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear()+" at "+((""+d.getHours()).length==1?0+""+d.getHours():d.getHours())+":"+((""+d.getMinutes()).length==1?0+""+d.getMinutes():d.getMinutes())}</div>
+                    <div class="chat-area-date" id="${message["date"]}">${d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear() + " at " + (("" + d.getHours()).length == 1 ? 0 + "" + d.getHours() : d.getHours()) + ":" + (("" + d.getMinutes()).length == 1 ? 0 + "" + d.getMinutes() : d.getMinutes())}</div>
                     <div class="chat-area-content">${emojify(linkify(message["content"]))}</div>
                     <div class="chat-area-bar"></div>
-                    </div>`);
+                    </div>`;
+    if(!top) {
+        area.append(messageContentData);
+    }else{
+        area.prepend(messageContentData);
+    }
 }
 
 function openProfile(name, id) {
@@ -1792,11 +1865,14 @@ jQuery(function($) {
             this.value = "";
         }
     });
-    $('#message-area').scroll(function (event){
+    $('#message-area').scroll(function (event) {
         let area = $(this);
-        let bottom = area.scrollTop() + area.innerHeight() >= area[0].scrollHeight-1;;
-        if(bottom){
+        let bottom = area.scrollTop() + area.innerHeight() >= area[0].scrollHeight - 1;
+        ;
+        if (bottom) {
             $('#text-box').css("box-shadow", "none");
+        }else if(area.scrollTop()==0){
+            getOlderMessages(oldest, 25);
         }else{
             $('#text-box').css("box-shadow", "0px 0px 20px 4px #000");
         }
