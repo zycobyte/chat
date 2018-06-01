@@ -661,13 +661,23 @@ body{
 .move-up{
     border-bottom-color: #249a30;
     right: 5px;
+    top: -10px;
+    position: absolute;
+}
+.done{
+    background-color: #14d200;
+    right: 5px;
     top: 5px;
     position: absolute;
+    width: 30px;
+    height: 16px;
+    font-size: 12px;
+    text-align: center;
 }
 .move-down{
     border-top-color: #af332a;
     right: 5px;
-    top: 26px;
+    top: 21px;
     position: absolute;
 }
 

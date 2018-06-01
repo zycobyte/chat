@@ -229,11 +229,12 @@ function updateGlobalChatSettings(){
     let isJoinMessage = ""+document.getElementById("join-message-enabled-settings").checked;
     let joinMessage = ""+$("#join-message-content-settings").val();
     let joinMessageChannel = ""+$("#join-message-channel-settings").val();
+    let channelData = currentChatData["channels"];
 
     let json = {"username":read("username"), "token":read("token"), "data":"edit", "type":"server-global", "chat-id":currentChatID,
         "name":name, "desc":desc, "pub":isPublic, "cat":catagory, "closed":isMaintainance,
         "maintainaners":JSON.stringify(maintainers), "is-join-msg":isJoinMessage, "join-msg": joinMessage,
-        "join-msg-channel": joinMessageChannel, "maintainance-message":maintainanceMessage};
+        "join-msg-channel": joinMessageChannel, "maintainance-message":maintainanceMessage, "channels":channelData};
 
     popup = document.getElementById("chat-settings-popup-global");
     send(json, popupReply);
@@ -440,34 +441,22 @@ function chat_settings_popup_global(){
 
     let textChannels = "";
     let raw = JSON.parse(currentChatData["channels"]);
-    for(let key in raw){
-        let d1 = JSON.parse(raw[key]);
-        if(d1["type"]==="chat"){
-            textChannels+=`<option value="${d1["id"]}">${d1["name"]}</option>`;
-        }
-        let c1 = JSON.parse(d1["contents"]);
-        for(let key2 in c1){
-            let d2 = JSON.parse(c1[key2]);
-            let c2 = JSON.parse(d2["contents"]);
-            if(d2["type"]==="chat"){
-                textChannels+=`<option value="${d2["id"]}">${d2["name"]}</option>`;
+    let order = asList(raw.order);
+    channels = order;
+    let selected = JSON.parse(currentChatData["settings"])["join-message-channel"];
+    for (let i = 0; i < order.length; i++) {
+        if (typeof order[i] == "object") {
+            for (let ii = 0; ii < order[i].length; ii++) {
+                let d1 = JSON.parse(JSON.parse(raw["data"])[order[i][ii]]);
+                textChannels += `<option ${selected == order[i][ii]?"selected":""} value="${order[i][ii]}">${d1["name"]}</option>`;
             }
-            for(let key3 in c2) {
-                let d3 = JSON.parse(c2[key3]);
-                let c3 = JSON.parse(d3["contents"]);
-                if(d3["type"]==="chat"){
-                    textChannels+=`<option value="${d3["id"]}">${d3["name"]}</option>`;
-                }
-                for (let key4 in c3) {
-                    let d4 = JSON.parse(c3[key4]);
-                    if(d4["type"]==="chat"){
-                        textChannels+=`<option value="${d4["id"]}">${d4["name"]}</option>`;
-                    }
-                }
+        } else {
+            if(!(typeof order[i+1] == "object")) {
+                let d1 = JSON.parse(JSON.parse(raw["data"])[order[i]]);
+                textChannels += `<option ${selected == order[i]?"selected":""} value="${order[i]}">${d1["name"]}</option>`;
             }
         }
     }
-
     if(admin) {// or manager
         area.append(`
                 <div class="container">
@@ -570,6 +559,7 @@ function chat_settings_popup_global(){
                 </div>
 `);
         for(let i = 0; i < i+1; i++) {
+            if(!JSON.parse(currentChatData["settings"])["maintainers"])break;
             let id = JSON.parse(currentChatData["settings"])["maintainers"].split(";")[i];
             if(!id)break;
             let user;
@@ -590,9 +580,11 @@ function chat_settings_popup_global(){
                     <div id="ranks-channels-settings">
                         <div id="channels-list-settings" class="scrollable">
                             <div class="title">Channels</div>
-                            <div style="top:20px" class="container" id="channel-list-setting-edit">
+                            <div style="top:20px;height:245px" class="container scrollable" id="channel-list-setting-edit">
                                 <!--channels go here-->
                             </div>
+                            <button class="btn-cancel btn-blue" onclick="createNew('catagory')">Create new catagory</button>
+                            <button class="btn-left btn-true" onclick="createNew('channel')">Create new channel</button>
                         </div>
                         <div id="rank-list-settings" class="scrollable">
                             <div class="title">Ranks</div>
@@ -606,72 +598,29 @@ function chat_settings_popup_global(){
 `);
     let ranks = $('#channel-rank-setting-edit');
     ranks.append(`<div class="title">Sorry!  We underestimated the time it would take to make this, and it is not here yet.<br>Don't worry though!  It will be coming out as soon as it's ready, regardless of whether the next full update is complete.</div>`)
-
-    // if(admin){//or can edit ranks
-    //     let roles = JSON.parse(currentChatData["roles"]);
-    //     for(let role in roles){
-    //         let roleData = JSON.parse(roles[role]);
-    //         if(!roleData["invisible"]){
-    //             ranks.append(`<div id="${roleData["name"]}" class="chat-rank" style="color: ${roleData["colour"]}"><b>${roleData["name"]}</b></div>`);
-    //         }
-    //     }
-    //     ranks.append(`<div id="online" class="chat-rank" style="color: #f8ffb3"><b>Online</b></div>`);
-    //     ranks.parent().append(`<button class="btn-true" style="left:10px;bottom:10px;">Create Rank</button>`);
-    //     ranks.parent().append(`<button class="btn-false" style="right:10px;bottom:10px;">Delete Rank</button>`);
-    // }else{
-    //     ranks.append(`<div class="title">You do not have permission to change the chats ranks</div>`)
-    // }
-    //
     let channelArea = $('#channel-list-setting-edit');
-    channelArea.append(`<div class="title">Sorry!  We underestimated the time it would take to make this, and it is not here yet.<br>Don't worry though!  It will be coming out as soon as it's ready, regardless of whether the next full update is complete.</div>`)
-
-    // channelArea.html("");
-    // if(!admin){//and can't edit chats
-    //     channelArea.append(`<div class="title">You do not have permission to change the chats channels</div>`)
-    // }else {
-    //     raw = JSON.parse(currentChatData["channels"]);
-    //     for (let key in raw) {
-    //         let d1 = JSON.parse(raw[key]);
-    //         channelArea.append(`<div class="channel-list-0 channel-list channel-list-edit" id="${d1["id"]}-edit" title="${d1["name"]}" onclick="editChannels($('#${d1["id"]}-edit'))"><b>${d1["name"] + (d1["type"] === "catagory" ? " v " : "")}</b></i></div>`);
-    //         let c1 = JSON.parse(d1["contents"]);
-    //         if (d1["type"] === "catagory") {
-    //             channels.push("cat-0");
-    //         } else if (d1["type"] === "chat") {
-    //             channels.push("text-0");
-    //         }
-    //         for (let key2 in c1) {
-    //             let d2 = JSON.parse(c1[key2]);
-    //             let c2 = JSON.parse(d2["contents"]);
-    //             let u1 = $(`#${d1["id"]}-edit`);
-    //             u1.append(`<div class="channel-list-1 channel-list channel-list-edit" id="${d2["id"]}-edit" title="${d2["name"]}" onclick="editChannels($('#${d2["id"]}-edit'))"><b>${d2["name"] + (d2["type"] === "catagory" ? " v " : "")}</b></i></div>`);
-    //             if (d2["type"] === "catagory") {
-    //                 channels.push("cat-1");
-    //             } else if (d2["type"] === "chat") {
-    //                 channels.push("text-1");
-    //             }
-    //             for (let key3 in c2) {
-    //                 let d3 = JSON.parse(c2[key3]);
-    //                 let c3 = JSON.parse(d3["contents"]);
-    //                 let u2 = $(`#${d2["id"]}-edit`);
-    //                 u2.append(`<div class="channel-list-2 channel-list channel-list-edit" id="${d3["id"]}-edit" title="${d3["name"]}" onclick="editChannels($('#${d3["id"]}-edit'))"><b>${d3["name"] + (d2["type"] === "catagory" ? " v " : "")}</b></i></div>`);
-    //                 if (d3["type"] === "catagory") {
-    //                     channels.push("cat-2");
-    //                 } else if (d3["type"] === "chat") {
-    //                     channels.push("text-2");
-    //                 }
-    //                 for (let key4 in c3) {
-    //                     let d4 = JSON.parse(c3[key4]);
-    //                     let u3 = $(`#${d3["id"]}-edit`);
-    //                     u3.append(`<div class="channel-list-3 channel-list channel-list-edit"  id="${d4["id"]}-edit" title="${d1["name"]}" onclick="editChannels($('#${d4["id"]}-edit'))"><b>${d4["name"]}</b></i></div>`);
-    //                     if (d4["type"] === "chat") {
-    //                         channels.push("text-3");
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     console.log(channels);
-    // }
+    // channelArea.append(`<div class="title">Sorry!  We underestimated the time it would take to make this, and it is not here yet.<br>Don't worry though!  It will be coming out as soon as it's ready, regardless of whether the next full update is complete.</div>`)
+    //
+    channelArea.html("");
+    if(!admin){//and can't edit chats
+        channelArea.append(`<div class="title">You do not have permission to change the chats channels</div>`)
+    }else {
+        raw = JSON.parse(currentChatData["channels"]);
+        let order = asList(raw.order);
+        channels = order;
+        for (let i = 0; i < order.length; i++) {
+            if(typeof order[i] == "object"){
+                for (let ii = 0; ii < order[i].length; ii++) {
+                    let d1 = JSON.parse(JSON.parse(raw["data"])[order[i][ii]]);
+                    channelArea.append(`<div class="channel-list-1 channel-list channel-list-edit" id="${order[i][ii]}-edit" title="${d1["name"]}" onclick="editChannels($('#${order[i][ii]}-edit'))"><b>${d1["name"] + (d1["type"] === "catagory" ? " v " : "")}</b></i></div>`);
+                }
+            }else{
+                let d1 = JSON.parse(JSON.parse(raw["data"])[order[i]]);
+                channelArea.append(`<div class="channel-list-0 channel-list channel-list-edit" id="${order[i]}-edit" title="${d1["name"]}" onclick="editChannels($('#${order[i]}-edit'))"><b>${d1["name"] + (d1["type"] === "catagory" ? " v " : "")}</b></i></div>`);
+            }
+        }
+        // console.log(channels);
+    }
     if(admin){
         area.append(`
                 <div class="container">
@@ -784,149 +733,259 @@ function maintainanceUser(){
 }
 
 let editing = false;
-let indexOfEditingChat = -10;
+// let indexOfEditingChat = -10;
+
+function createNew(type){
+    let id = new Date().getTime();
+    let raw = JSON.parse(currentChatData["channels"]);
+    if(type === "channel"){
+        let list = asList(raw["order"]);
+        list.push(id+"");
+        raw["order"] = fromList(list);
+        let data = {"type":"chat", "name":"New Channel", "nsfw":"false", "Description":""};
+        let allData = JSON.parse(raw["data"]);
+        allData[id+""]=JSON.stringify(data);
+        raw["data"]=JSON.stringify(allData);
+    }else if(type === "catagory"){
+        let list = asList(raw["order"]);
+        list.push(id+"");
+        list.push([]);
+        raw["order"] = fromList(list);
+        let data = {"type":"catagory", "name":"New Catagory", "nsfw":"false"};
+        let allData = JSON.parse(raw["data"]);
+        allData[id+""]=JSON.stringify(data);
+        raw["data"]=JSON.stringify(allData);
+    }
+    currentChatData["channels"] = JSON.stringify(raw);
+    let order = asList(raw["order"]);
+    channels = order;
+    rerenderEditChats();
+}
 
 function editChannels(area) {
-    if(editing) return;
+    if (editing) return;
     editing = true;
     let name = area.attr("title");
     area.attr("onclick", null);
-    area.children().filter("b").html(`<input class="edit-channel-input" value="${name}"/><div class="move-up arrow-up" onclick="moveChannel('${area.attr("id")}', -1)"></div><div class="move-down arrow-down" onclick="moveChannel('${area.attr("id")}', 1)"></div>`)
-    let i = -10;
-    let lookup = {};// for 1st channel in second catagory  cat-0:1, text-1:0
+    area.children().filter("b").html(`<input class="edit-channel-input" value="${name}"/><div class="move-up arrow-up" onclick="moveChannel('${area.attr("id")}', -1)"></div><div class="done" onclick="updateChatChannels($('#${area.attr("id")}'))">Done</div><div class="move-down arrow-down" onclick="moveChannel('${area.attr("id")}', 1)"></div>`)
+}
+function updateChatChannels(area){
     let raw = JSON.parse(currentChatData["channels"]);
-    for (let key in raw) {
-        let d1 = JSON.parse(raw[key]);
-        let c1 = JSON.parse(d1["contents"]);
-        if (d1["type"] === "catagory") {
-            lookup[0]={"type":"cat-0", "pos":key};
-        } else if (d1["type"] === "chat") {
-            lookup[0]={"type":"text-0", "pos":key};
-        }
-        for (let key2 in c1) {
-            let d2 = JSON.parse(c1[key2]);
-            let c2 = JSON.parse(d2["contents"]);
-            if (d2["type"] === "catagory") {
-                lookup[1]={"type":"cat-1", "pos":key2};
-            } else if (d2["type"] === "chat") {
-                lookup[1]={"type":"text-1", "pos":key2};
-            }
-            for (let key3 in c2) {
-                let d3 = JSON.parse(c2[key3]);
-                let c3 = JSON.parse(d3["contents"]);
-                if (d3["type"] === "catagory") {
-                    lookup[2]={"type":"cat-2", "pos":key3};
-                } else if (d3["type"] === "chat") {
-                    lookup[2]={"type":"text-2", "pos":key3};
-                }
-                for (let key4 in c3) {
-                    let d4 = JSON.parse(c3[key4]);
-                    if (d4["type"] === "catagory") {
-                        lookup[3]={"type":"text-3", "pos":key4};
-                    }
-                }
-            }
-        }
-    }
-    let counts = {0:0, 1:0, 2:0, 3:0};
-    for(let index = 0; index < channels.length; index++){
-        if(channels[index]===lookup[0]["type"]){
-            if(counts[0]+""===lookup[0]["pos"]){
-                if(!lookup[1]){
-                    indexOfEditingChat = index;
-                    return;
-                }else{
-                    for(; index < channels.length; index++) {
-                        if (channels[index] === lookup[1]["type"]) {
-                            if (counts[1] + "" === lookup[1]["pos"]) {
-                                if (!lookup[2]) {
-                                    indexOfEditingChat = index;
-                                    return;
-                                } else {
-                                    for (; index < channels.length; index++) {
-                                        if (channels[index] === lookup[2]["type"]) {
-                                            if (counts[2] + "" === lookup[2]["pos"]) {
-                                                if (!lookup[3]) {
-                                                    indexOfEditingChat = index;
-                                                    return;
-                                                } else {
-                                                    for(; index < channels.length; index++) {
-                                                        if (channels[index] === lookup[3]["type"]) {
-                                                            if (counts[3] + "" === lookup[3]["pos"]) {
-                                                                indexOfEditingChat = index;
-                                                                return;
-                                                            }
-                                                            counts[3]++;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            counts[2]++;
-                                        }
+    raw["order"] = fromList(channels);
+    let id = area.attr('id').split('-edit')[0];
 
-                                    }
-                                }
-                            }
-                            counts[1]++;
-                        }
-                    }
-                }
+    let allData = JSON.parse(raw["data"]);
+    let data = JSON.parse(allData[id+""]);
+    data["name"] = $('.edit-channel-input').val();
+    allData[id+""]=JSON.stringify(data);
+    raw["data"]=JSON.stringify(allData);
+
+    currentChatData["channels"] = JSON.stringify(raw);
+
+    rerenderEditChats();
+}
+function getChatLocationCode(list, id){
+    for(let i = 0; i < list.length; i++){
+        if(typeof list[i] == "object"){
+            let index = getChatLocationCode(list[i], id);
+            if(index != -1){
+                return i+"_"+index;
             }
-            counts[0]++;
+        }else if(list[i]+"" == id+""){
+            return ""+i;
         }
     }
+    return -1;
+}
+
+function rerenderEditChats(){
+    let channelArea = $('#channel-list-setting-edit');
+    channelArea.html("");
+
+    let raw = JSON.parse(currentChatData["channels"]);
+    let order = channels;
+    for (let i = 0; i < order.length; i++) {
+        if (typeof order[i] == "object") {
+            for (let ii = 0; ii < order[i].length; ii++) {
+                let d1 = JSON.parse(JSON.parse(raw["data"])[order[i][ii]]);
+                channelArea.append(`<div class="channel-list-1 channel-list channel-list-edit" id="${order[i][ii]}-edit" title="${d1["name"]}" onclick="editChannels($('#${order[i][ii]}-edit'))"><b>${d1["name"] + (d1["type"] === "catagory" ? " v " : "")}</b></i></div>`);
+            }
+        } else {
+            let d1 = JSON.parse(JSON.parse(raw["data"])[order[i]]);
+            channelArea.append(`<div class="channel-list-0 channel-list channel-list-edit" id="${order[i]}-edit" title="${d1["name"]}" onclick="editChannels($('#${order[i]}-edit'))"><b>${d1["name"] + (d1["type"] === "catagory" ? " v " : "")}</b></i></div>`);
+        }
+    }
+    editing = false;
 }
 
 function moveChannel(id, dir) {
     if(dir > 1 || dir < -1) throw new Error;
-    if(dir+indexOfEditingChat >= channels.length || indexOfEditingChat+dir < 0) return;
+    id = id.split("-")[0];
+    let location = getChatLocationCode(channels, id);
 
-    let newarr = [];
-    for(let n = 0; n < channels.length; n++){
-        if(n==indexOfEditingChat+dir){
-            let push = "";
-            if(channels[indexOfEditingChat+dir].includes("cat")){
-                push = "cat-";
-            }else{
-                push = "text-";
-            }
-            if(indexOfEditingChat+dir==0){
-                push+=0;
-            }else if(dir>1){
-                let above = channels[indexOfEditingChat+dir];
-                let num = Number(above.split("-")[1]);
-                if(push.contains("cat")){
-                    if(num == 3)push+=num;
-                    else push+= (num+1);
-                }else if(above.includes("cat")){
-                    push+=(num+1);
-                }else{
-                    push+=num;
-                }
-            }else if(dir<1){
-                let above = channels[indexOfEditingChat+dir-1];
-                let num = Number(above.split("-")[1]);
-                if(push.contains("cat")){
-                    if(num == 3)push+=num;
-                    else push+= (num+1);
-                }else if(above.includes("cat")){
-                    push+=(num+1);
-                }else{
-                    push+=num;
-                }
-            }
-            newarr.push(channels[indexOfEditingChat]);
-        }else if(n<indexOfEditingChat){
-            newarr.push(channels[n]);
-        }else if(n==indexOfEditingChat){
-            newarr.push(channels[n+dir])
+    let index0 = Number(location.split("_")[0]);
+    let index1 = Number(location.split("_")[1]);
+
+    if(!isNaN(index1)){
+        if(channels[index0][index1+dir]){
+            //move by dir
+
+            //next to a channel
+            //move chat by dir and
+            let store = [];
+            store[0] = channels[index0][index1];
+            store[1] = channels[index0][index1+dir];
+            channels[index0][index1] = store[1];
+            channels[index0][index1+dir] = store[0];
+        }else if(dir==-1){
+            //insert at index0-2
+            let store = [];
+            store[0] = channels[index0-1];
+            store[2] = channels[index0][index1];
+            channels[index0].splice(index1, 1);
+            store[1] = channels[index0];
+
+            channels[index0-1]=store[2];
+            channels[index0] = store[0];
+            channels.splice(index0+1, 0, store[1]);
         }else{
-            newarr.push(channels[n]);
+            //insert at index0+1
+            let store = channels[index0][index1];
+            channels[index0].splice(index1, 1);
+            channels.splice(index1+2, 0, store);
+        }
+    }else{
+        if(typeof channels[index0+1]=="object" && channels[index0+1]){
+            //Catagory
+            if(typeof channels[index0+1 + 2*dir] == "object" && channels[index0+1+2*dir]){
+                //next to edge or another cat
+                //move list and cat by 2*dir and + 1
+                let store = [];
+                store[0] = channels[index0];
+                store[1] = channels[index0+1];
+                channels[index0] = channels[index0+2*dir];
+                channels[index0+1] = channels[index0+2*dir+1];
+                channels[index0+2*dir] = store[0];
+                channels[index0+2*dir+1] = store[1];
+            }else{
+                //next to a channel
+                //move list and cat by dir and + 1
+                if(dir == -1) {
+                    if (!channels[index0 - 1]) return;
+                }else{
+                    if(!channels[index0+2])return;
+                }
+                let store = [];
+                store[0] = channels[index0];
+                store[1] = channels[index0+1];
+                if(dir == 1){
+                    channels[index0] = channels[index0+2*dir];
+                }else{
+                    channels[index0+1] = channels[index0+dir];
+                }
+                channels[index0+dir] = store[0];
+                channels[index0+dir+1] = store[1];
+            }
+        }else{
+            //Channel
+            if(typeof channels[index0+dir] == "object" && dir == -1){
+                //next to edge or another cat
+                //move list and cat by 2 and channel by - 1
+                if(index0 == 0)return;
+
+                let store = channels[index0];
+                channels[index0-1].splice(channels[index0-1].length, 0, store);
+                channels.splice(index0, 1);
+                //Skip a catagory, add later when shift held
+                // let store = [];
+                // store[0] = channels[index0-2];
+                // store[1] = channels[index0-1];
+                // channels[index0-2] = channels[index0];
+                // channels[index0-1] = store[0];
+                // channels[index0] = store[1];
+            }else if(typeof channels[index0+2*dir] == "object" && dir == 1){
+                //next to edge or another cat
+                //move list and cat by - 1 and channel by 2
+                //console.log(channels[index0+2*dir])
+                if(!channels[index0+2*dir])return;
+                //console.log(!channels[index0+2*dir])
+
+                let store = channels[index0];
+                channels[index0+2].splice(0, 0, store);
+                channels.splice(index0, 1);
+
+                //Skip a catagory, add later when shift held
+                // let store = [];
+                // store[0] = channels[index0+1];
+                // store[1] = channels[index0+2];
+                // channels[index0+2] = channels[index0];
+                // channels[index0] = store[0];
+                // channels[index0+1] = store[1];
+            }else{
+                //next to a channel
+                //move chat by dir and
+                if(!channels[index0+dir])return;
+                let store = [];
+                store[0] = channels[index0];
+                store[1] = channels[index0+dir];
+                channels[index0] = store[1];
+                channels[index0+dir] = store[0];
+            }
         }
     }
-    indexOfEditingChat += dir;
-    channels = newarr;
-    console.log(channels)
+    rerenderEditChats();
+    editChannels($('#'+id+'-edit'));
+}
+
+function fromList(list){
+    //console.log(list)
+    let string = "[";
+    for(let i=0;i<list.length;i++){
+        let item = list[i];
+        if(typeof item == "object"){
+            let string_child = "[";
+            for(let ii = 0; ii<item.length; ii++){
+                let child = item[ii];
+                string_child+=child + ",";
+            }
+            if(string_child==="[")string_child="[]";
+            string_child = string_child.replace(/.$/,"]");
+            string+=string_child+",";
+        }else{
+            string += item+",";
+        }
+    }
+   // console.log(string);
+    return string.replace(/.$/,"]");
+}
+
+function asList(string){
+    let data = string.split(",");
+    let list_main = [];
+    for(let i = 0; i < data.length; i++){
+        if(i==0){
+            list_main.push(data[i].replace('[','').split(']').join(''));
+        }else if(i==data.length) {
+            if (data[i].includes('[]')){
+                list_main.push([])
+            }else{
+                list_main.push(data[i].split(']').join(''));
+            }
+        }else if(data[i].indexOf('[')!=-1){
+            let list = [];
+            if(!data[i].includes('[]')) {
+                list.push(data[i].replace('[', '').split(']').join(''));
+                while (data[i].indexOf(']') == -1) {
+                    i++
+                    list.push(data[i].split(']').join(''));
+                }
+            }
+            list_main.push(list);
+        }else{
+            list_main.push(data[i].split(']').join(''));
+        }
+    }
+    return list_main;
 }
 
 function safeClose(){
@@ -1496,33 +1555,50 @@ function handleOpenChat(data){//adds things to the storage when you select a cha
         }
         let channels = $('#channels-list');
         channels.html("");
-        let raw = JSON.parse(data["channels"]);
-        for(let key in raw){
-            let d1 = JSON.parse(raw[key]);
-            console.log(d1["name"]);
-            channels.append(`<div class="channel-list-0 channel-list" id="${d1["id"]}"><b>${(currentChannelID === d1["id"] ? "<i> -- ":"") + d1["name"] + (d1["type"]==="catagory"?" v " : "")}</b></i></div>`);
-            let c1 = JSON.parse(d1["contents"]);
-            for(let key2 in c1){
-                let d2 = JSON.parse(c1[key2]);
-                console.log("\t"+d2["name"]);
-                let c2 = JSON.parse(d2["contents"]);
-                let u1 = $(`#${d1["id"]}`);
-                u1.append(`<div class="channel-list-1 channel-list" id="${d2["id"]}"><b>${(currentChannelID === d2["id"] ? "<i> -- ":"") + d2["name"] + (d2["type"]==="catagory"?" v " : "")}</b></i></div>`);
-                for(let key3 in c2) {
-                    let d3 = JSON.parse(c2[key3]);
-                    console.log("\t" + "\t" + d3["name"]);
-                    let c3 = JSON.parse(d3["contents"]);
-                    let u2 = $(`#${d2["id"]}`);
-                    u2.append(`<div class="channel-list-2 channel-list" id="${d3["id"]}"><b>${(currentChannelID === d3["id"] ? "<i> -- ":"") + d3["name"] + (d2["type"]==="catagory"?" v " : "")}</b></i></div>`);
-                    for (let key4 in c3) {
-                        let d4 = JSON.parse(c3[key4]);
-                        console.log("\t" + "\t" + "\t" + d4["name"]);
-                        let u3 = $(`#${d3["id"]}`);
-                        u3.append(`<div class="channel-list-3 channel-list"  id="${d4["id"]}"><b>${(currentChannelID === d4["id"] ? "<i> -- ":"") + d4["name"]}</b></i></div>`);
-                    }
+
+        let raw = JSON.parse(currentChatData["channels"]);
+        let order = asList(raw.order);
+        let last = null;
+        for (let i = 0; i < order.length; i++) {
+            if (typeof order[i] == "object") {
+                for (let ii = 0; ii < order[i].length; ii++) {
+                    let d1 = JSON.parse(JSON.parse(raw["data"])[order[i][ii]]);
+                    last.append(`<div class="channel-list-1 channel-list" id="${order[i][ii]}"><b>${(currentChannelID === order[i][ii] ? "<i> -- ":"") + d1["name"] + (d1["type"]==="catagory"?" v " : "")}</b></i></div>`);
                 }
+            } else {
+                let d1 = JSON.parse(JSON.parse(raw["data"])[order[i]]);
+                channels.append(`<div class="channel-list-0 channel-list" id="${order[i]}"><b>${(currentChannelID === order[i] ? "<i> -- ":"") + d1["name"] + (d1["type"]==="catagory"?" v " : "")}</b></i></div>`);
+                last = $('#'+order[i]);
             }
         }
+
+        // let raw = JSON.parse(data["channels"]);
+        // for(let key in raw){
+        //     let d1 = JSON.parse(raw[key]);
+        //     console.log(d1["name"]);
+        //     channels.append(`<div class="channel-list-0 channel-list" id="${d1["id"]}"><b>${(currentChannelID === d1["id"] ? "<i> -- ":"") + d1["name"] + (d1["type"]==="catagory"?" v " : "")}</b></i></div>`);
+        //     let c1 = JSON.parse(d1["contents"]);
+        //     for(let key2 in c1){
+        //         let d2 = JSON.parse(c1[key2]);
+        //         console.log("\t"+d2["name"]);
+        //         let c2 = JSON.parse(d2["contents"]);
+        //         let u1 = $(`#${d1["id"]}`);
+        //         u1.append(`<div class="channel-list-1 channel-list" id="${d2["id"]}"><b>${(currentChannelID === d2["id"] ? "<i> -- ":"") + d2["name"] + (d2["type"]==="catagory"?" v " : "")}</b></i></div>`);
+        //         for(let key3 in c2) {
+        //             let d3 = JSON.parse(c2[key3]);
+        //             console.log("\t" + "\t" + d3["name"]);
+        //             let c3 = JSON.parse(d3["contents"]);
+        //             let u2 = $(`#${d2["id"]}`);
+        //             u2.append(`<div class="channel-list-2 channel-list" id="${d3["id"]}"><b>${(currentChannelID === d3["id"] ? "<i> -- ":"") + d3["name"] + (d2["type"]==="catagory"?" v " : "")}</b></i></div>`);
+        //             for (let key4 in c3) {
+        //                 let d4 = JSON.parse(c3[key4]);
+        //                 console.log("\t" + "\t" + "\t" + d4["name"]);
+        //                 let u3 = $(`#${d3["id"]}`);
+        //                 u3.append(`<div class="channel-list-3 channel-list"  id="${d4["id"]}"><b>${(currentChannelID === d4["id"] ? "<i> -- ":"") + d4["name"]}</b></i></div>`);
+        //             }
+        //         }
+        //     }
+        // }
     }else{
         let chatData = JSON.parse(JSON.parse(read("dms"))[currentChatID]);
         let userArea = $('#users');
