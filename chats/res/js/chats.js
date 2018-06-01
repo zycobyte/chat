@@ -1331,6 +1331,7 @@ function createChatLoad() {
 }
 
 function switchChat(chatID, dm){
+    oldest = 0;
     if(cancelOpen){
         cancelOpen = false;
         return;
