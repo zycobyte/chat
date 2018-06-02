@@ -112,30 +112,8 @@ function init_data_socket(){
 }
 function handleRecieveDataFromServer(data){
     if(data["type"] === "newmessage"){
-        let online = JSON.parse(read("online"));
-        if(data["mentions"].split(";").includes(read("id")) || data["is_dm"]==="true"){
-            if(!(data["sender_id"]===read("id"))) {
-                let status = online["id"];
-                let message = JSON.parse(online["message"])[status];
-                if (message) {
-                    let tosend = {
-                        "username": read("username"),
-                        "token": read("token"),
-                        "data": "msg",
-                        "channel_id": "" + data["channel_id"],
-                        "chat_id": `${data["chat_id"]}`,
-                        "is_dm": `${data["is_dm"]}`,
-                        "content": "##Auto Reply## " + message,
-                        "embed_data": null,
-                        "uploads": null,
-                        "mentions": ""
-                    };
-                    send(tosend, none);
-                }
-            }
-        }
         //add message
-        if(data["chat_id"]===currentChatID) {
+        if(data["chat_id"]===currentChatID && data["channel_id"] === currentChannelID) {
             if(!focused){
                 if(!(online["id"]==="3")){
                     document.getElementById('message_new_wav').play()
@@ -165,6 +143,30 @@ function handleRecieveDataFromServer(data){
                 oldest = $('#msgs').children().eq(0).children().filter('.chat-area-date').attr('id');
             }
         }else{
+
+            let online = JSON.parse(read("online"));
+            if(data["mentions"].split(";").includes(read("id")) || data["is_dm"]==="true"){
+                if(!(data["sender_id"]===read("id"))) {
+                    let status = online["id"];
+                    let message = JSON.parse(online["message"])[status];
+                    if (message) {
+                        let tosend = {
+                            "username": read("username"),
+                            "token": read("token"),
+                            "data": "msg",
+                            "channel_id": "" + data["channel_id"],
+                            "chat_id": `${data["chat_id"]}`,
+                            "is_dm": `${data["is_dm"]}`,
+                            "content": "##Auto Reply## " + message,
+                            "embed_data": null,
+                            "uploads": null,
+                            "mentions": ""
+                        };
+                        send(tosend, none);
+                    }
+                }
+            }
+
             if(!(online["id"]==="3")){
                 document.getElementById('message_new_wav').play()
             }

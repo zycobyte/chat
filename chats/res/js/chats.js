@@ -1563,11 +1563,11 @@ function handleOpenChat(data){//adds things to the storage when you select a cha
             if (typeof order[i] == "object") {
                 for (let ii = 0; ii < order[i].length; ii++) {
                     let d1 = JSON.parse(JSON.parse(raw["data"])[order[i][ii]]);
-                    last.append(`<div class="channel-list-1 channel-list" id="${order[i][ii]}"><b>${(currentChannelID === order[i][ii] ? "<i> -- ":"") + d1["name"] + (d1["type"]==="catagory"?" v " : "")}</b></i></div>`);
+                    last.append(`<div class="channel-list-1 channel-list" id="${order[i][ii]}" type="${d1["type"]}"><b>${(currentChannelID === order[i][ii] ? "<i> -- ":"") + d1["name"] + (d1["type"]==="catagory"?" v " : "")}</b></i></div>`);
                 }
             } else {
                 let d1 = JSON.parse(JSON.parse(raw["data"])[order[i]]);
-                channels.append(`<div class="channel-list-0 channel-list" id="${order[i]}"><b>${(currentChannelID === order[i] ? "<i> -- ":"") + d1["name"] + (d1["type"]==="catagory"?" v " : "")}</b></i></div>`);
+                channels.append(`<div class="channel-list-0 channel-list" id="${order[i]}" type="${d1["type"]}"><b>${(currentChannelID === order[i] ? "<i> -- ":"") + d1["name"] + (d1["type"]==="catagory"?" v " : "")}</b></i></div>`);
                 last = $('#'+order[i]);
             }
         }
@@ -1657,6 +1657,7 @@ function handleOpenChat(data){//adds things to the storage when you select a cha
         if(event.ctrlKey)return;
         event.ctrlKey = true;
         try {
+            //check if it has children channels
             if ($(this).children().filter("div").eq(0).attr('class').split(/\s+/).includes("shrink-up-fade")) {
                 $(this).children().filter("div").removeClass("shrink-up-fade").addClass("show");
                 content = content.substr(0, content.length - 5);
@@ -1667,14 +1668,33 @@ function handleOpenChat(data){//adds things to the storage when you select a cha
                 title.html(content + "> ");
             }
         }catch(err){
-            content = " -- " + title.eq(0).html();
-            if(content.includes("<i>"))return;
-            let prevChat = $('#'+currentChannelID).children().eq(0);//bold element
-            prevChat.html(prevChat.children().eq(0).html().split(" -- ")[1]);
-            title.html("<i>"+content+"</i>");
-            currentChannelID = title.parent().attr("id");
-            let json = {"username":read("username"), "token":read("token"), "data":"request", "requests":"messages", "chatID": ""+currentChatID, "isdm":""+isdm, "channelID":""+currentChannelID};
-            send(json, getMessages);
+            //is it a channel or catagory?
+            if($(this).attr('type') == "catagory"){
+                if(content.includes('&gt')){
+                    content = content.substr(0, content.length - 5);
+                    title.html(content + "v ");
+                }else{
+                    content = content.substr(0, content.length - 2);
+                    title.html(content + "> ");
+                }
+            }else {
+                content = " -- " + title.eq(0).html();
+                if (content.includes("<i>")) return;
+                let prevChat = $('#' + currentChannelID).children().eq(0);//bold element
+                prevChat.html(prevChat.children().eq(0).html().split(" -- ")[1]);
+                title.html("<i>" + content + "</i>");
+                currentChannelID = title.parent().attr("id");
+                let json = {
+                    "username": read("username"),
+                    "token": read("token"),
+                    "data": "request",
+                    "requests": "messages",
+                    "chatID": "" + currentChatID,
+                    "isdm": "" + isdm,
+                    "channelID": "" + currentChannelID
+                };
+                send(json, getMessages);
+            }
         }
     });
 
