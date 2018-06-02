@@ -113,6 +113,7 @@ function init_data_socket(){
 function handleRecieveDataFromServer(data){
     if(data["type"] === "newmessage"){
         //add message
+        let online = JSON.parse(read("online"));
         if(data["chat_id"]===currentChatID && data["channel_id"] === currentChannelID) {
             if(!focused){
                 if(!(online["id"]==="3")){
@@ -143,8 +144,6 @@ function handleRecieveDataFromServer(data){
                 oldest = $('#msgs').children().eq(0).children().filter('.chat-area-date').attr('id');
             }
         }else{
-
-            let online = JSON.parse(read("online"));
             if(data["mentions"].split(";").includes(read("id")) || data["is_dm"]==="true"){
                 if(!(data["sender_id"]===read("id"))) {
                     let status = online["id"];
