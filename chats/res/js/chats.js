@@ -5,7 +5,9 @@ let nextChatID = false;
 let nextChatDM = false;
 let currentChatData = {};
 let currentChatUsers = {};
+let currentChatUserNames = {};
 let currentChatRoles = {};
+let roleOrder = {};
 let channels = [];
 let isdm = false;
 let dmList = false;
@@ -20,12 +22,21 @@ let defaultNames = ["Online", "Away", "Do Not Disturb", "Offline"];
 let method = none;
 let userOptionMethod = none;
 let userChatMethod = yourChats;
-
 let emojiData;
+lostConnection=false;
+
 //online away DND offline
 //#0073d6
 
-window.onload = function () {
+window.onload = new function () {
+    pageLoadData = 1;
+}
+
+function onLoad() {
+    $("#user-icon-file-upload").change(function() {
+        showImg(this, $('#user-icon-upload-preview'));
+    });
+
     showChats();
 
     if(read("username") === null || read("token") === null){
@@ -48,16 +59,21 @@ window.onload = function () {
         searchEmojis($(this).val());
     })
 };
-
+let messagesTotDisp = 0;
 function message(message){
     console.log(message);
-    $('.message#msg').html(split(message, 40)).addClass('show').removeClass('hide');
+    messagesTotDisp ++;
+    $('.message#msg').html((message)).addClass('show').removeClass('hide');
 
+    setTimeout(hideMessageBox, 3500);
+}
+function hideMessageBox(){
+    messagesTotDisp --;
+    if(!(messagesTotDisp ==0))return;
     setTimeout(function () {
         $('.message').removeClass('show').addClass('hide');
-    }, 3500);
+    }, 100);
 }
-
 function dropDownOpen(menu){
     $('#'+menu+'-drop-down').addClass("drop-down").removeClass("hide-shrink").addClass("show").removeClass("box-1x1");
 }
@@ -100,6 +116,9 @@ function addCustomStatus(id, name, reply, colour,  from, to){
     let times = $('#'+id+'-times').children();
     times.eq(0).val(from);
     times.eq(1).val(to);
+    let scrollArea = $('#online-status-popup-area');
+    let height = scrollArea[0].scrollHeight;
+    scrollArea.scrollTop(height);
 }
 
 function onlineStatus(id){
@@ -179,6 +198,16 @@ function onlineStatusUpdate(){
     }
 }
 
+function reOrderRoles(){
+    roleOrder = {};
+    for(let roleID in currentChatRoles){
+        let priority = Number(JSON.parse(currentChatRoles[roleID])["priority"]);
+        if(priority<0)priority=0;
+        if(!roleOrder[priority])roleOrder[priority]=[];
+        roleOrder[priority].push(roleID);
+    }
+}
+
 function hideMenus(){
     $("#chat-select").addClass("hide").removeClass("show");
     $("#user-list").addClass("hide").removeClass("show");
@@ -210,35 +239,124 @@ function hide(elm){
         });
 }
 
-function updateGlobalChatSettings(){
-    let name = ""+$('#chat-name-settings').val();
-    let desc = ""+$('#chat-description-settings').val();
-    let isPublic = ""+document.getElementById("is-public-settings").checked;
-    let catagory = ""+$("#public-catagory-settings").val();
-    let isMaintainance = ""+document.getElementById("in-maintainance-settings").checked;
-    let maintainanceMessage = ""+$("#maintainance-message-content-settings").val();
-    let maintainers = "";
-    let area = $('#maintainance-whitelist-names');
-    for(let i = 0; i < i+1;i++){
-        let child = area.children().eq(i);
-        if(!child)break;
-        if(!child.attr("id"))break;
-        let id = child.attr("id").split("-")[0];
-        maintainers+=id+";";
-    }
-    let isJoinMessage = ""+document.getElementById("join-message-enabled-settings").checked;
-    let joinMessage = ""+$("#join-message-content-settings").val();
-    let joinMessageChannel = ""+$("#join-message-channel-settings").val();
-    let channelData = currentChatData["channels"];
+function updateGlobalChatSettings() {
 
-    let json = {"username":read("username"), "token":read("token"), "data":"edit", "type":"server-global", "chat-id":currentChatID,
-        "name":name, "desc":desc, "pub":isPublic, "cat":catagory, "closed":isMaintainance,
-        "maintainaners":JSON.stringify(maintainers), "is-join-msg":isJoinMessage, "join-msg": joinMessage,
-        "join-msg-channel": joinMessageChannel, "maintainance-message":maintainanceMessage, "channels":channelData};
+    if ($('#chat-icon-upload-preview').attr('src').includes('data:image')) {
+        let fileInput = document.getElementById('chat-icon-file-upload');
+        let file = fileInput.files[0];
+        if(file.size>500000){
+            fileInput.value=""
+            let size = (file.size/1000)+"";
+            if(size.includes('.')){size = size.split('.')[0]+'.'+size.split('.')[1][0];}else{size=size+'.0';}
+            message("Max Size: 500kB.  Sorry!<br><h6>(Your file is "+size+"kB)</h6>");
+            saveGlobalChatSettings();
+            return;
+        }
+        event.preventDefault();
+        message("Uploading File...")
+        setTimeout(function () {
+            let formData = new FormData();
+            formData.append('file', file);
+            fileInput.value="";
+            $.ajax({
+                url: 'https://eiennochat.uk/FileUploadServlet/FileUpload',
+                type: 'POST',
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                headers: {
+                    "username":read("username"),
+                    "token":read("token"),
+                    "user-id":read("id"),
+                    "chat-id":currentChatID
+                },
+                success: function (returnData) {
+                    saveGlobalChatSettings(returnData);
+                },
+                error: function () {
+                    saveGlobalChatSettings();
+                    message("Unable to upload file")
+                }
+            });
+        }, 5);
+    } else {
+        saveGlobalChatSettings();//search for globby
+    }
+}
+function saveGlobalChatSettings(imgUrl){
+    let json = {"username":read("username"), "token":read("token"), "data":"edit", "type":"server-global", "chat-id":currentChatID}
+    if(isAdmin || permissions.includes("manager")) {
+        let name = "" + $('#chat-name-settings').val();
+        let desc = "" + $('#chat-description-settings').val();
+        let isPublic = "" + document.getElementById("is-public-settings").checked;
+        let catagory = "" + $("#public-catagory-settings").val();
+        let isJoinMessage = ""+document.getElementById("join-message-enabled-settings").checked;
+        let joinMessage = ""+$("#join-message-content-settings").val();
+        let joinMessageChannel = ""+$("#join-message-channel-settings").val();
+        let channelData = currentChatData["channels"];
+        let roleData = JSON.stringify(currentChatRoles);
+        if (editing) {
+            let area = $('.edit-channel-input').parent().parent();
+            updateChatChannels(area);
+        }
+        editing = false;
+        json["name"]=name;
+        json["desc"]=desc;
+        if(imgUrl){
+            json["icon"]=imgUrl;
+        }
+        json["pub"]=isPublic;
+        json["cat"]=catagory;
+        json["is-join-msg"]=isJoinMessage;
+        json["join-msg"]=joinMessage;
+        json["join-msg-channel"]=joinMessageChannel;
+        json["channels"]=channelData;
+        json["roles"]=roleData;
+}
+
+    if(isAdmin || permissions.includes("maintainer")){
+        let isMaintainance = ""+document.getElementById("in-maintainance-settings").checked;
+        let maintainanceMessage = ""+$("#maintainance-message-content-settings").val();
+        let maintainers = "";
+        let area = $('#maintainance-whitelist-names');
+        for(let i = 0; i < i+1;i++){
+            let child = area.children().eq(i);
+            if(!child)break;
+            if(!child.attr("id"))break;
+            let id = child.attr("id").split("-")[0];
+            maintainers+=id+";";
+        }
+        json["closed"]=isMaintainance;
+        json["maintainance-message"]=maintainanceMessage;
+        json["maintainaners"]=JSON.stringify(maintainers);
+    }
 
     popup = document.getElementById("chat-settings-popup-global");
     send(json, popupReply);
 }
+function selectRoleIcon(src){
+    $('.role-icon-edit').attr('src',src);
+    toggleRoleIconList()
+}
+
+let preventRoleIconToggle = false;
+function toggleRoleIconList(option){
+    if(!option)option = '';
+    let list = $('.edit-role-icon-list');
+    if(preventRoleIconToggle)return
+    if(list.css('display').includes('none')){
+        if(option==='hide')return;
+        list.css('display','block');
+    }else{
+        if(option==='show')return;
+        list.css('display','none');
+    }
+    preventRoleIconToggle=true;
+    setTimeout(function () {preventRoleIconToggle=false;}, 10);
+}
+
 function popupReply(data){
     if(invalid(data))return;
     hide(popup);
@@ -345,11 +463,70 @@ function saveSettings(id) {
         j2 = {"new-name":$('#user-setting-val').val(), "new-email": $('#email-setting-val').val(),
             "new-pass": $('#pass-new-setting-val').val(), "current-pass": $('#pass-old-setting-val').val()}
     }else if(id==2){
-        j2 = {"email-notifs":$('#email-notif-setting-val').prop("checked")+"", "scan": $('input[name=scanner]:checked', '#scanners').val()+""}
+        if($('#user-icon-upload-preview').attr('src').includes('data:image')){
+            let fileInput = document.getElementById('user-icon-file-upload');
+            let file = fileInput.files[0];
+            if(file.size>500000){
+                fileInput.value=""
+                let size = (file.size/1000)+"";
+                if(size.includes('.')){size = size.split('.')[0]+'.'+size.split('.')[1][0];}else{size=size+'.0';}
+                message("Max Size: 500kB.  Sorry!<br><h6>(Your file is "+size+"kB)</h6>");
+                j2 = {"email-notifs":$('#email-notif-setting-val').prop("checked")+"", "scan": $('input[name=scanner]:checked', '#scanners').val()+""}
+                message("Unable to upload file")
+                for(let key in j2){
+                    json[key]=j2[key];
+                }
+                send(json, handleSettingSave);
+                return;
+            }
+            event.preventDefault();
+            message("Uploading File...")
+            setTimeout(function () {
+                let json = {"username":read("username"), "token":read("token"), "data":"edit", "type":"settings"+id};
+                let formData = new FormData();
+                formData.append('file', file);
+                fileInput.value="";
+                $.ajax({
+                    url: 'https://eiennochat.uk/FileUploadServlet/FileUpload',
+                    type: 'POST',
+                    data: formData,
+                    async: false,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    headers: {
+                        "username":read("username"),
+                        "token":read("token"),
+                        "user-id":read("id"),
+                        "chat-id":currentChatID
+                    },
+                    success: function (returnData) {
+                        j2 = {"email-notifs":$('#email-notif-setting-val').prop("checked")+"", "scan": $('input[name=scanner]:checked', '#scanners').val()+"", "icon":returnData}
+                        for(let key in j2){
+                            json[key]=j2[key];
+                        }
+                        send(json, handleSettingSave);
+
+                    },
+                    error: function () {
+                        j2 = {"email-notifs":$('#email-notif-setting-val').prop("checked")+"", "scan": $('input[name=scanner]:checked', '#scanners').val()+""}
+                        message("Unable to upload file")
+                        for(let key in j2){
+                            json[key]=j2[key];
+                        }
+                        send(json, handleSettingSave);
+                    }
+                });
+            }, 5);
+            return;
+        }else{
+            j2 = {"email-notifs":$('#email-notif-setting-val').prop("checked")+"", "scan": $('input[name=scanner]:checked', '#scanners').val()+""}
+        }
     }
     for(let key in j2){
         json[key]=j2[key];
     }
+    console.log(json)
     send(json, handleSettingSave);
 }
 
@@ -432,12 +609,122 @@ function handleGenInviite(data){
     $("#invite-link-settings").val("https://"+(window.location.href+"/join/#").split("://")[1].split("//").join("/")+data["code"]);
 }
 
+function updateChatSettings(){
+    let notifList = read("chatNotifs");
+    let selected = "";//all that are muted
+    if(!notifList){
+        notifList = {}
+    }else{
+        notifList = JSON.parse(notifList);
+    }
+    if($('input[value="chat"]').prop('checked')){
+        selected+='chat;';
+        let unread = JSON.parse(read("unread"));
+        if(unread[currentChatID]){
+            let tot = Number(JSON.parse(unread[currentChatID])["total"]);
+            unread[isdm] = Number(unread[isdm])-tot;
+            delete unread[currentChatID];
+        }
+        save("unread", JSON.stringify(unread));
+        messageStore = unread;
+        reorderChats();
+    }
+    if($('input[value="everyone"]').prop('checked')){
+        selected+='everyone;';
+    }
+    if($('input[value="username"]').prop('checked')){
+        selected+='username;';
+    }
+    let raw = JSON.parse(currentChatData["channels"]);
+    let order = asList(raw.order);
+    for (let i = 0; i < order.length; i++) {
+        if (typeof order[i] == "object") {
+            for (let ii = 0; ii < order[i].length; ii++) {
+                if($('input[value="'+order[i][ii]+'"]').prop('checked')){
+                    selected+=order[i][ii]+';';
+                    updateChannelUnreads(order[i][ii], 0, true, isdm, currentChatID);
+                }
+            }
+        } else {
+            if(!(typeof order[i+1] == "object")) {
+                if($('input[value="'+order[i]+'"]').prop('checked')){
+                    selected+=order[i]+';';
+                    updateChannelUnreads(order[i], 0, true, isdm, currentChatID);
+                }
+            }
+        }
+    }
+    notifList[currentChatID]=selected;
+    notifList=JSON.stringify(notifList);
+    save("chatNotifs", notifList);
+    let json = {"username":read("username"), "token":read("token"), "data":"edit", "type":"server-personal", "chat-id":currentChatID,
+        "muted":notifList, "is_dm":isdm+""};
+
+    popup = document.getElementById("chat-settings-popup");
+    send(json, popupReply);
+
+}
+
+function chat_settings_popup(){
+    let area = $('#chat-settings');
+    area.html("");
+    let raw = JSON.parse(currentChatData["channels"]);
+    let order = asList(raw.order);
+    let notifList = read("chatNotifs");
+    let selected = [];//all that are muted
+    if(notifList){
+        notifList = JSON.parse(notifList);
+        if(notifList[currentChatID]){
+            selected = notifList[currentChatID].split(';');
+        }
+    }
+
+    area.append(`<div class="container"><br>
+<div>Mute Entire Chat<input type="checkbox" ${selected.contains("chat")?"checked":""} value="chat"></div>
+<div>Mute @everyone pings<input type="checkbox" ${selected.contains("everyone")?"checked":""} value="everyone"></div>
+<div>Mute @${read('username')} pings<input type="checkbox" ${selected.contains("username")?"checked":""} value="username"></div>
+</div><br>`)//TODO ? boxes for help maybe
+    area.append('<div class="container"><div class="scrollable" id="list-muted-channels" style="border: solid 1px black"></div></div>')
+
+    let list = $('#list-muted-channels');
+    list.append(`<div><u>Mute Specific Channels (overridden by the 'Mute Entire Chat' Setting)</u></div><br>`);
+    for (let i = 0; i < order.length; i++) {
+        if (typeof order[i] == "object") {
+            for (let ii = 0; ii < order[i].length; ii++) {
+                let d1 = JSON.parse(JSON.parse(raw["data"])[order[i][ii]]);
+                list.append(`<div class="channel-list" style="left:60px">${d1["name"]}<input type="checkbox" ${selected.contains(order[i][ii]+'')?"checked":""} value="${order[i][ii]}"></div>`);
+            }
+        } else {
+            if(!(typeof order[i+1] == "object")) {
+                let d1 = JSON.parse(JSON.parse(raw["data"])[order[i]]);
+                list.append(`<div class="channel-list" style="left:20px">${d1["name"]}<input type="checkbox" ${selected.contains(order[i]+'')?"checked":""} value="${order[i]}"></div>`);
+            }else{
+                let d1 = JSON.parse(JSON.parse(raw["data"])[order[i]]);
+                list.append(`<div class="channel-list" style="left:20px"><i>${d1["name"]}</i><!--<input type="checkbox" ${selected.contains(order[i]+'')?"checked":""} value="${order[i]}">--></div>`);
+            }
+        }
+    }
+}
+
+Array.prototype.contains = function(obj){
+    return !(this.indexOf(obj)==-1)
+}
+function showImg(inputElm, outputElm) {
+    if (inputElm.files && inputElm.files[0]) {
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            outputElm.attr('src', e.target.result);
+        }
+        reader.readAsDataURL(inputElm.files[0]);
+    }
+}
+
 function chat_settings_popup_global(){
     let area = $('#chat-settings-global');
     area.html("");
     let chatData = JSON.parse(JSON.parse(read("chats"))[currentChatID]);
     let chatSettings = JSON.parse(currentChatData["settings"]);
-    let admin = read("username")===chatData["owner"];
+    let admin = isAdmin;
 
     let textChannels = "";
     let raw = JSON.parse(currentChatData["channels"]);
@@ -457,7 +744,7 @@ function chat_settings_popup_global(){
             }
         }
     }
-    if(admin) {// or manager
+    if(admin || permissions.includes("manager")) {
         area.append(`
                 <div class="container">
                     <div class="setting-text" id="chat-name-settings-text">Change Name:</div>
@@ -468,10 +755,22 @@ function chat_settings_popup_global(){
                     <div class="setting-text" id="chat-description-settings-text">Change Description:</div>
                     <textarea class="input-field-dark" id="chat-description-settings" maxlength="128">${chatData["desc"]}</textarea>
                 </div>
+                <div class="container" style="height:70px">
+                    <label>
+                        Edit Chat Icon: <img id="chat-icon-upload-preview" style="left: 110px;" src="${JSON.parse(JSON.parse(read("chats"))[currentChatID])["icon"]}" class="chats-list-icon"/>
+                        <form style="position: absolute;left: -1000000px;" class="uploadChatFile">
+                            <input type="file" class="file" id="chat-icon-file-upload" name="myfile" accept="image/*">
+                        </form>
+                    </label>
+                </div>
 `)
+        $("#chat-icon-file-upload").change(function() {
+            showImg(this, $('#chat-icon-upload-preview'));
+        });
+
     }
 
-    if(admin){//or create invites
+    if(admin|| permissions.includes("create_invites")){//or create invites
         //TODO create invites
         area.append(`
                 <div class="container">
@@ -481,7 +780,7 @@ function chat_settings_popup_global(){
 `);
     }
     //TODO add manage invites
-    if(admin) {//or manager
+    if(admin || permissions.includes("manager")) {//or manager
 
         area.append(`
                 <div class="container">
@@ -533,7 +832,7 @@ function chat_settings_popup_global(){
 
 `)
     }
-    if(admin){//or maintainer
+    if(admin || permissions.includes("maintainer")){//or maintainer
         area.append(`
                 <div class="container">
                     <div class="setting-text" id="in-maintainance-settings-text">Maintainance Mode</div>
@@ -583,27 +882,37 @@ function chat_settings_popup_global(){
                             <div style="top:20px;height:245px" class="container scrollable" id="channel-list-setting-edit">
                                 <!--channels go here-->
                             </div>
-                            <button class="btn-cancel btn-blue" onclick="createNew('catagory')">Create new catagory</button>
-                            <button class="btn-left btn-true" onclick="createNew('channel')">Create new channel</button>
+                            <button id="create-new-cat" class="btn-cancel btn-blue" onclick="createNew('catagory')">Create new catagory</button>
+                            <button id="create-new-chan" class="btn-left btn-true" onclick="createNew('channel')">Create new channel</button>
                         </div>
                         <div id="rank-list-settings" class="scrollable">
-                            <div class="title">Ranks</div>
-                            <div style="top:20px" class="container" id="channel-rank-setting-edit">
+                            <div class="title">Roles</div>
+                            <div class="subtitle">Give users roles by clicking 'admin' on their profile</div>
+                            <div style="top:20px;max-height: 240px;" class="container scrollable" id="channel-role-setting-edit">
                                 <!--ranks go here-->
                             </div>
+                            <button id="new-role-btn" class="btn-cancel btn-true" onclick="editRole('new')">Create new role</button>
                         </div>
                         <!--left is ranks, right is channels-->
                     </div>
                 </div>
 `);
-    let ranks = $('#channel-rank-setting-edit');
-    ranks.append(`<div class="title">Sorry!  We underestimated the time it would take to make this, and it is not here yet.<br>Don't worry though!  It will be coming out as soon as it's ready, regardless of whether the next full update is complete.</div>`)
+    let roles = $('#channel-role-setting-edit');
+    if(!admin && !permissions.includes("manager")){//and can't edit ranks
+        roles.html("");
+        roles.append(`<div class="title" style="display: contents">You do not have permission to change the chats role</div>`)
+        roles.parent().css("text-align","center");
+        $('#new-role-btn').remove();
+    } else {
+        refreshRoles();
+    }
+
     let channelArea = $('#channel-list-setting-edit');
-    // channelArea.append(`<div class="title">Sorry!  We underestimated the time it would take to make this, and it is not here yet.<br>Don't worry though!  It will be coming out as soon as it's ready, regardless of whether the next full update is complete.</div>`)
-    //
     channelArea.html("");
-    if(!admin){//and can't edit chats
+    if(!admin && !permissions.includes("manager")){//and can't edit chats
         channelArea.append(`<div class="title">You do not have permission to change the chats channels</div>`)
+        $('#create-new-chan').remove();
+        $('#create-new-cat').remove();
     }else {
         raw = JSON.parse(currentChatData["channels"]);
         let order = asList(raw.order);
@@ -621,7 +930,6 @@ function chat_settings_popup_global(){
         }
         // console.log(channels);
     }
-    if(admin){
         area.append(`
                 <div class="container">
                     <div class="setting-text" id="user-search-settings-text">User Settings:</div>
@@ -634,14 +942,115 @@ function chat_settings_popup_global(){
                     <div id="user-settings"></div>
                 </div>
         `)
+
+//     if(!admin){//or any other perms
+//         area.prepend(`
+//                 <div class="container">
+//                     <div class="subtitle">You must be an [ADMIN] or have specific permissions to edit the global chat settings</div>
+//                 </div>
+// `);
+//     }
+}
+let currentEditingRole = 0;
+function editRole(role){
+    if(role === 'new'){
+        let roleID = new Date().getTime()+"";
+        let data = {"name":"New Role","colour":"#aedaff","icon":"","permissions":"history;file_upload;create_invites;ping_everyone;","priority":"0"};
+        currentChatRoles[roleID] = JSON.stringify(data);
+        role = roleID;
+        //create default role && save
+        //role = new id
     }
-    if(!admin){//or any other perms
-        area.prepend(`
-                <div class="container">
-                    <div class="subtitle">You must be an [ADMIN] or have specific permissions to edit the global chat settings</div>
-                </div>
+    //load role
+    let roleData = (currentChatRoles[role]);
+    if(!roleData){//default/ everyone role
+        roleData={}
+        roleData["colour"] = '#aedaff';
+        roleData["name"] = 'Everyone';
+        roleData["priority"] = '0';
+        roleData["permissions"] = 'history;file_upload;create_invites;ping_everyone;';
+        roleData["icon"] = "";
+    }else{
+        roleData = JSON.parse(roleData);
+    }
+    let colour = roleData["colour"];
+    let name = roleData["name"];
+    let priority = roleData["priority"];
+    let perms = roleData["permissions"].split(';');
+    let icon = roleData["icon"];
+    let invisible = roleData["invisible"];
+
+    window.jscolor = null;
+    $('.role-colour-edit').attr('value',colour).attr('content',colour).css('background-color', colour);
+    //reset all values
+    $('.role-perm-edit').html(`
+                        <label class="role-permission role-perm-checkbox">Admin<input id="admin_perm" type="checkbox"/><span class="checkmark"></span></label>
+                        <label class="role-permission role-perm-checkbox">Manager<input id="manager_perm" type="checkbox"/><span class="checkmark"></span></label>
+                        <label class="role-permission role-perm-checkbox">Maintainer<input id="maintainer_perm" type="checkbox"/><span class="checkmark"></span></label>
+                        <label class="role-permission role-perm-checkbox">Ban<input id="ban_perm" type="checkbox"/><span class="checkmark"></span></label>
+                        <label class="role-permission role-perm-checkbox">Kick<input id="kick_perm" type="checkbox"/><span class="checkmark"></span></label>
+                        <label class="role-permission role-perm-checkbox">Create Invites<input id="create_invites_perm" type="checkbox"/><span class="checkmark"></span></label>
+                        <label class="role-permission role-perm-checkbox">View History<input id="history_perm" type="checkbox"/><span class="checkmark"></span></label>
+                        <!--<label class="role-permission role-perm-checkbox">Upload Files<input id="file_upload_perm" type="checkbox"/><span class="checkmark"></span></label>-->
+                        <label class="role-permission role-perm-checkbox">Use @eveyone and @all<input id="ping_everyone_perm" type="checkbox"/><span class="checkmark"></span></label>
+                        <script src="jscolor.js"></script>
 `);
+    for(let i=0; i<perms.length;i++){
+        let perm = perms[i];
+        if(!perm)continue;
+        $('#'+perm+"_perm").prop('checked', true);
     }
+    if(invisible){
+        $('#role-edit-invisible').prop('checked', true);
+    }else{
+        $('#role-edit-invisible').prop('checked', false);
+    }
+    $('.role-icon-edit').attr("src",icon);
+    $('#role-name').val(name);
+    $('.role-priority-edit').val(priority);
+    currentEditingRole = role;
+    show(document.getElementById('chat-settings-edit-role'));
+}
+function saveRole(){
+    let roleData = {};
+    roleData["colour"] = $('.role-colour-edit').css('background-color');
+    roleData["name"] = $('#role-name').val();
+    roleData["priority"] = $('.role-priority-edit').val();
+    roleData["icon"] = $('.role-icon-edit').attr('src');
+    roleData["invisible"] = $('#role-edit-invisible').prop('checked');
+    let perms = ['admin','manager','maintainer','ban','kick','create_invites','history','file_upload','ping_everyone'];
+    let permissions = "";
+    for(let i=0;i<perms.length;i++){
+        let perm = perms[i];
+        if(perm==="file_upload")continue;
+        if($('#'+perm+"_perm").prop('checked'))
+            permissions += (perm+';');
+
+    }
+    roleData["permissions"]=permissions;
+
+    currentChatRoles[currentEditingRole] = JSON.stringify(roleData);
+    hide(document.getElementById('chat-settings-edit-role'));
+    refreshRoles();
+}
+function deleteRole(){
+    delete currentChatRoles[currentEditingRole];
+    hide(document.getElementById('chat-settings-edit-role'));
+    refreshRoles();
+}
+function refreshRoles() {
+    let roles = $('#channel-role-setting-edit');
+    roles.html("");
+    reOrderRoles();
+    for (let priority in roleOrder) {
+        for(let i=0;i<roleOrder[priority].length;i++){
+            let roleID = roleOrder[priority][i];
+            roles.prepend(`<div onclick="editRole('${roleID}')"><b style="color:${JSON.parse(currentChatRoles[roleID])["colour"]}">${JSON.parse(currentChatRoles[roleID])["name"]}</b></div>`);
+        }
+    }
+    if (!currentChatRoles["everyone"])
+        roles.append(`<div onclick="editRole('everyone')">@Everyone</div>`);
+
 }
 
 function openHelpTag(message){
@@ -760,6 +1169,9 @@ function createNew(type){
     let order = asList(raw["order"]);
     channels = order;
     rerenderEditChats();
+    let scrollArea = $('#custom-status-popups');
+    let height = scrollArea[0].scrollHeight;
+    scrollArea.scrollTop(height);
 }
 
 function editChannels(area) {
@@ -767,7 +1179,7 @@ function editChannels(area) {
     editing = true;
     let name = area.attr("title");
     area.attr("onclick", null);
-    area.children().filter("b").html(`<input class="edit-channel-input" value="${name}"/><div class="move-up arrow-up" onclick="moveChannel('${area.attr("id")}', -1)"></div><div class="done" onclick="updateChatChannels($('#${area.attr("id")}'))">Done</div><div class="move-down arrow-down" onclick="moveChannel('${area.attr("id")}', 1)"></div>`)
+    area.children().filter("b").html(`<input class="edit-channel-input" value="${name}" maxlength="20"/><div class="move-up arrow-up" onclick="moveChannel('${area.attr("id")}', -1)"></div><div class="done" onclick="updateChatChannels($('#${area.attr("id")}'))">Done</div><div class="move-down arrow-down" onclick="moveChannel('${area.attr("id")}', 1)"></div>`)
 }
 function updateChatChannels(area){
     let raw = JSON.parse(currentChatData["channels"]);
@@ -1036,8 +1448,8 @@ function openSettings() {
     let id = settings["scan-id"];
     id=(id==null?"1":id);
     $('.scanner-settings-val').filter('[value="'+id+'"]').prop("checked", true);
+    $('#user-icon-upload-preview').attr('src',read("avitar"));
 }
-
 
 function friends(){
     // showUserMenu('#browse-chat-list');
@@ -1122,26 +1534,33 @@ function setUserList(type){
         let text_content = status < 4 ? defaultNames[status] : JSON.parse(online["names"])[user];
         text.css("color", col);
         text.html(text_content);
+        elm.append(`<div class="btn-blue settings-profile" id="settings-profile-${user}" onclick="showProfileSettings('settings-profile-${user}')">Settings v</div><div id="settings-profile-${user}-content" class="profile-content settings-profile-content" style="visibility: hidden"></div>`);
+        let settings = $('#settings-profile-'+user+'-content');
+        if(JSON.parse(read("friends"))[user]){
+            settings.append(`<button class="btn-blue profile-button-extended" id="friend" onclick="user('friend', false, '${user}')">Remove Friend</button>`);
 
-        if (JSON.parse(read("friends"))[user]) {
-            elm.append(`<button class="btn-blue" id="friend" onclick="user('friend', false, '${user}')">Remove Friend</button>`);
-        } else {
-            if(type==="pending"){
-                elm.append(`<button class="btn-blue" id="no-friend" onclick="user('deny', true, '${user}')">Don't Add</button>`);
+            if(JSON.parse(read("close"))[user]){
+                settings.append(`<button class="btn-blue profile-button-extended" id="close-friend" onclick="user('close-friend', false, '${user}')">Remove Close Friend</button>`);
+            }else{
+                settings.append(`<button class="btn-blue profile-button-extended" id="close-friend" onclick="user('close-friend', true, '${user}')">Add Close Friend</button>`);
             }
-            elm.append(`<button class="btn-blue" id="friend" onclick="user('friend', true, '${user}')">Add Friend</button>`);
+
+        }else{
+            if(type==="pending"){
+                settings.append(`<button class="btn-blue profile-button-extended" id="friend" onclick="user('friend', true, '${user}')">Add Friend</button>`);
+                settings.append(`<button class="btn-blue profile-button-extended" onclick="user('deny', true, '${user}')">Don't Add</button>`);
+            }else if(type==="outgoing"){
+                settings.append(`<button class="btn-blue profile-button-extended" onclick="user('deny', true, '${user}')">Cancel Friend Request</button>`);
+            }else{
+                settings.append(`<button class="btn-blue profile-button-extended" id="friend" onclick="user('friend', true, '${user}')">Add Friend</button>`);
+            }
         }
-        if (JSON.parse(read("close"))[user]) {
-            elm.append(`<button class="btn-blue" id="close-friend" onclick="user('close-friend', false, '${user}')">Remove Close Friend</button>`);
-        } else {
-            elm.append(`<button class="btn-blue" id="close-friend" onclick="user('close-friend', true, '${user}')">Add Close Friend</button>`);
+        if(JSON.parse(read("blocked"))[user]){
+            settings.append(`<button class="btn-blue profile-button-extended" id="blocked" onclick="user('block', false, '${user}')">Unblock User</button>`);
+        }else{
+            settings.append(`<button class="btn-blue profile-button-extended" id="blocked" onclick="user('block', true, '${user}')">Block User</button>`);
         }
-        if (JSON.parse(read("blocked"))[user]) {
-            elm.append(`<button class="btn-blue" id="blocked" onclick="user('block', false, '${user}')">Unblock User</button>`);
-        } else {
-            elm.append(`<button class="btn-blue" id="blocked" onclick="user('block', true, '${user}')">Block User</button>`);
-        }
-        elm.append(`<button class="btn-blue" id="start-dm" onclick="createNewDM('${user}')">Start DM</button>`);
+        elm.append(`<button class="btn-blue" id="start-dm" onclick="createNewDM('${user}')">DM</button>`);
     }
     if(type === "pending"){setUserList("outgoing")}
 }
@@ -1174,10 +1593,18 @@ function userMenuButton(button){
     $(button).removeClass("btn-100-off-br").addClass("btn-100-br-selected");
 }
 
+function resendEmailVerif(){
+    if(read("email-verif")==="true") return message("Email Already Verified.");
+    let json = {"data":"verifyEmail", "sub":"newKey", "username": read("username")};
+    send(json, displayMessage);
 
+}
+function displayMessage(data){
+    message(data["message"]);
+}
 function requestData(data){
     if(!data){
-        data = "chats;dms;avitar;friends;close;blocked;online;settings;id;pending;outgoing;email;unread;";
+        data = "chats;dms;avitar;friends;close;blocked;online;settings;id;pending;outgoing;email;unread;email-verif;mentions;";
     }
     let json = {"username":read("username"), "token":read("token"), "data":"request", "requests":data};
     send(json, handleRequest);
@@ -1201,8 +1628,6 @@ function handleRequest(data){
     userChatMethod();
 
     setDropDownData();
-
-
 }
 
 function setDropDownData(){
@@ -1285,9 +1710,11 @@ function setDropDownData(){
     data = JSON.parse(read("blocked"));
     for(let id in data) {
         if(count >= 9) break;
-        userDropDown(id, data, this.blocked, blocked);
+        userDropDown(id, data, blocked, this.blocked);
         count++;
     }
+    if(viewingProfile)
+        openProfile(JSON.parse(currentChatUsers[viewingProfile+""])["username"], ""+viewingProfile);
 }
 
 function userDropDown(id, data, area, menu, text){
@@ -1302,12 +1729,13 @@ function userDropDown(id, data, area, menu, text){
     }else{
         col = '#' + col;
     }
-
+    let displayRank = userData["display-rank"];
+    if(displayRank==="everyone" && !currentChatRoles["everyone"])displayRank="";
     area.append(`<div class="chat-user" id="${id}" onclick="showUserList(${menu});//openProfile('${userData["username"]}', ${"'" + id + "'"})">
                                     <div class="chat-user-pp" style="background-image: url(${userData["avitar"]})"></div>
                                     <div class="chat-user-online" style="background-color: ${col}"></div>
-                                    <div class="chat-user-name">${userData["username"]}
-                                    ${(userData["display-rank"]) ? `${!JSON.parse(currentChatRoles[userData["display-rank"]])["icon"] ? `` : `<div class="chat-user-icon" style="url(${JSON.parse(currentChatRoles[userData["display-rank"]])["icon"]})"></div>`}` : ``}</div>
+                                    <div class="chat-user-name" style="color: ${(displayRank) ? JSON.parse(currentChatRoles[userData["display-rank"]])["colour"]:"black"}">${userData["username"]}
+                                    ${(displayRank) ? `${!JSON.parse(currentChatRoles[userData["display-rank"]])["icon"] ? `` : `<div class="chat-user-icon" style="background-image:url(${JSON.parse(currentChatRoles[userData["display-rank"]])["icon"]})"></div>`}` : ``}</div>
                                     <!--</div>-->
                                     <div class="chat-user-status">${text}</div>
                                     </div>`);
@@ -1388,7 +1816,7 @@ function createChatLoad() {
     switchChat(currentChatID, create_dm);
     hide(document.getElementById('create-chat'));
 }
-
+//search for me
 function switchChat(chatID, dm){
     oldest = 0;
     if(cancelOpen){
@@ -1397,31 +1825,128 @@ function switchChat(chatID, dm){
     }
     isdm = dm;
     currentChatID = chatID+"";
-    if(!messageStore[currentChatID]){
 
-    }else {
-        let amount = messageStore[isdm];
-        amount -= messageStore[currentChatID];
-        messageStore[isdm] = amount;
-    }
-    messageStoreDisply();
-
-    messageStore[currentChatID]="";
+    // messageStore[currentChatID]="";
     safeClose();
     let json = {"username":read("username"), "token":read("token"), "data":"request", "requests":"chat-data", "chatID": ""+chatID, "isdm":""+dm};
     getChatMsgs = true;
     send(json, handleOpenChat);
 }
-
 function messageStoreDisply() {
-    let dms = messageStore["true"];
-    let chats = messageStore["false"];
+    let dms = Number(!messageStore["true"]?0:messageStore["true"]);
+    let chats = Number(!messageStore["false"]?0:messageStore["false"]);
+    let m = read("mentions");
+    if(!m)m="{}";
+    m=JSON.parse(m);
+    let pings = m['false'];
+    if(!pings)pings = "0";
+    let col = Number(pings)>0?'#971c20':'#c5b6b6';
 
-    $('#chat-select-button-count').html(chats);
-    $('#chat-button-count').html(chats);
+    $('#chat-select-button-count').html(chats).css('background-color',col);
+    $('#chat-button-count').html(chats).css('background-color',col);
+    pings = m['true'];
+    if(!pings)pings = "0";
+    col = Number(pings)>0?'#971c20':'#c5b6b6';
+    $('#dm-select-button-count').html(dms).css('background-color',col);
+    $('#dm-button-count').html(dms).css('background-color',col);
+}
+function saveChatUnreadData(channelID, chatID, amount, set){
+    let toParse = messageStore[chatID];
+    if(!toParse)toParse="{}";
+    let chatUnreads = JSON.parse(toParse);
+    let total = Number(chatUnreads["total"]);
+    let channelUnread = Number(chatUnreads[channelID]);
+    if(!total)total = 0;
+    if(!channelUnread)channelUnread = 0;
 
-    $('#dm-select-button-count').html(dms);
-    $('#dm-button-count').html(dms);
+    if(set) {
+        total -= channelUnread;
+        channelUnread = amount;
+        total += amount;
+    } else {
+        channelUnread += amount;
+        total += amount;
+    }
+
+    if(set && amount == 0){
+        let m = read("mentions");
+        if(!m)m="{}";
+        m=JSON.parse(m);
+        let pings = m[channelID];
+        if(pings) {
+            pings = Number(pings);
+            m[chatID] = ""+Number(m[chatID])-pings;
+            m[isdm] = ""+Number(m[isdm])-pings;
+            m[channelID] = "0";
+            save("mentions", JSON.stringify(m));
+        }
+    }
+
+    chatUnreads["total"] = total;
+    chatUnreads[channelID] = channelUnread;
+    messageStore[chatID] = JSON.stringify(chatUnreads);
+    if(total==0)messageStore[chatID] = "";
+}
+function updateChannelUnreads(chan, amount, set, isDm, chat){
+    //if the channel or chat is muted, return;
+    let notifList = read("chatNotifs");
+    if(notifList){
+        notifList = JSON.parse(notifList);
+        if(notifList[chat]){
+            if(notifList[chat].split(';').contains(chan)){
+                amount = 0;
+                set=true;
+            }
+            if(notifList[chat].split(';').contains("chat")){
+                amount = 0;
+                set=true
+            }
+        }
+    }
+    saveChatUnreadData(chan, chat, amount, set);
+    let cat = $('#'+$('#'+chan).parents().attr('id')+'-unread-count');
+    let chanUnread = $('#'+chan+'-unread-count');
+    let catAmm = Number(cat.html());
+    let chanAmm = Number(chanUnread.html());
+    let mainAmm = Number(messageStore[isDm]);
+    if(!mainAmm)mainAmm = 0;
+    if(isNaN(chanAmm))chanAmm=0;
+    if(isNaN(catAmm))catAmm=0;
+
+    if(set) {
+        catAmm -= chanAmm;
+        mainAmm -= chanAmm;
+        chanAmm = amount;
+        catAmm += amount;
+        mainAmm += amount;
+    } else {
+        chanAmm += amount;
+        catAmm += amount;
+        mainAmm += amount;
+    }
+    cat.html(catAmm);
+    chanUnread.html(chanAmm);
+    messageStore[isDm] = mainAmm;
+
+    let m = read("mentions");
+    if(!m)m="{}";
+    m=JSON.parse(m);
+    let pings = m[chan];
+    if(!pings)pings = "0";
+    let col = Number(pings)>0?'#971c20':'#b6988e';
+
+    if(chanAmm==0 || cat.css("opacity")==="1"){
+        chanUnread.css("opacity","0").css('background-color',col);
+    }else{
+        chanUnread.css("opacity","1").css('background-color',col);
+    }
+    if(catAmm==0 || cat.css("opacity")==="0"){
+        cat.css("opacity","0").css('background-color',col);
+    }else{
+        cat.css("opacity","1").css('background-color',col);
+    }
+    messageStoreDisply();
+    reorderChats();
 }
 
 function updateChatUser(id, userData){
@@ -1431,13 +1956,14 @@ function updateChatUser(id, userData){
         currentChatUsers[id + ""] = JSON.stringify(save);
     }catch(err){
         currentChatUsers[id + ""] = JSON.stringify(userData);
-        userData = JSON.parse(currentChatUsers[id + ""]);
     }
+    setUsersDisplayRanks();
+    userData = JSON.parse(currentChatUsers[id + ""]);
     let area_to_add_user;
     let online = JSON.parse(userData["online"]);
     if(online["is_online_now"]==="true"){
-        let rank = userData["display-rank"];
-        if(!rank){
+        let rank = userData["side-rank"];
+        if(!rank || rank==="everyone"){
             area_to_add_user = $('#online');
         }else{
             area_to_add_user = $('#'+rank);
@@ -1457,13 +1983,14 @@ function updateChatUser(id, userData){
     }else{
         col = '#'+col;
     }
+    let displayRank = userData["display-rank"];
+    if(displayRank==="everyone" && !currentChatRoles["everyone"])displayRank="";
 
     area_to_add_user.append(`<div class="chat-user" id="${id}" onclick="openProfile('${userData["username"].split("'").join("\\'")}', ${"'"+id+"'"})">
                                     <div class="chat-user-pp" style="background-image: url(${userData["avitar"]})"></div>
                                     <div class="chat-user-online" style="background-color: ${col}"></div>
-                                    <div class="chat-user-name">${userData["username"]}
-                                    ${(userData["display-rank"]) ?`${!JSON.parse(currentChatRoles[userData["display-rank"]])["icon"]?``:`<div class="chat-user-icon" style="url(${JSON.parse(currentChatRoles[userData["display-rank"]])["icon"]})"></div>`}`:``}</div>
-                                    <!--</div>-->
+                                    <div class="chat-user-name" style="color: ${(displayRank) ? JSON.parse(currentChatRoles[userData["display-rank"]])["colour"]:"black"}">${userData["username"]}
+                                    ${(displayRank) ?`${!JSON.parse(currentChatRoles[userData["display-rank"]])["icon"]?``:`<div class="chat-user-icon" style="background-image:url(${JSON.parse(currentChatRoles[userData["display-rank"]])["icon"]})"></div>`}`:``}</div>
                                     <div class="chat-user-status">${online["is_online_now"]==="true"?status_content:""}</div>
                                     </div>`);
 
@@ -1477,14 +2004,63 @@ function updateChatUser(id, userData){
     }
 }
 
+let permissions = [];
+let isAdmin = false;
+function setUserPermissions(){
+    permissions = [];
+    let list = JSON.parse(currentChatData['user-roles'])[read('id')];
+    if(list){
+        list = list.split(';');
+        for(let i = 0; i < list.length;i++){
+            let data = currentChatRoles[list[i]];
+            if(!list[i])continue;
+            let perms = JSON.parse(data)["permissions"].split(';');
+            for(let ii = 0;ii<perms.length;ii++){
+                if(!permissions.includes(perms[ii]))permissions.push(perms[ii]);
+            }
+        }
+    }
+    if(currentChatRoles['everyone']){
+        let perms = JSON.parse(currentChatRoles['everyone'])["permissions"].split(';');
+        for(let ii = 0;ii<perms.length;ii++) {
+            if (!permissions.includes(perms[ii])) permissions.push(perms[ii]);
+        }
+    }else{
+        let perms = ['create_invites','history','ping_everyone','file_upload'];
+        for(let ii = 0;ii<perms.length;ii++) {
+            if (!permissions.includes(perms[ii])) permissions.push(perms[ii]);
+        }
+    }
+    isAdmin = (JSON.parse(JSON.parse(read("chats"))[currentChatID])["owner"] === read("username") || permissions.includes("admin"))
+}
+
+let oldChannelID;
+
 function handleOpenChat(data){//adds things to the storage when you select a chat
     if(invalid(data))return;
 
     //TODO stuff like users and channels
     currentChatData = data;
     if(getChatMsgs) {
-        currentChannelID = data["main-chat"]+"";
+        if(!lostConnection){
+            currentChannelID = data["main-chat"]+"";
+        }
     }
+    lostConnection=false;
+
+    if(messageStore[currentChatID]){
+        let json = JSON.parse(messageStore[currentChatID]);
+        let channelMessageCount = Number(json[currentChannelID]);
+        let total = messageStore[isdm];
+        if(!isNaN(channelMessageCount)){
+            total -= channelMessageCount;
+            json[currentChannelID] = 0;
+            json["total"] -= channelMessageCount;
+        }
+        messageStore[isdm] = total;
+        messageStore[currentChatID] = JSON.stringify(json);
+    }
+    messageStoreDisply();
 
     if(!isdm){
         let chatData = JSON.parse(JSON.parse(read("chats"))[currentChatID]);
@@ -1506,26 +2082,35 @@ function handleOpenChat(data){//adds things to the storage when you select a cha
         let roles = JSON.parse(data["roles"]);
         currentChatUsers = users;
         currentChatRoles = roles;
-
-        for(let role in roles){
-            let roleData = JSON.parse(roles[role]);
-            if(!roleData["invisible"]){
-                userArea.append(`<div id="${roleData["name"]}" class="chat-rank" style="color: ${roleData["colour"]}"><b>${roleData["name"]}</b></div>`);
+        setUsersDisplayRanks();
+        reOrderRoles();
+        setChatUsersNames();
+        for (let priority in roleOrder) {
+            for(let i=0;i<roleOrder[priority].length;i++){
+                let roleID = roleOrder[priority][i];
+                if(roleID==="everyone")continue;
+                let roleData = JSON.parse(roles[roleID]);
+                if(!roleData["invisible"]){
+                    userArea.prepend(`<div id="${roleID}" class="chat-rank" style="color: ${roleData["colour"]}"><b>${roleData["name"]}</b></div>`);
+                }
             }
         }
+
         userArea.append(`<div id="online" class="chat-rank" style="color: #FFEF0F"><b>Online</b></div>`);
         userArea.append(`<div id="offline" class="chat-rank" style="color: #A0B7FF"><b>Offline</b></div>`);
         // console.log(users);
         // console.log(roles);
+        setUserPermissions();
         //TODO make note of users roles and permissions
-        for(let user in users){
-            let userData = JSON.parse(users[user]);
-            //console.log(userData);
+        for(let user in currentChatUsers){
+            let userData = JSON.parse(currentChatUsers[user]);
+            // console.log(userData);
+            // console.log(user);
             let area_to_add_user;
             let online = JSON.parse(userData["online"]);
             if(online["is_online_now"]==="true"){
-                let rank = userData["display-rank"];
-                if(!rank){
+                let rank = userData["side-rank"];
+                if(!rank || rank==="everyone"){
                     area_to_add_user = $('#online');
                 }else{
                     area_to_add_user = $('#'+rank);
@@ -1545,11 +2130,14 @@ function handleOpenChat(data){//adds things to the storage when you select a cha
             }else{
                 col = '#' + col;
             }
+            let displayRank = userData["display-rank"];
+            if(displayRank==="everyone" && !currentChatRoles["everyone"])displayRank="";
+
             area_to_add_user.append(`<div class="chat-user" id="${user}" onclick="openProfile('${userData["username"].split("'").join("\\'")}', ${"'"+user+"'"})">
                                     <div class="chat-user-pp" style="background-image: url(${userData["avitar"]})"></div>
                                     <div class="chat-user-online" style="background-color: ${col}"></div>
-                                    <div class="chat-user-name">${userData["username"]}
-                                    ${(userData["display-rank"]) ?`${!JSON.parse(roles[user["display-rank"]])["icon"]?``:`<div class="chat-user-icon" style="url(${JSON.parse(roles[user["display-rank"]])["icon"]})"></div>`}`:``}</div>
+                                    <div class="chat-user-name" style="color: ${(displayRank) ? JSON.parse(currentChatRoles[userData["display-rank"]])["colour"]:"black"}">${userData["username"]}
+                                    ${(displayRank) ?`${!JSON.parse(roles[userData["display-rank"]])["icon"]?``:`<div class="chat-user-icon" style="background-image:url(${JSON.parse(roles[userData["display-rank"]])["icon"]})"></div>`}`:``}</div>
                                     <div class="chat-user-status">${online["is_online_now"]==="true"?status_content:""}</div>
                                     </div>`);
         }
@@ -1560,14 +2148,38 @@ function handleOpenChat(data){//adds things to the storage when you select a cha
         let order = asList(raw.order);
         let last = null;
         for (let i = 0; i < order.length; i++) {
+            let chatStore = messageStore[currentChatID];
+            let notifList = read("chatNotifs");
+            let selected = [];
+            if(notifList){
+                notifList = JSON.parse(notifList);
+                if(notifList[currentChatID]){
+                    selected = notifList[currentChatID].split(';');
+                }
+            }
+            if(!chatStore)chatStore="{}";
+            let m = read("mentions");
+            if(!m)m="{}";
+            m=JSON.parse(m);
+
             if (typeof order[i] == "object") {
                 for (let ii = 0; ii < order[i].length; ii++) {
                     let d1 = JSON.parse(JSON.parse(raw["data"])[order[i][ii]]);
-                    last.append(`<div class="channel-list-1 channel-list" id="${order[i][ii]}" type="${d1["type"]}"><b>${(currentChannelID === order[i][ii] ? "<i> -- ":"") + d1["name"] + (d1["type"]==="catagory"?" v " : "")}</b></i></div>`);
+                    let no = Number(JSON.parse(chatStore)[order[i][ii]]);
+                    if(selected.contains(order[i])||selected.contains("chat"))no="nan";
+                    let pings = m[order[i][ii]];
+                    if(!pings)pings = "0";
+                    let col = Number(pings)>0?'#971c20':'#b6988e';
+                    last.append(`<div id="${order[i][ii]}-unread-count" class="chat-message-count" style="${isNaN(no)?"opacity:0":"opacity:1"}; background-color: ${col}">${no}</div><div class="channel-list-1 channel-list" id="${order[i][ii]}" type="${d1["type"]}"><b>${(currentChannelID === order[i][ii] ? "<i> -- ":"") + d1["name"] + (d1["type"]==="catagory"?" v " : "")}</b></i></div>`);
                 }
             } else {
                 let d1 = JSON.parse(JSON.parse(raw["data"])[order[i]]);
-                channels.append(`<div class="channel-list-0 channel-list" id="${order[i]}" type="${d1["type"]}"><b>${(currentChannelID === order[i] ? "<i> -- ":"") + d1["name"] + (d1["type"]==="catagory"?" v " : "")}</b></i></div>`);
+                let no = Number(JSON.parse(chatStore)[order[i]]);
+                if(selected.contains(order[i])||selected.contains("chat"))no="nan";
+                let pings = m[order[i]];
+                if(!pings)pings = "0";
+                let col = Number(pings)>0?'#971c20':'#b6988e';
+                channels.append(`<div id="${order[i]}-unread-count" class="chat-message-count" style="${isNaN(no)?"opacity:0":"opacity:1"}; background-color: ${col}">${no}</div><div class="channel-list-0 channel-list" id="${order[i]}" type="${d1["type"]}"><b>${(currentChannelID === order[i] ? "<i> -- ":"") + d1["name"] + (d1["type"]==="catagory"?" v " : "")}</b></i></div>`);
                 last = $('#'+order[i]);
             }
         }
@@ -1607,7 +2219,9 @@ function handleOpenChat(data){//adds things to the storage when you select a cha
         let roles = JSON.parse(data["roles"]);
         currentChatUsers = users;
         currentChatRoles = roles;
-
+        setUsersDisplayRanks();
+        reOrderRoles();
+        setChatUsersNames();
         for(let role in roles){
             let roleData = JSON.parse(roles[role]);
             if(!roleData["invisible"]){
@@ -1637,11 +2251,14 @@ function handleOpenChat(data){//adds things to the storage when you select a cha
             }else{
                 col = '#' + col;
             }
+
+            let displayRank = userData["display-rank"];
+            if(displayRank==="everyone" && !currentChatRoles["everyone"])displayRank="";
             area_to_add_user.append(`<div class="chat-user" id="${user}" onclick="openProfile('${userData["username"].split("'").join("\\'")}', ${"'"+user+"'"})">
                                     <div class="chat-user-pp" style="background-image: url(${userData["avitar"]})"></div>
                                     <div class="chat-user-online" style="background-color: ${col}"></div>
-                                    <div class="chat-user-name">${userData["username"]}
-                                    ${(userData["display-rank"]) ?`${!JSON.parse(roles[user["display-rank"]])["icon"]?``:`<div class="chat-user-icon" style="url(${JSON.parse(roles[user["display-rank"]])["icon"]})"></div>`}`:``}</div>
+                                    <div class="chat-user-name" style="color: ${(displayRank) ? JSON.parse(currentChatRoles[userData["display-rank"]])["colour"]:"black"}">${userData["username"]}
+                                    ${(displayRank) ?`${!JSON.parse(roles[userData["display-rank"]])["icon"]?``:`<div class="chat-user-icon" style="background-image:url(${JSON.parse(roles[userData["display-rank"]])["icon"]})"></div>`}`:``}</div>
                                     <div class="chat-user-status">${online["is_online_now"]==="true"?status_content:""}</div>
                                     </div>`);
         }
@@ -1660,10 +2277,29 @@ function handleOpenChat(data){//adds things to the storage when you select a cha
             //check if it has children channels
             if ($(this).children().filter("div").eq(0).attr('class').split(/\s+/).includes("shrink-up-fade")) {
                 $(this).children().filter("div").removeClass("shrink-up-fade").addClass("show");
+                let divs = $(this).children().filter("div");
+                for(let i=0; i<divs.length; i++){
+                    let chan = divs.eq(i);
+                    if(!isNaN(chan.html())){
+                        chan.css("opacity","1");
+                    }
+                }
                 content = content.substr(0, content.length - 5);
                 title.html(content + "v ");
+                $('#'+$(this).attr("id")+'-unread-count').css("opacity","0");
             } else {
-                $(this).children().filter("div").addClass("shrink-up-fade").removeClass("show");
+                $(this).children().filter("div").addClass("shrink-up-fade").removeClass("show")
+                let total = 0;
+                let divs = $(this).children().filter("div");
+                for(let i=0; i<divs.length; i++){
+                    let chan = divs.eq(i);
+                    if(!isNaN(Number(chan.html()))){
+                        chan.css("opacity","0");
+                        total+=Number(chan.html());
+                    }
+                }
+                $('#'+$(this).attr("id")+'-unread-count').html(total).css("opacity","1");
+
                 content = content.substr(0, content.length - 2);
                 title.html(content + "> ");
             }
@@ -1684,6 +2320,7 @@ function handleOpenChat(data){//adds things to the storage when you select a cha
                 prevChat.html(prevChat.children().eq(0).html().split(" -- ")[1]);
                 title.html("<i>" + content + "</i>");
                 currentChannelID = title.parent().attr("id");
+                oldest = 0;
                 let json = {
                     "username": read("username"),
                     "token": read("token"),
@@ -1691,7 +2328,8 @@ function handleOpenChat(data){//adds things to the storage when you select a cha
                     "requests": "messages",
                     "chatID": "" + currentChatID,
                     "isdm": "" + isdm,
-                    "channelID": "" + currentChannelID
+                    "channelID": "" + currentChannelID,
+                    "channelID_OLD":oldChannelID+""
                 };
                 send(json, getMessages);
             }
@@ -1706,10 +2344,71 @@ function handleOpenChat(data){//adds things to the storage when you select a cha
             "requests": "messages",
             "chatID": "" + currentChatID,
             "isdm": "" + isdm,
-            "channelID": "" + currentChannelID
+            "channelID": "" + currentChannelID,
+            "channelID_OLD":oldChannelID+""
         };
         send(json, getMessages);
     }
+}
+
+function setUsersDisplayRanks(){
+    let userRoles = currentChatData["user-roles"];
+    if(userRoles)userRoles=JSON.parse(userRoles);
+    for(let userID in currentChatUsers){
+        let userData = JSON.parse(currentChatUsers[userID])
+        if(userRoles){
+            let roles = userRoles[userID];
+            if(roles){
+                roles = roles.split(';');
+                let toSave = "";
+                roleOrder = {};
+                for(let i = 0; i < roles.length; i++){
+                    let roleID = roles[i];
+                    if(currentChatRoles[roleID]){
+                        toSave+=(roleID+';');
+                    }else continue;
+                    let priority = Number(JSON.parse(currentChatRoles[roleID])["priority"]);
+                    if(priority<0)priority=0;
+                    if(!roleOrder[priority])roleOrder[priority]=[];
+                    roleOrder[priority].push(roleID);
+                }
+                userRoles[userID] = toSave;
+
+                let display_rank = "everyone";
+                let side_rank = "everyone";
+                for(let priority in roleOrder){
+                    for(let i = 0; i < roleOrder[priority].length; i++){
+                        let role = roleOrder[priority][i];
+                        display_rank = role;
+                        if(!JSON.parse(currentChatRoles[role])["invisible"]){
+                            side_rank = role;
+                        }
+                    }
+                }
+                userData["display-rank"]=display_rank;
+                userData["side-rank"]=side_rank;
+            }else{
+                userData["display-rank"]="everyone";
+                userData["side-rank"]="everyone";
+            }
+        }else{
+            userData["display-rank"]="everyone";
+            userData["side-rank"]="everyone";
+        }
+        currentChatUsers[userID] = JSON.stringify(userData);
+    }
+    if(!userRoles) userRoles = "{}";
+    currentChatData["user-roles"]=JSON.stringify(userRoles);
+}
+
+function logoutEverywhere() {
+    let json = {"username":read("username"), "token":read("token"), "data":"log-out"};
+    send(json, deleteSavedData);
+}
+
+function deleteSavedData(d){
+    localStorage.clear();
+    redirLogin("Successfully logged out!")
 }
 
 function getOlderMessages(date, num){
@@ -1742,6 +2441,13 @@ function handleGetOlderMessages(data){
     }
 }
 
+document.addEventListener("keypress", function(event) {
+    if($(document.activeElement).is("input")||$(document.activeElement).is("textfield")||$(document.activeElement).is("textarea"))
+        return;
+    $('.new-message-area').focus();
+});
+
+
 function getMessages(data){
     if(invalid(data))return;
     let area = $('#msgs');
@@ -1754,6 +2460,9 @@ function getMessages(data){
     let height = scrollArea[0].scrollHeight;
     scrollArea.scrollTop(height);
     messages = 25;
+    updateChannelUnreads(currentChannelID, 0, true, isdm, currentChatID);
+    oldChannelID = currentChannelID;
+    $('.new-message-area').focus();
 }
 function th(num) {
     num = num + "";
@@ -1833,24 +2542,108 @@ function addMessage(message, top){
     if(message["sender_id"]===read("id")){
         warn='argb(1,0,0,0)';
     }
+    let content = message["content"];
+    let contentSplit = content.split('@');
+    content = contentSplit[0];
+    for(let i = 1; i < contentSplit.length; i++){
+        let elm = contentSplit[i];
+        let taggedUser = "";
+        if(elm.indexOf('&lt')==0){
+            let first = elm.split('&lt').join('').split('&gt')[0]
+            if((first === "all" || first === "everyone")){
+                taggedUser = '<span class="tagged-user"><b>'+first+'</b></span>';
+            }else{
+                if(currentChatUsers[first]){
+                    let username = JSON.parse(currentChatUsers[first])["username"];
+                    taggedUser = `<span class="tagged-user" onclick="openProfile('${username}', '${first}')"><b>${username}</b></span>`;
+                }else{
+                    taggedUser = '<span class="tagged-user"><b>Unknown User</b></span>';
+                }
+            }
+            content+=(taggedUser + elm.substr(elm.indexOf('&gt')+3));
+        }else{
+            content+=('@'+contentSplit[i]);
+        }
+    }
+    let colour = "black";
+    let displayRank = "";
+    if(currentChatUsers[message["sender_id"]]){
+        let role = currentChatRoles[JSON.parse(currentChatUsers[message["sender_id"]])["display-rank"]];
+        if(role){
+            colour = JSON.parse(role)["colour"];
+            displayRank=role;
+        }
+    }
     let messageContentData = `<div class="chat-area">
                     ${!message["sender_name"] ? `<div style="width:1px;height:30px;"></div>` : `<div class="chat-area-pp" style="background-image: url(${message["avitar"]})" onclick="openProfile('${message["sender_name"].split("'").join("\\'") + "', '" + message["sender_id"] + "'"})"></div>
-                    <div class="chat-area-username" onclick="openProfile('${message["sender_name"].split("'").join("\\'") + "', '" + message["sender_id"] + "'"})">${message["sender_name"]}${!currentChatUsers[message["sender_id"]] ? "" : (JSON.parse(currentChatUsers[message["sender_id"]])["display-rank"]) ? `${!JSON.parse(currentChatRoles[JSON.parse(currentChatUsers[message["sender_id"]])["display-rank"]])["icon"] ? `` : `<div class="chat-user-icon" style="url(${JSON.parse(currentChatRoles[JSON.parse(currentChatUsers[message["sender_id"]])["display-rank"]])["icon"]})"></div>`}` : ""}</div>`}
+                    <div class="chat-area-username" style="color: ${colour}" onclick="openProfile('${message["sender_name"].split("'").join("\\'") + "', '" + message["sender_id"] + "'"})">${message["sender_name"]}${!currentChatUsers[message["sender_id"]] ? "" : (displayRank) ? `${!JSON.parse(currentChatRoles[JSON.parse(currentChatUsers[message["sender_id"]])["display-rank"]])["icon"] ? `` : `<div class="chat-user-icon" style="background-image:url(${JSON.parse(currentChatRoles[JSON.parse(currentChatUsers[message["sender_id"]])["display-rank"]])["icon"]})"></div>`}` : ""}</div>`}
                     <div class="warning" style="background-color:${warn}"  onmouseover="openHelpTag('${tagmsg}')" onmouseleave="closeHelpTag()"></div>
                     <div class="chat-area-date" id="${message["date"]}">${d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear() + " at " + (("" + d.getHours()).length == 1 ? 0 + "" + d.getHours() : d.getHours()) + ":" + (("" + d.getMinutes()).length == 1 ? 0 + "" + d.getMinutes() : d.getMinutes())}</div>
-                    <div class="chat-area-content">${emojify(linkify(message["content"]))}</div>
+                    <div class="chat-area-content">${emojify(linkify(content))}</div>
                     <div class="chat-area-bar"></div>
                     </div>`;
     if(!top) {
         area.append(messageContentData);
     }else{
-        area.prepend(messageContentData);
+        if(permissions.includes("history"))
+            area.prepend(messageContentData);
     }
+}
+let viewingProfile = 0;
+
+function editUsersRoles(id){
+    viewingProfile = id;
+    let userRoles = currentChatData["user-roles"];
+    if(userRoles){userRoles=JSON.parse(userRoles)}else{userRoles={}};
+    let roles = userRoles[id];
+    if(roles) {
+        roles = roles.split(';');
+    }else{
+        roles = [];
+    }
+
+    let roleArea = $('#rank-area');
+    roleArea.html("");
+    for(let pri in roleOrder){
+        for(let i = 0; i<roleOrder[pri].length;i++){
+            let role = roleOrder[pri][i];
+            if(role === "everyone")continue;
+            let roleData = JSON.parse(currentChatRoles[role]);
+            roleArea.prepend(`<label class="role-permission role-perm-checkbox" style="background-color: ${roleData["colour"]}">${roleData["name"]}<input id="${role}-update-user" type="checkbox"/><span class="checkmark"></span></label>`)
+            $('#'+role+"-update-user").prop('checked',roles.contains(role));
+        }
+    }
+
+    show(document.getElementById('edit-users-roles-popup'));
+}
+
+function updateUsersRoles(){
+    let roles = "";
+    for(let roleID in currentChatRoles){
+        let isGiven = $('#'+roleID+"-update-user").prop('checked');
+        if(isGiven)roles += (roleID+';');
+    }
+    let data = currentChatData["user-roles"];
+    if(!data)data="{}";
+    let store = JSON.parse(data);
+    while(typeof store === "string")store = JSON.parse(store);
+    store[viewingProfile] = roles;
+    data = JSON.stringify(store);
+    let json = {"username":read("username"), "token":read("token"), "data":"edit", "type":"user-roles", "chat-id":currentChatID,
+        "users-roles":data};
+    send(json, none);
+    hide(document.getElementById('edit-users-roles-popup'));
 }
 
 function openProfile(name, id) {
     let elm = $("#profile-bg");
-    elm.css('left', '');
+    if(!viewingProfile)
+        elm.css('left', '');
+
+    let a = $('#admin-profile-content').css('visibility');
+    let ah = $('#admin-profile').html();
+    let s = $('#settings-profile-content').css('visibility');
+    let sh = $('#settings-profile').html();
 
     // console.log(name + " " + id)
     let online = JSON.parse(JSON.parse(currentChatUsers[id+""])["online"]);
@@ -1891,39 +2684,83 @@ function openProfile(name, id) {
         <button class="btn-blue" id="close-friend">Close Friend</button>
         <button class="btn-blue" id="block">Block User</button>
         <button class="btn-blue" id="start-dm">Start DM</button>
+        <button class="btn-blue" id="start-dm">Start DM</button>
      */
     if(!isdm) {
-        let chatData = JSON.parse(JSON.parse(read("chats"))[currentChatID]);
-        if (chatData["owner"] === read("username")) {
-            elm.append(`<button class="btn-blue" id="no-friend" onclick="kick('${id}')">Kick user</button>`);
+        if (isAdmin || permissions.includes("ban") || permissions.includes("kick") || permissions.includes("manager")) {
+            elm.append(`<div class="btn-blue" id="admin-profile" onclick="showProfileSettings('admin-profile')">${viewingProfile?ah:"Admin v"}</div><div id="admin-profile-content" class="profile-content" style="visibility: ${viewingProfile?a:"hidden"}"></div>`);
+            let admin = $('#admin-profile-content');
+            if(isAdmin || permissions.includes("kick")){
+                admin.append(`<button class="btn-blue profile-button-extended" id="friend" onclick="kick('${id}')">Kick User</button>`);
+            }
+            if(isAdmin || permissions.includes("ban")){
+                admin.append(`<button class="btn-blue profile-button-extended" id="friend" onclick="ban('${id}')">Ban User</button>`);
+            }
+            if(isAdmin || permissions.includes("manage")){
+                admin.append(`<button class="btn-blue profile-button-extended" id="friend" onclick="editUsersRoles('${id}')">Edit Users Roles</button>`);
+            }
         }
     }
+    elm.append(`<div class="btn-blue" id="settings-profile" onclick="showProfileSettings('settings-profile')">${viewingProfile?sh:"Settings v"}</div><div id="settings-profile-content" class="profile-content" style="visibility: ${viewingProfile?s:"hidden"}"></div>`);
+    let settings = $('#settings-profile-content');
+    /*
+
+     */
+
     if(JSON.parse(read("friends"))[id]){
-        elm.append(`<button class="btn-blue" id="friend" onclick="user('friend', false, '${id}')">Remove Friend</button>`);
+        settings.append(`<button class="btn-blue profile-button-extended" id="friend" onclick="user('friend', false, '${id}')">Remove Friend</button>`);
+
+        if(JSON.parse(read("close"))[id]){
+            settings.append(`<button class="btn-blue profile-button-extended" id="close-friend" onclick="user('close-friend', false, '${id}')">Remove Close Friend</button>`);
+        }else{
+            settings.append(`<button class="btn-blue profile-button-extended" id="close-friend" onclick="user('close-friend', true, '${id}')">Add Close Friend</button>`);
+        }
+
     }else{
-        elm.append(`<button class="btn-blue" id="friend" onclick="user('friend', true, '${id}')">Add Friend</button>`);
-    }
-    if(JSON.parse(read("close"))[id]){
-        elm.append(`<button class="btn-blue" id="close-friend" onclick="user('close-friend', false, '${id}')">Remove Close Friend</button>`);
-    }else{
-        elm.append(`<button class="btn-blue" id="close-friend" onclick="user('close-friend', true, '${id}')">Add Close Friend</button>`);
+        if(JSON.parse(read("pending"))[id]){
+            settings.append(`<button class="btn-blue profile-button-extended" id="friend" onclick="user('friend', true, '${id}')">Add Friend</button>`);
+            settings.append(`<button class="btn-blue profile-button-extended" onclick="user('deny', true, '${id}')">Don't Add</button>`);
+        }else if(JSON.parse(read("outgoing"))[id]){
+            settings.append(`<button class="btn-blue profile-button-extended" onclick="user('deny', true, '${id}')">Cancel Friend Request</button>`);
+        }else{
+            settings.append(`<button class="btn-blue profile-button-extended" id="friend" onclick="user('friend', true, '${id}')">Add Friend</button>`);
+        }
     }
     if(JSON.parse(read("blocked"))[id]){
-        elm.append(`<button class="btn-blue" id="blocked" onclick="user('block', false, '${id}')">Unblock User</button>`);
+        settings.append(`<button class="btn-blue profile-button-extended" id="blocked" onclick="user('block', false, '${id}')">Unblock User</button>`);
     }else{
-        elm.append(`<button class="btn-blue" id="blocked" onclick="user('block', true, '${id}')">Block User</button>`);
+        settings.append(`<button class="btn-blue profile-button-extended" id="blocked" onclick="user('block', true, '${id}')">Block User</button>`);
     }
+    //search for bob
 
-    elm.append(`<button class="btn-blue" id="start-dm" onclick="createNewDM('${id}')">Start DM</button>`);
+    elm.append(`<button class="btn-blue" id="start-dm" onclick="createNewDM('${id}')">DM</button>`);
 
-    elm.addClass("show").removeClass("hide-shrink");
-    elm.css("top", y);
-    elm.css("left", getRelativeMouseX());
-
+    if(!viewingProfile) {
+        elm.addClass("show").removeClass("hide-shrink");
+        elm.css("top", y);
+        elm.css("left", getRelativeMouseX());
+    }
+    viewingProfile = id;
 }
-
+function showProfileSettings(id) {
+    let settings = $("#"+id+"-content");
+    let click = $("#"+id);
+    let html = click.html();
+    if(html.includes('&gt')){
+        html = html.substr(0, html.length-5) + ' v';
+        settings.css("visibility", "hidden");
+    }else{
+        html = html.substr(0, html.length-2) + ' >';
+        settings.css("visibility", "visible");
+    }
+    click.html(html);
+}
 function kick(user){
     let json = {"username":read("username"), "token":read("token"), "data":"remove-user", "type":"kick", "user": ""+user, "chat":""+currentChatID};
+    send(json, handleKickUser);
+}
+function ban(user){
+    let json = {"username":read("username"), "token":read("token"), "data":"remove-user", "type":"ban", "user": ""+user, "chat":""+currentChatID};
     send(json, handleKickUser);
 }
 function handleKickUser(data){
@@ -1942,34 +2779,166 @@ function handleUserRequest(data){
     requestData("friends;blocked;pending;outgoing;close;dms;");
 }
 
+function setChatUsersNames(){
+    currentChatUserNames = {};
+    for(let id in currentChatUsers){
+        let username = JSON.parse(currentChatUsers[id])["username"];
+        currentChatUserNames[username.toLowerCase()] = id;
+    }
+}
+let toSendMessages = {};
+
+function setChatFileUploadData() {
+    $(".uploadChatFile").submit(function (event) {
+        let fileInput = document.getElementById('chat-msg-file-upload');
+        let file = fileInput.files[0];
+        if(file.size>10000000){
+            fileInput.value=""
+            let size = (file.size/1000000)+"";
+            if(size.includes('.')){size = size.split('.')[0]+'.'+size.split('.')[1][0];}else{size=size+'.0';}
+            message("Max Size: 10MB.  Sorry!<br><h6>(Your file is "+size+"MB)</h6>");
+            return false;
+        }
+        event.preventDefault();
+        message("Uploading File...")
+        setTimeout(function () {
+            let formData = new FormData();
+            formData.append('file', file);
+            let msgArea = $('.new-message-area');
+            let messageContent = msgArea.val();
+            fileInput.value=""
+            msgArea.val("");
+            $.ajax({
+                url: 'https://eiennochat.uk/FileUploadServlet/FileUpload',
+                type: 'POST',
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                headers: {
+                    "username":read("username"),
+                    "token":read("token"),
+                    "user-id":read("id"),
+                    "chat-id":currentChatID
+                },
+                success: function (returnData) {
+                    sendMessage(messageContent + " " + returnData, false);
+                },
+                error: function () {
+                    message("Unable to upload file")
+                }
+            });
+        }, 5);
+        return false;
+    });
+}
+
+function sendMessage(msgContent, clear){
+    if(msgContent.length > 2000){
+        message("Sorry, messages must be less than 2000 characters");
+        return;
+    }
+
+    if(document.getElementById('chat-msg-file-upload').files[0]){
+        $(".uploadChatFile").submit();
+        return;
+    }
+    if(clear)$('.new-message-area').val("");
+    let d = new Date();
+    let shard = makeShard();
+    let colour = "black";
+    let role = currentChatRoles[JSON.parse(currentChatUsers[read("id")])["display-rank"]];
+    if(role){
+        colour = JSON.parse(role)["colour"];
+    }
+    $('#msgs').append(`<div class="chat-area" id="${shard}" style="opacity: 0.5;">
+                    ${`<div class="chat-area-pp" style="background-image: url(${read("avitar")})" onclick="openProfile('${read("username").split("'").join("\\'") + "', '" + read("id") + "'"})"></div>
+                    <div class="chat-area-username" style="color: ${colour}" onclick="openProfile('${read("username").split("'").join("\\'") + "', '" + read("id") + "'"})">${read("username")}${!currentChatUsers[read("id")] ? "" : (role) ? `${!JSON.parse(currentChatRoles[JSON.parse(currentChatUsers[read("id")])["display-rank"]])["icon"] ? `` : `<div class="chat-user-icon" style="background-image: url(${JSON.parse(currentChatRoles[JSON.parse(currentChatUsers[read("id")])["display-rank"]])["icon"]})"></div>`}` : ""}</div>`}
+                    <div class="chat-area-date" id="${d.getTime()}">${d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear() + " at " + (("" + d.getHours()).length == 1 ? 0 + "" + d.getHours() : d.getHours()) + ":" + (("" + d.getMinutes()).length == 1 ? 0 + "" + d.getMinutes() : d.getMinutes())}</div>
+                    <div class="chat-area-content" style="color:lightgrey">${emojify(linkify(msgContent.split('<').join('&lt').split('>').join('&gt')))}</div>
+                    <div class="chat-area-bar"></div>
+                    <script>
+                    let ${shard}Interval = setInterval(checkSent, 10000);
+                    function checkSent(){
+                        let msg = $('#${shard}');
+                        let count = 0;
+                        if(msg.length==0){
+                            clearInterval(${shard}Interval);
+                            return;
+                        }
+                        count ++;
+//                        if(count>6){
+//                            message('We are unable to send your message.  Check your connection?');
+//                        }
+                        send(toSendMessages['${shard}'], none)
+                    }
+                    </script>
+                    </div>`);
+
+    let scrollArea = $('#message-area');
+    let height = scrollArea[0].scrollHeight;
+    scrollArea.scrollTop(height);
+
+
+    let data = msgContent.split('@');
+    let mentions = "";
+    if(data.length>1){
+        //Contains @ char
+        for(let i = 1; i <data.length; i++){
+            let elm = data[i];
+            let index = elm.indexOf(" ");
+            if((index > elm.indexOf('\n') || index==-1) && (elm.indexOf('\n')>-1))index = elm.indexOf('\n');
+            let first = elm.substr(0, index).toLowerCase();
+            if(index==-1){
+                first = elm.toLowerCase();
+                index = first.length;
+            }
+            first = first.trim();
+            let remSigns = first.split('<').join('').split('>').join('');
+            if((first === "all" || first === "everyone")&&permissions.includes("ping_everyone")){
+                mentions += "all;";
+                elm = "<"+first+">"+elm.substr(index);
+            }else if(currentChatUserNames[first]){
+                mentions += (currentChatUserNames[first]+";");
+                elm = "<"+currentChatUserNames[first]+">"+elm.substr(index);
+            }else if(currentChatUsers[remSigns]){
+                mentions+=(remSigns+';');
+                elm = "<"+remSigns+">"+elm.substr(index);
+            }
+            data[i] = elm;
+        }
+        msgContent = data.join('@');
+    }
+    let dataToSend = {"username":read("username"), "token":read("token"), "data":"msg", "shard":shard+"", "channel_id": `${currentChannelID}`, "chat_id": `${currentChatID}`, "is_dm": `${isdm}`, "content": msgContent, "embed_data": null, "uploads": null, "mentions": mentions};
+    toSendMessages[shard] = dataToSend;
+    send(dataToSend, none);
+}
+
 jQuery(function($) {
     $('.new-message-area').keyup(function (event) {
         if (event.keyCode == 13 && event.shiftKey) {
             event.stopPropagation();
-
         } else if (event.keyCode == 13) {
+            if(!currentChatID)return;
+            if(this.value.split(' ').join('').split('\t').join('').split('\n').join('')==='' &&!document.getElementById('chat-msg-file-upload').files[0])return;
             event.stopPropagation();
             let content = this.value;
-            if(content.length > 2000){
-                message("Sorry, messages must be less than 2000 characters");
-                return;
-            }
             let caret = getCaret(this);
             this.value = content.substring(0, caret-1)+content.substring(caret, content.length);
-            let mentions = "";
-            let data = {"username":read("username"), "token":read("token"), "data":"msg", "channel_id": `${currentChannelID}`, "chat_id": `${currentChatID}`, "is_dm": `${isdm}`, "content": this.value, "embed_data": null, "uploads": null, "mentions": mentions};
-            send(data, none);
-            this.value = "";
+
+            sendMessage(this.value, true);
         }
     });
     $('#message-area').scroll(function (event) {
         let area = $(this);
         let bottom = area.scrollTop() + area.innerHeight() >= area[0].scrollHeight - 1;
-        ;
         if (bottom) {
             $('#text-box').css("box-shadow", "none");
         }else if(area.scrollTop()==0){
-            getOlderMessages(oldest, 25);
+            if(permissions.includes('history')){
+                getOlderMessages(oldest, 25);
+            }
         }else{
             $('#text-box').css("box-shadow", "0px 0px 20px 4px #000");
         }
@@ -1981,6 +2950,15 @@ jQuery(function($) {
         }
     });
 });
+
+function makeShard(){
+    let text = "";
+    let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    for(let i=0; i < 15; i++)
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
+}
+
 function getCaret(el) {
     if (el.selectionStart) {
         return el.selectionStart;
@@ -2185,6 +3163,9 @@ function join(chat){
 }
 
 function handleJoinChat(data){
+    if(data.message.includes("ban")){
+        return message(data.message)
+    }
     requestData("chats");
 }
 
@@ -2213,6 +3194,13 @@ function addChat(chatID, isdm){
     if(!chatID)return;
     let data = JSON.parse(read(isdm?"dms":"chats"));
     let d = JSON.parse(data[(chatID+"")]);
+    let m = read("mentions");
+    if(!m)m="{}";
+    m=JSON.parse(m);
+    let pings = m['false'];
+    if(!pings)pings = "0";
+    let col = Number(pings)>0?'#971c20':'#c5b6b6';
+
     if(d.starred === "false"){
         $(isdm?'#your-dm-list':'#other-chats').append(
             `<div class="chats-list-background" onclick="switchChat('${chatID}', ${isdm})" id="${chatID}">
@@ -2220,7 +3208,7 @@ function addChat(chatID, isdm){
              <div class="chats-list-name-owner">${d['name']} | ${d['owner']}</div>
              ${isdm?"":`<div class="chats-list-starred" onclick="star('${chatID}')">Star chat<div class="chats-list-star-false chats-list-star"></div></div>`}
              <div class="chats-list-description">${split(d['desc'], 50)}</div>
-             ${!messageStore[chatID]?'':`<div class="chat-mmessage-count">${messageStore[chatID]}</div>`}
+             ${!messageStore[chatID]?'':`<div class="chat-mmessage-count" style="background-color: ${col}">${Number(JSON.parse(messageStore[chatID])["total"])}</div>`}
         </div>`)
 
     }else if(d.starred === "true"){
@@ -2230,7 +3218,7 @@ function addChat(chatID, isdm){
                  <div class="chats-list-name-owner">${d['name']} | ${d['owner']}</div>
                  <div class="chats-list-starred" onclick="unstar('${chatID}')">Starred<div class="chats-list-star-true chats-list-star"></div></div>
                  <div class="chats-list-description">${split(d['desc'], 50)}</div>
-                 ${!messageStore[chatID] ? '' :`<div class="chat-mmessage-count">${messageStore[chatID]}</div>`}
+                 ${!messageStore[chatID] ? '' :`<div class="chat-mmessage-count" style="background-color: ${col}">${Number(JSON.parse(messageStore[chatID])["total"])}</div>`}
                 </div>`)
     }
     if(!isdm) {
