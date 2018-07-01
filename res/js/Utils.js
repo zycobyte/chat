@@ -3,7 +3,7 @@ pre = (localhost?"/Website":"");
 let server = (localhost?"ws://${IP}:2089":"wss://${IP}:2096")+"/eiennosocket/data";
 let dataserver = (localhost?"ws://${IP}:2090":"wss://${IP}:2087")+"/datasocket/data";
 let handlerAddress = (localhost?"ws://192.168.0.24:2089":"wss://TODO:2096")+"/eiennosocket/clientConnect";
-let IP = null;
+let IP = "eiennochat.uk";
 
 allowStorage = (typeof(Storage) !== "undefined");
 messages = 0;
@@ -46,7 +46,7 @@ function init_socket_connecter() {
             if ($('#loading-message-box').html() === "Attempting to establish a secure connection to the Eien.no Chat Servers") {
                 fails = 0;
                 $('#loading-message').removeClass("show").addClass("hidden");
-                IP = null;
+            
             }
         }
         if (!opening_data && canConnect) {
@@ -68,10 +68,8 @@ function init_socket_connecter() {
 }
 setInterval(function () {//Get a server IP
     if (!open || !open_data) {
-        if(!localhost){
             IP="eiennochat.uk";
             return;
-        }
         if(gettingIP || IP) return;
         let s;
         if (fails % 10 == 0 || !IP) {
