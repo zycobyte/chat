@@ -127,6 +127,7 @@ function init_data_socket(){
     //     if (!dataSocket && canConnect) {
             try{
                 // dataSocket.close();
+               IP="eiennochat.uk";
                 if(!IP) {
                     opening_data = false;
                     return;
@@ -334,6 +335,7 @@ function send(data, method) {
     //If no socket connected, then make a new one
     if (!socket) {
         try{
+            IP="eiennochat.uk";
             // socket.close();
             if(!IP) return;
             socket = new WebSocket(server.replace("${IP}", IP));
