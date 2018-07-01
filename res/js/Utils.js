@@ -68,7 +68,13 @@ function init_socket_connecter() {
 }
 setInterval(function () {//Get a server IP
     if (!open || !open_data) {
+        
             IP="eiennochat.uk";
+                      
+             if(pageLoadData == 1){
+                        onLoad();
+                        pageLoadData++;
+                    }
             return;
         if(gettingIP || IP) return;
         let s;
