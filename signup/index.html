@@ -61,17 +61,26 @@
     <input id="password" class="show text" type="password"/>
     <div id="em" class="show">E-Mail: </div>
     <input id="email" class="show text"/>
-    <div id="message">By using Eien.no Chat you agree to our <a href="../terms/">terms and conditions</a><br><br>If you are younger than 13, please use your parents E-Mail</div>
-    <button class="login" id="login" onclick="window.location.href='../login/'">login</button>
+    <div id="message">By using Eien.no Chat you agree to our <a href="../terms/">terms and conditions</a><br><br><a href="#" onclick="resetPass()">Forgotten password? Click here!</a></div>
+    <button class="login" id="login" onclick="window.location.href='../login/'+redir()">login</button>
     <button class="login" id="signup" onclick="prepare('signup')" style="right:70px">signup</button>
 </div>
 
 <script>
     let url = window.location.href;
-    if(url.includes("?")){
+    if(url.includes("reason=")){
         let reason = decodeURIComponent(url.split("reason=")[1]);
         document.getElementById("returnmsg").innerHTML=reason;
     }
+    function redir(){
+        let url = window.location.href;
+        if(url.includes("redir=")) {
+            return "?redir="+decodeURIComponent(url.split("redir=")[1].split("&")[0]);
+        }else{
+            return "";
+        }
+    }
+
 </script>
 
 </body>

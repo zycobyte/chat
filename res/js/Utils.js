@@ -1,11 +1,14 @@
-pre = (window.location.hostname==="localhost"?"/Website":"");
-let server = (window.location.hostname==="localhost"?"ws://localhost:2089":"wss://eiennochat.uk:2096")+"/eiennosocket/data";
-let dataserver = (window.location.hostname==="localhost"?"ws://localhost:2090":"wss://eiennochat.uk:2087")+"/datasocket/data";
+let localhost = window.location.hostname==="localhost" || window.location.hostname.includes("192.168");
+pre = (localhost?"/Website":"");
+let server = (localhost?"ws://${IP}:2089":"wss://${IP}:2096")+"/eiennosocket/data";
+let dataserver = (localhost?"ws://${IP}:2090":"wss://${IP}:2087")+"/datasocket/data";
+let handlerAddress = (localhost?"ws://192.168.0.24:2089":"wss://TODO:2096")+"/eiennosocket/clientConnect";
+let IP = null;
 
 allowStorage = (typeof(Storage) !== "undefined");
 messages = 0;
 getChatMsgs=true;
-messageStore = [];
+messageStore = {};
 
 let socket;//sockets should only be accessed from here to ensure data is encrypted and handled properly
 let dataSocket;
@@ -14,6 +17,9 @@ let open_data = false;
 let opening_data = false;
 let toSend = [];
 let recieved = 0;
+let pageLoadData = 0;
+
+let gettingIP = false;
 
 let canConnect = true;
 let fails = 0;
@@ -31,7 +37,8 @@ function init_socket_connecter() {
     setInterval(function () {
         if (!window.location.href.includes("chats") || window.location.href.includes("join")) return;
         if (!open || !open_data) {
-            if (!($('#loading-message-box').html() === "Attempting to establish a secure connection to the Eien.no Chat Servers")) {
+            $('#loading-message-box').removeClass('hide').removeClass('show');
+            if (!($('#loading-message-box').html() === "Attempting to establish a secure connection to the Eien.no Chat Servers") || !$('#loading-message').attr('class').includes('show')) {
                 $('#loading-message').removeClass("hidden").addClass("show");
                 $('#loading-message-box').html("Attempting to establish a secure connection to the Eien.no Chat Servers");
             }
@@ -39,7 +46,7 @@ function init_socket_connecter() {
             if ($('#loading-message-box').html() === "Attempting to establish a secure connection to the Eien.no Chat Servers") {
                 fails = 0;
                 $('#loading-message').removeClass("show").addClass("hidden");
-                $('#loading-message-box').html("Loading");
+                IP = null;
             }
         }
         if (!opening_data && canConnect) {
@@ -59,6 +66,58 @@ function init_socket_connecter() {
         }
     }, 100);
 }
+setInterval(function () {//Get a server IP
+    if (!open || !open_data) {
+        if(!localhost){
+            IP="eiennochat.uk";
+            return;
+        }
+        if(gettingIP || IP) return;
+        let s;
+        if (fails % 10 == 0 || !IP) {
+            //Get a server IP
+            gettingIP = true;
+            try{
+                s = new WebSocket(handlerAddress);
+            }catch(err){
+                gettingIP=false;
+                return;
+            }
+
+            s.onopen = function (event) {};
+            s.onerror = function (error) {
+                if (!window.location.href.includes("chats") || window.location.href.includes("join")){
+                    alert("Unable to contact the Eienno Chat Servers.  Try checking your internet connection or reloading the page?");
+                }else{
+                    message("Unable to contact the Eienno Chat Servers.  Try checking your internet connection or reloading the page?")
+                }
+                gettingIP = false;
+            };
+            s.onclose = function (event) {
+                s = null;
+                gettingIP = false;
+            };
+            s.onmessage = function (event) {
+                let reply = (event.data);
+                if(reply.includes("{")){
+                    if (!window.location.href.includes("chats") || window.location.href.includes("join")){
+                        alert(JSON.parse(reply)["message"]);
+                    }else{
+                        message(JSON.parse(reply)["message"])
+                    }
+                }else{
+                    IP = reply;
+                    if(pageLoadData == 1){
+                        onLoad();
+                        pageLoadData++;
+                    }
+                }
+                gettingIP = false;
+            };
+
+        }
+    }
+}, 100);
 
 function init_data_socket(){
     opening_data = true;
@@ -70,7 +129,11 @@ function init_data_socket(){
     //     if (!dataSocket && canConnect) {
             try{
                 // dataSocket.close();
-                dataSocket = new WebSocket(dataserver);
+                if(!IP) {
+                    opening_data = false;
+                    return;
+                }
+                dataSocket = new WebSocket(dataserver.replace("${IP}", IP));
             }catch(err){
                 opening_data=false;
                 fails++;
@@ -84,6 +147,7 @@ function init_data_socket(){
                 let s = JSON.stringify({"id": `${read("id")}`});
                 dataSocket.send(s);
                 if(currentChatID){
+                    lostConnection = true
                     switchChat(currentChatID, isdm);
                 }
             };
@@ -112,11 +176,30 @@ function init_data_socket(){
 }
 function handleRecieveDataFromServer(data){
     if(data["type"] === "newmessage"){
+        //remove sent msg (if exists)
+        let msgSendingArea = $('#'+data["shard"]);
+        if(msgSendingArea.length!=0){
+            msgSendingArea.remove();
+        }
         //add message
         let online = JSON.parse(read("online"));
+        //if the channel or chat is muted, return;
+        let notifList = read("chatNotifs");
+        let notifEnabled = true;
+        if(notifList) {
+            notifList = JSON.parse(notifList);
+            if(notifList[data["chat_id"]]){
+                if(notifList[data["chat_id"]].split(';').contains(data["channel_id"])){
+                    notifEnabled = false;
+                }
+                if(notifList[data["chat_id"]].split(';').contains("chat")){
+                    notifEnabled = false;
+                }
+            }
+        }
         if(data["chat_id"]===currentChatID && data["channel_id"] === currentChannelID) {
             if(!focused){
-                if(!(online["id"]==="3")){
+                if(!(online["id"]==="3") && notifEnabled){
                     document.getElementById('message_new_wav').play()
                 }
             }
@@ -144,7 +227,9 @@ function handleRecieveDataFromServer(data){
                 oldest = $('#msgs').children().eq(0).children().filter('.chat-area-date').attr('id');
             }
         }else{
-            if(data["mentions"].split(";").includes(read("id")) || data["is_dm"]==="true"){
+            let mentionedList = data["mentions"].split(";");
+            let userMentioned = mentionedList.includes(read("id"));
+            if(userMentioned || data["is_dm"]==="true"){
                 if(!(data["sender_id"]===read("id"))) {
                     let status = online["id"];
                     let message = JSON.parse(online["message"])[status];
@@ -165,20 +250,39 @@ function handleRecieveDataFromServer(data){
                     }
                 }
             }
-
-            if(!(online["id"]==="3")){
-                document.getElementById('message_new_wav').play()
+            if(!notifList){
+                notifList={}
+            }
+            let mutedData = notifList[data["chat_id"]];
+            if(!mutedData){
+                mutedData = "";
+            }else{
+                mutedData=mutedData.split(';');
             }
 
-            let amount = messageStore[data["chat_id"]];
-            if(!amount)amount = 0;
-            amount += 1;
-            messageStore[data["chat_id"]] = amount;
+            if((userMentioned && !mutedData.includes("username")) || ((mentionedList.includes("all") || mentionedList.includes("everyone"))&&!mutedData.includes("everyone"))) {
+                let m = read("mentions");
+                if (!m) m = "{}";
+                m = JSON.parse(m);
+                let pings = m[data["channel_id"]];
+                if (!pings) pings="0";
+                m[data["channel_id"]] = (Number(pings)+1)+"";
 
-            amount = messageStore[data["is_dm"]];
-            if(!amount)amount = 0;
-            amount += 1;
-            messageStore[data["is_dm"]] = amount;
+                pings = m[data["chat_id"]];
+                if (!pings) pings="0";
+                m[data["chat_id"]] = (Number(pings)+1)+"";
+
+                pings = m[data["is_dm"]];
+                if (!pings) pings="0";
+                m[data["is_dm"]] = (Number(pings)+1)+"";
+
+                save("mentions", JSON.stringify(m));
+
+            }
+
+            if(!(online["id"]==="3") && notifEnabled){
+                document.getElementById('message_new_wav').play()
+            }
 
             let d = JSON.parse(read("dms"));
             if(Object.keys(d).length === 0){
@@ -189,8 +293,7 @@ function handleRecieveDataFromServer(data){
             for(let chat in d){
                 addChat(chat, true);
             }
-            reorderChats();
-            messageStoreDisply();
+            updateChannelUnreads(data["channel_id"], 1, false, data["is_dm"], data["chat_id"]);
         }
     }else if(data["type"]==="chatsettings"){
         if(currentChatID===data["chatID"]) {
@@ -213,12 +316,15 @@ function handleRecieveDataFromServer(data){
             currentChatUsers = null;
             currentChatRoles = null;
             currentChatData = null;
+            currentChatUserNames = {};
             message("You have been kicked from the chat.");
             safeClose();
         }
     }else if(data["type"]==="userstatus"){
         if(!currentChatUsers[data["users_id"]])return;
         updateChatUser(data["users_id"], JSON.parse(data["users_data"]))
+        if(viewingProfile+""===data["users_id"])
+            openProfile(data["username"], data["users_id"])
     }else if(data["data"]==="request"){
         requestData(data["requests"]);
     }
@@ -231,7 +337,8 @@ function send(data, method) {
     if (!socket) {
         try{
             // socket.close();
-            socket = new WebSocket(server);
+            if(!IP) return;
+            socket = new WebSocket(server.replace("${IP}", IP));
         }catch(err){
             fails++;
             // if(fails > 4)canConnect = false;

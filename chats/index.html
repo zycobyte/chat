@@ -153,10 +153,16 @@
                 <input id="gif-search" class="input-field-dark" placeholder="Search Gifs using Giphy!">
                 <div class=" scrollable container" id="gif-display"></div>
             </div>
+            <label class="file-upload-label">
+                <form style="position: absolute;left: -1000000px;" class="uploadChatFile">
+                    <input type="file" class="file" id="chat-msg-file-upload" name="myfile">
+                </form>
+            </label>
+            <script>setChatFileUploadData()</script>
         </div>
     </div>
     <div id="tabs" class="below-bar animatable right">
-        <div id="channels-list">
+        <div id="channels-list" class="scrollable">
             <!--Different channels etc go here-->
         </div>
         <div id="server-option-menu" onclick="show(document.getElementById('chat-settings-popup'))">Chat Settings<br><br>Change personal or global settings for this chat.</div>
@@ -170,7 +176,7 @@
         </div>
         <div class="align-horizontal search-area">
             <div class="search-bar-area">
-                Search: <input id="search-bar" class="search-bar" size="25" placeholder="Type key words or the chat name" maxlength="50"/>
+                Search: <input id="search-bar" class="search-bar" size="30" placeholder="Type key words or the chat name" maxlength="50"/>
             </div>
             <!--<div id="filter-icon"></div>-->
             <div class="search-btn" onclick="searchChats()">Search!</div>
@@ -295,6 +301,7 @@
             <div class="user-setting-text pass-setting">Current Password:</div><input id="pass-old-setting-val" class="input-field-dark setting pass-setting" type="password"/>
             <div style="height: 200px;"></div>
             <button class="btn-true btn-cancel" onclick="saveSettings('1')">Update Settings</button>
+            <button class="btn-blue btn-create" onclick="resendEmailVerif()">Resend E-Mail Verification Code</button>
         </div>
         <div class="settings-box">
             <div class="user-setting-text username-setting">Enable Email notifications</div><input style="left:179px" class="setting username-setting" id="email-notif-setting-val" type="checkbox"/>
@@ -306,8 +313,20 @@
                 <div class="user-setting-text radio3">Don't scan messages from any friends</div><input style="left:250px;" class="setting radio3 scanner-settings-val" type="radio" name="scanner" value="2"/>
                 <div class="user-setting-text radio4">Don't scan any messages</div><input style="left:165px;" class="setting radio4 scanner-settings-val" type="radio" name="scanner" value="3"/>
             </form>
-            <div style="height: 200px;"></div>
+            <label style="position: absolute;left: 10px;top: 140px;">
+                Edit Avitar: <img id="user-icon-upload-preview" style="left: 75px;" src="#" class="chats-list-icon"/>
+                <form style="position: absolute;left: -1000000px;" class="uploadChatFile">
+                    <input type="file" class="file" id="user-icon-file-upload" name="myfile" accept="image/*">
+                </form>
+            </label>
+
+            <div style="height: 270px;"></div>
             <button class="btn-true btn-cancel" onclick="saveSettings('2')">Update Settings</button>
+        </div>
+        <div class="settings-box">
+            <button class="user-setting-text username-setting btn-blue" style="background-color: #40b3ff" onclick="deleteSavedData();">Log out</button>
+            <button class="user-setting-text username-setting btn-blue" style="background-color: #40b3ff;left:120px;" onclick="logoutEverywhere();">Log out everywhere</button>
+            <div style="height: 70px;"></div>
         </div>
     </div>
 
@@ -353,26 +372,61 @@
             <div class="title">Global Chat Settings</div>
             <div class="subtitle">These are the settings that affect all users, such as adding channels and changing the chat name etc.</div>
             <div class="popup-scrollable" id="chat-settings-global">
-                <!--Settings
-                name
-                description
-                is public
-                catagory
-                in Maintenance
-                whitelist (for Maintenance)
-                join message enabled
-                join message text
-                join message channel
-                ranks
-                rank settings
-                channels
-                channel settings
-                users settings <- ie their rank etc
-                -->
             </div>
             <button class="btn-blue btn-left" onclick="toggle(document.getElementById('chat-settings-popup'));toggle(document.getElementById('chat-settings-popup-global'))">Switch to Settings</button>
             <button class="btn-true btn-create" onclick="updateGlobalChatSettings()">Update Global Settings</button>
             <button class="btn-false btn-cancel" onclick="hide(document.getElementById('chat-settings-popup-global'))">Cancel</button>
+        </div>
+    </div>
+    <div class="popup-bg below-bar hidden hide-shrink" id="chat-settings-edit-role" onclick="hide(this)">
+        <div class="popup" onclick="toggle(this);toggleRoleIconList('hide')">
+            <div class="title">Edit Role</div>
+            <!--<div class="subtitle"></div>-->
+            <div class="popup-scrollable" id="chat-settings-role">
+                <div class="container">
+                    <input id="role-name" class="input-field-dark" maxlength="20"/>
+                    <div class="role-edit-colour-text">
+                        Colour:
+                        <input value="000" class="role-colour-edit jscolor {width:243, height:150, position:'right',
+                        borderColor:'#FFF', insetColor:'#FFF', backgroundColor:'#666'}" content="000" autocomplete="off" style="background-color: #000 none;color: rgb(0, 0, 0);">
+                    </div>
+                    <div class="role-icon-edit-text">
+                        Icon:
+                        <img class="role-icon-edit" onclick="toggleRoleIconList()"/>
+                    </div>
+                    <div class="edit-role-icon-list" style="display: none">
+                        <img class="role-icon-row0 role-icon-column0" src="res/icons/roles/crown.png" onclick="selectRoleIcon($(this).attr('src'))"/>
+                        <img class="role-icon-row0 role-icon-column1" src="res/icons/roles/star.png" onclick="selectRoleIcon($(this).attr('src'))"/>
+                        <img class="role-icon-row0 role-icon-column2" src="res/icons/roles/moon.png" onclick="selectRoleIcon($(this).attr('src'))"/>
+                        <img class="role-icon-row1 role-icon-column0" src="res/icons/roles/smiley.png" onclick="selectRoleIcon($(this).attr('src'))"/>
+                        <img class="role-icon-row1 role-icon-column1" src="res/icons/roles/exclamation.png" onclick="selectRoleIcon($(this).attr('src'))"/>
+                        <img class="role-icon-row1 role-icon-column2" src="res/icons/roles/light-bulb.png" onclick="selectRoleIcon($(this).attr('src'))"/>
+                        <img class="role-icon-row2 role-icon-column0" src="res/icons/roles/red.png" onclick="selectRoleIcon($(this).attr('src'))"/>
+                        <img class="role-icon-row2 role-icon-column1" src="res/icons/roles/green.png" onclick="selectRoleIcon($(this).attr('src'))"/>
+                        <img class="role-icon-row2 role-icon-column2" src="res/icons/roles/blue.png" onclick="selectRoleIcon($(this).attr('src'))"/>
+                    </div>
+                    <div class="role-priority-edit-text">
+                        Priority Level:
+                        <input class="role-priority-edit input-field-dark"/>
+                    </div>
+                    <label class="role-permission role-perm-checkbox edit-role-invis">Hide Role<input id="role-edit-invisible" type="checkbox"/><span class="checkmark"></span></label>
+                    <div class="title role-perm-text">Edit Role Permissions</div>
+                    <div class="scrollable role-perm-edit">
+                    </div>
+                </div>
+            </div>
+            <button class="btn-blue btn-left" onclick="refreshRoles();hide(document.getElementById('chat-settings-edit-role'))">Cancel</button>
+            <button class="btn-true btn-create" onclick="saveRole()">Save</button>
+            <button class="btn-false btn-cancel" onclick="deleteRole()">Delete</button>
+        </div>
+    </div>
+    <div class="popup-bg below-bar hidden hide-shrink" id="edit-users-roles-popup" onclick="hide(this)" style="z-index: 200">
+        <div class="popup" onclick="toggle(this)">
+            <div class="title">Manage Users Roles</div>
+            <div class="popup-scrollable" id="rank-area">
+            </div>
+            <button class="btn-true btn-create" id="saveUsersRolesBtn" onclick="updateUsersRoles()">Save</button>
+            <button class="btn-false btn-cancel" onclick="hide(document.getElementById('edit-users-roles-popup'))">Cancel</button>
         </div>
     </div>
     <div class="popup-bg below-bar hidden hide-shrink" id="invite-settings-popup" onclick="hide(this)">
@@ -416,7 +470,7 @@
         </div>
     </div>
 
-    <div id="prf" class="screen hidden" onclick="$('.contextmenu').addClass('hide');$('#profile-bg').addClass('hide-shrink').removeClass('show').css('top', -500);$(this).addClass('hidden')"></div>
+    <div id="prf" class="screen hidden" onclick="$('.contextmenu').addClass('hide');$('#profile-bg').addClass('hide-shrink').removeClass('show').css('top', -500);$(this).addClass('hidden');viewingProfile=0;"></div>
     <div class="hide-shrink" id="profile-bg" style="top: -500px"></div>
 
     <div class="popup-bg below-bar hidden hide-shrink" id="online-status-popup" onclick="hide(this)">
@@ -426,8 +480,8 @@
             <div class="popup-scrollable" id="online-status-popup-area">
                 <div class="container">
                     <div class="online-status-box-popup" id="set-status-msg" style="height: 35px">
-                        <div style="top: 5px" class="reply-message-text">Status Message:</div>
-                        <textarea style="height: 20px;top: 5px" class="reply-message input-field-dark" maxlength="64" placeholder=""></textarea>
+                        <div style="top: 5px" class="reply-message-text">Status Comment:</div>
+                        <textarea style="height: 20px;top: 5px;left: 130px;width: 490px;" class="reply-message input-field-dark" maxlength="64" placeholder=""></textarea>
                     </div>
                     <!--["#15ff00", "#d6a800", "#d61e00", "#9cb2e4"];
                         online away DND offline-->

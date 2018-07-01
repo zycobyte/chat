@@ -20,27 +20,26 @@
     <meta name="description" content="Eien.no Chat is a free social chat website that aims to
     bring the world closer together no matter how far people are apart."/>
 
-    <link rel="icon" href="../favicon.ico" type="image/x-icon"/>
+    <title>Eien.no Chat -- Reset Password</title>
 
     <link rel="stylesheet" type="text/css" href="../res/css/Head.css">
     <link rel="stylesheet" type="text/css" href="../res/css/styles.css">
     <link rel="stylesheet" type="text/css" href="../res/css/login.css">
-
     <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
-    <script type="text/javascript" src="../res/js/Head.js"></script>
     <script type="text/javascript" src="../res/js/Utils.js"></script>
-    <script type="text/javascript" src="../res/js/Mouse.js"></script>
-    <script type="text/javascript" src="res/js/verify.js"></script>
-
-    <title>Eien.no Chat -- Verify</title>
-
+    <script type="text/javascript" src="res/js/handler.js"></script>
 </head>
 <body>
 
 <div class="show" id="login-box" style="right: 50%;margin-right: -150px;top: 50%;margin-top: -200px;position: absolute;">
-    <div id="title"><u>Verifying Your E-Mail</u></div>
+    <div id="title"><u>Enter Password Below</u></div>
     <div id="returnmsg"></div>
-    <div id="message" style="width: 100%"><br><br><a href="#" onclick="resetKey()">Expired Key? Click here!</a></div>
+    <!--<div id="name">Username: </div>-->
+    <!--<input id="username" class="show text"/>-->
+    <div id="pass">Password: </div>
+    <input id="password" class="show text" type="password"/>
+    <div id="message" style="width: 100%"><br><br><a href="#" onclick="resetPass()">Expired Key? Click here!</a></div>
+    <button class="login" id="login" onclick="prepare('login')">submit</button>
 </div>
 
 

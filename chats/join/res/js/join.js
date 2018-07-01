@@ -3,9 +3,13 @@ function goBack() {
 }
 function handler(data){
     document.write(data["message"])
+    if(data["message"].includes("credentials"))redirLogin(data["message"]+"&redir="+window.location.href)
     setTimeout(function(){goBack()}, 1500);
 }
 document.onload = new function () {
+    pageLoadData = 1;
+}
+function onLoad(){
     let code = window.location.hash.substr(1).trim();
     console.log(code);
     if(!code){

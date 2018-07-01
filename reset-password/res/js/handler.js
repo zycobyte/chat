@@ -1,5 +1,8 @@
-function prepare(data){
-    let username = $("#username").val();
+function prepare(){
+    let url = window.location.href;
+    let key = decodeURIComponent(url.split("key=")[1].split("&")[0]);
+
+    let username = decodeURIComponent(url.split("username_lower=")[1].split("&")[0]);
     let password = $("#password").val();
 
     if(username.length < 4 || username.length > 16){
@@ -11,37 +14,22 @@ function prepare(data){
         return
     }
 
-    let json = {"data":data, "username": username, "password": password};
-    if(data === "signup"){
-        let email = $("#email").val();
-        //TODO check email is valid
-        json["email"] = email;
-        $("#returnmsg").html("Creating Account.");
-    }else{
-        $("#returnmsg").html("Logging In.");
-    }
-
+    let json = {"data":"updatePassword", "username": username, "password": password, "key":key};
+    $("#returnmsg").html("Changing Password.");
     send(json, loginDataRecieved);
-
 }
-
 function loginDataRecieved(reply){
     if(reply.data === "success"){
         save("username", reply.username);
         save("token", reply.token);
-        let url = window.location.href;
-        if(url.includes("redir")){
-            window.location.href = decodeURIComponent(url.split("redir=")[1].split("&")[0]);
-        }else{
-            window.location.href = pre+"/chats/"
-        }
+        window.location.href = pre+"/chats/"
     }else{
         $("#returnmsg").html(reply.message);
     }
 }
-
 function resetPass(){
-    let username = $("#username").val();
+    let url = window.location.href;
+    let username = decodeURIComponent(url.split("username_lower=")[1].split("&")[0]);
     if(username.length < 4 || username.length > 16) {
         $("#returnmsg").html("Username must be between 4 and 16 characters.");
         return

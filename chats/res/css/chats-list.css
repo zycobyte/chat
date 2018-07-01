@@ -11,7 +11,7 @@
     border-radius: 15px;
 }
 .chats-list-icon{
-    background: darkred no-repeat;
+    /*background: darkred no-repeat;*/
     /*background-size: contain;*/
     background-size: 100% 100%;
     width:65px;
@@ -66,10 +66,23 @@
     position: absolute;
     right: 5px;
     bottom: 5px;
-    background-color: #971c20;
+    background-color: #b3b3b6;
     color: white;
     border-radius: 7px;
     text-align: center;
+}
+.chat-message-count{
+    width: 10px;
+    height: 10px;
+    position: relative;
+    right: -5px;
+    bottom: -20px;
+    font-size: 7px;
+    background-color: #b6988e;
+    color: white;
+    border-radius: 7px;
+    text-align: center;
+    margin-top: -10px;
 }
 
 .chat-rank{
@@ -94,8 +107,9 @@
     right: -14px;
     height: 10px;
     width: 10px;
-    background-color: darkgreen;
-    top: 2px;
+    background-repeat-x: no-repeat;
+    background-repeat-y: no-repeat;
+    background-size: cover;    top: 2px;
     position: absolute;
 }
 .chat-user-pp{
@@ -103,7 +117,7 @@
     height: 25px;
     border-radius: 15px;
     position: absolute;
-    background: darkred no-repeat;
+    /*background: darkred no-repeat;*/
     /*background-size: contain;*/
     background-size: 100% 100%;
 }
