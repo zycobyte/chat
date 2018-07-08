@@ -58,6 +58,7 @@ function onLoad() {
     $('#emoji-search').on( "keyup", function () {
         searchEmojis($(this).val());
     })
+    message("File Uploading has been disabled while we update the servers. Sorry!")
 };
 let messagesTotDisp = 0;
 function message(message){
