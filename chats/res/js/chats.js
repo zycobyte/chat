@@ -420,7 +420,7 @@ function addImages(text){
         url = url.split("\"")[0];
         let split_url = url.split(".");
         let type = split_url[split_url.length-1];
-        if(imageTypes.indexOf(type) != -1) {
+        if(imageTypes.toLowerCase().indexOf(type) != -1) {
             // $.get(url)
             //     .done(function () {
             text+= '<br><img src="'+url+'" style="max-width: 75%;max-height: 256px"/>'
