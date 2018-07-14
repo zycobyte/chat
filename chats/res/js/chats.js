@@ -260,7 +260,7 @@ function updateGlobalChatSettings() {
             formData.append('file', file);
             fileInput.value="";
             $.ajax({
-                url: 'https://eiennochat.uk/FileUploadServlet/FileUpload',
+                url: 'https://eiennochat.uk:8443/FileUploadServlet/FileUpload',
                 type: 'POST',
                 data: formData,
                 async: false,
@@ -488,7 +488,7 @@ function saveSettings(id) {
                 formData.append('file', file);
                 fileInput.value="";
                 $.ajax({
-                    url: 'https://eiennochat.uk/FileUploadServlet/FileUpload',
+                    url: 'https://eiennochat.uk:8443/FileUploadServlet/FileUpload',
                     type: 'POST',
                     data: formData,
                     async: false,
@@ -2810,7 +2810,7 @@ function setChatFileUploadData() {
             fileInput.value=""
             msgArea.val("");
             $.ajax({
-                url: 'https://eiennochat.uk/FileUploadServlet/FileUpload',
+                url: 'https://eiennochat.uk:8443/FileUploadServlet/FileUpload',
                 type: 'POST',
                 data: formData,
                 async: false,
