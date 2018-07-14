@@ -274,6 +274,8 @@ function updateGlobalChatSettings() {
                     "chat-id":currentChatID
                 },
                 success: function (returnData) {
+                    if(localhost)returnData='https://eiennochat.uk/1522528986896/1531579365775/Lloyd.Finished.png'
+                    $('#chat-icon-upload-preview').attr('src', returnData);
                     saveGlobalChatSettings(returnData);
                 },
                 error: function () {
@@ -315,7 +317,7 @@ function saveGlobalChatSettings(imgUrl){
         json["join-msg-channel"]=joinMessageChannel;
         json["channels"]=channelData;
         json["roles"]=roleData;
-}
+    }
 
     if(isAdmin || permissions.includes("maintainer")){
         let isMaintainance = ""+document.getElementById("in-maintainance-settings").checked;
@@ -421,11 +423,11 @@ function addImages(text){
         if(imageTypes.indexOf(type) != -1) {
             // $.get(url)
             //     .done(function () {
-                    text+= '<br><img src="'+url+'" style="max-width: 75%;max-height: 256px"/>'
-                    imgs ++;
-                    if(imgs >= 5) return text;
-                    // console.log(text)
-                // }).fail(function () {
+            text+= '<br><img src="'+url+'" style="max-width: 75%;max-height: 256px"/>'
+            imgs ++;
+            if(imgs >= 5) return text;
+            // console.log(text)
+            // }).fail(function () {
             // })
         }
     }
@@ -502,6 +504,8 @@ function saveSettings(id) {
                         "chat-id":currentChatID
                     },
                     success: function (returnData) {
+                        if(localhost)returnData='https://eiennochat.uk/1522528986896/1531579365775/Lloyd.Finished.png'
+                        $('#user-icon-upload-preview').attr('src', returnData)
                         j2 = {"email-notifs":$('#email-notif-setting-val').prop("checked")+"", "scan": $('input[name=scanner]:checked', '#scanners').val()+"", "icon":returnData}
                         for(let key in j2){
                             json[key]=j2[key];
@@ -527,7 +531,7 @@ function saveSettings(id) {
     for(let key in j2){
         json[key]=j2[key];
     }
-    console.log(json)
+    //console.log(json)
     send(json, handleSettingSave);
 }
 
@@ -931,7 +935,7 @@ function chat_settings_popup_global(){
         }
         // console.log(channels);
     }
-        area.append(`
+    area.append(`
                 <div class="container">
                     <div class="setting-text" id="user-search-settings-text">User Settings:</div>
                     <input class="input-field-dark" id="user-search-settings" placeholder="Type a users name here"/>
@@ -1368,7 +1372,7 @@ function fromList(list){
             string += item+",";
         }
     }
-   // console.log(string);
+    // console.log(string);
     return string.replace(/.$/,"]");
 }
 
@@ -2236,7 +2240,7 @@ function handleOpenChat(data){//adds things to the storage when you select a cha
             let area_to_add_user;
             let online = JSON.parse(userData["online"]);
             if(online["is_online_now"]==="true"){
-                    area_to_add_user = $('#online');
+                area_to_add_user = $('#online');
             }else{
                 area_to_add_user = $('#offline');
             }
@@ -2789,8 +2793,8 @@ function setChatUsersNames(){
 }
 let toSendMessages = {};
 
-function setChatFileUploadData() {
-    $(".uploadChatFile").submit(function (event) {
+function setChatFileUploadData() {}
+function chatFileUpload(){
         let fileInput = document.getElementById('chat-msg-file-upload');
         let file = fileInput.files[0];
         if(file.size>10000000){
@@ -2824,6 +2828,7 @@ function setChatFileUploadData() {
                     "chat-id":currentChatID
                 },
                 success: function (returnData) {
+                    if(localhost)returnData='https://eiennochat.uk/1522528986896/1531579365775/Lloyd.Finished.png'
                     sendMessage(messageContent + " " + returnData, false);
                 },
                 error: function () {
@@ -2832,7 +2837,6 @@ function setChatFileUploadData() {
             });
         }, 5);
         return false;
-    });
 }
 
 function sendMessage(msgContent, clear){
@@ -2842,7 +2846,7 @@ function sendMessage(msgContent, clear){
     }
 
     if(document.getElementById('chat-msg-file-upload').files[0]){
-        $(".uploadChatFile").submit();
+        chatFileUpload();
         return;
     }
     if(clear)$('.new-message-area').val("");
@@ -3149,8 +3153,8 @@ function reorderChats(){
 
 function addPublicChat(chatID, menu, d){
     if(!chatID)return;
-        menu.append(
-            `<div class="chats-list-background" onclick="join('${chatID}')" id="${chatID}">
+    menu.append(
+        `<div class="chats-list-background" onclick="join('${chatID}')" id="${chatID}">
              <div class="chats-list-icon" style="background-image: url(${d["icon"]})"></div>
              <div class="chats-list-name-owner">${d['name']} | ${d['owner']}</div>
              <div class="chats-list-description">${split(d['desc'], 50)}</div>
