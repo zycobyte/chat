@@ -33,7 +33,7 @@ window.onblur = function() {
     focused = false;
 };
 
-async function init_socket_connecter() {
+function init_socket_connecter() {
     setInterval(function () {
         if (!window.location.href.includes("chats") || window.location.href.includes("join")) return;
         if (!open || !open_data) {
