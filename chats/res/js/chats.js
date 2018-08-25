@@ -245,11 +245,11 @@ function updateGlobalChatSettings() {
     if ($('#chat-icon-upload-preview').attr('src').includes('data:image')) {
         let fileInput = document.getElementById('chat-icon-file-upload');
         let file = fileInput.files[0];
-        if(file.size>500000){
+        if(file.size>5000000){
             fileInput.value=""
-            let size = (file.size/1000)+"";
+            let size = (file.size/1000000)+"";
             if(size.includes('.')){size = size.split('.')[0]+'.'+size.split('.')[1][0];}else{size=size+'.0';}
-            message("Max Size: 500kB.  Sorry!<br><h6>(Your file is "+size+"kB)</h6>");
+            message("Max Size: 5MB.  Sorry!<br><h6>(Your file is "+size+"MB)</h6>");
             saveGlobalChatSettings();
             return;
         }
@@ -469,11 +469,11 @@ function saveSettings(id) {
         if($('#user-icon-upload-preview').attr('src').includes('data:image')){
             let fileInput = document.getElementById('user-icon-file-upload');
             let file = fileInput.files[0];
-            if(file.size>500000){
+            if(file.size>5000000){
                 fileInput.value=""
-                let size = (file.size/1000)+"";
+                let size = (file.size/1000000)+"";
                 if(size.includes('.')){size = size.split('.')[0]+'.'+size.split('.')[1][0];}else{size=size+'.0';}
-                message("Max Size: 500kB.  Sorry!<br><h6>(Your file is "+size+"kB)</h6>");
+                message("Max Size: 5MB.  Sorry!<br><h6>(Your file is "+size+"MB)</h6>");
                 j2 = {"email-notifs":$('#email-notif-setting-val').prop("checked")+"", "scan": $('input[name=scanner]:checked', '#scanners').val()+""}
                 message("Unable to upload file")
                 for(let key in j2){
