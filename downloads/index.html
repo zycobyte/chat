@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-89302611-2"></script>
+    <script>
+        if(window.location.href.concat("eiennochat")) {
+            window.dataLayer = window.dataLayer || [];
+
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+
+            gtag('js', new Date());
+
+            gtag('config', 'UA-89302611-2');
+        }
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="description" content="Eien.no Chat is a free social chat website that aims to
+    bring the world closer together no matter how far people are apart."/>
+
+    <link rel="icon" href="../favicon.ico" type="image/x-icon"/>
+
+    <link rel="stylesheet" type="text/css" href="../res/css/Head.css">
+    <link rel="stylesheet" type="text/css" href="../res/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="../res/css/login.css">
+    <link rel="stylesheet" type="text/css" href="res/css/info.css">
+
+    <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
+    <script type="text/javascript" src="../res/js/Head.js"></script>
+    <script type="text/javascript" src="../res/js/Utils.js"></script>
+    <script type="text/javascript" src="../res/js/Mouse.js"></script>
+    <script type="text/javascript" src="../res/js/login.js"></script>
+
+    <title>Eien.no Chat -- Info</title>
+
+</head>
+<body>
+<div id="notification" class="screen hide">
+    <div id="message-content" class="message"></div>
+</div>
+
+    <div class = "header-main">
+        <div class="dropdown-button" onclick="openmenu();">
+            <div class="dropdown-bar" id="_0"></div>
+            <div class="dropdown-bar" id="_8"></div>
+            <div class="dropdown-bar" id="_16"></div>
+        </div>
+        <div class="hide-menu" id="menu" onclick="menu()"></div>
+        <div class="hide-e" id="e" onclick="closemenu()"></div>
+
+    <img class="head-logo" src="../res/imgs/Logo-wide.png" onclick="window.location.href=pre+'/';"/>
+
+    <div class="head-sign-up head-opt" onclick="signup()">
+        Sign Up
+    </div>
+    <div class="head-log-in head-opt" onclick="login()">
+        Log In
+    </div>
+</div>
+
+    <div class="hide" id="login-box">
+        <div id="title"><u>Login Below</u></div>
+        <div id="returnmsg"></div>
+        <div id="name">Username: </div>
+        <input id="username" class="show text"/>
+        <div id="pass">Password: </div>
+        <input id="password" class="show text" type="password"/>
+        <div id="em" class="hide">E-Mail: </div>
+        <input id="email" class="hide text"/>
+        <div id="message">By using Eien.no Chat you agree to our <a href="../terms/">terms and conditions</a><br><br><a href="#" onclick="resetPass()">Forgotten password? Click here!</a></div>
+        <button class="hide login" id="login" onclick="prepare('login')">login</button>
+        <button class="hide login" id="signup" onclick="prepare('signup')">signup</button>
+    </div>
+
+    <div class="box"></div>
+    <div class="box">Please note that dates are in the format DD/MM/YY.</div>
+
+    <div class="box">
+        <u>Desktop Client</u><br>
+        <h6>Latest Version: 1.0.0 [BETA]</h6>
+        Windows Download: <a href="https://eiennochat.uk/downloads/Eienno%20Chat%20setup.exe">Link</a><br>
+        <h6>Please note, you may have to right click and go to properties and unblock the file once it's downloaded.</h6>
+        Linux Download: Date unknown.<br>
+        MacOS Download: Date unknown.<br>
+        <h6>Please report any bugs to bugs@eiennochat.co.uk.  Thanks!</h6>
+    </div>
+    <div class="box">
+        <u>Android Client</u><br>
+        <h6>Latest Version: -</h6>
+        Download: Date unknown.<br>
+        <h6>Please report any bugs to bugs@eiennochat.co.uk.  Thanks!</h6>
+    </div>
+    <div class="box">
+        <u>IOS Client</u><br>
+        <h6>Latest Version: -</h6>
+        Download: Date unknown.<br>
+        <h6>Please report any bugs to bugs@eiennochat.co.uk.  Thanks!</h6>
+    </div>
+
+    <div id="scroll-appear-on-load"></div>
+
+</body>
+</html>
