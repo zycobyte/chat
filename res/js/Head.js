@@ -27,8 +27,6 @@ function menu(){
     if(page.includes("chats")){
         if(!read("username") || !read("token")) return redirLogin("Please login to use Eien.no Chat");
     }
-    if(page.includes("download")) return alert("Coming soon!");
-
     window.location.href = page;
 }
 
@@ -43,7 +41,7 @@ function getPage(option) {
         case 3:
             return pre+"/info/";
         case 4:
-            return "http://download.eiennochat.co.uk/";
+            return pre+"/downloads/";
         case 5:
             return pre+"/chats/";
         case 6:

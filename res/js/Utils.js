@@ -2,7 +2,7 @@ let localhost = window.location.hostname==="localhost" || window.location.hostna
 pre = (localhost?"/Website":"");
 let server = (localhost?"ws://${IP}:2089":"wss://${IP}:2096")+"/eiennosocket/data";
 let dataserver = (localhost?"ws://${IP}:2090":"wss://${IP}:2087")+"/datasocket/data";
-let handlerAddress = (localhost?"ws://localhost:2089":"wss://TODO:2096")+"/eiennosocket/clientConnect";
+let handlerAddress = (localhost?"ws://www.handler.eiennochat.uk:2089":"wss://handler.eiennochat.uk:2096")+"/eiennosocket/clientConnect";
 let IP = null;
 
 allowStorage = (typeof(Storage) !== "undefined");
@@ -68,16 +68,17 @@ async function init_socket_connecter() {
 }
 setInterval(function () {//Get a server IP
     if (!open || !open_data) {
-        IP=localhost?"localhost":"eiennochat.uk";
-        if(pageLoadData == 1){
-            onLoad();
-            pageLoadData++;
-        }
-        return;
-        if(gettingIP || IP) return;
+        // IP=localhost?"localhost":"eiennochat.uk";
+        // if(pageLoadData == 1){
+        //     onLoad();
+        //     pageLoadData++;
+        // }
+        // return;
+        if(gettingIP) return;
         let s;
-        if (fails % 10 == 0 || !IP) {
+        if (fails > 0 || !IP) {
             //Get a server IP
+            IP = null;
             gettingIP = true;
             try{
                 s = new WebSocket(handlerAddress);
@@ -101,11 +102,12 @@ setInterval(function () {//Get a server IP
             };
             s.onmessage = function (event) {
                 let reply = (event.data);
+                // console.log(reply);
                 if(reply.includes("{")){
                     if (!window.location.href.includes("chats") || window.location.href.includes("join")){
-                        alert(JSON.parse(reply)["message"]);
+                        alert(JSON.parse(reply)["Error"]);
                     }else{
-                        message(JSON.parse(reply)["message"])
+                        message(JSON.parse(reply)["Error"])
                     }
                 }else{
                     IP = reply;
@@ -139,6 +141,7 @@ function init_data_socket(){
     }catch(err){
         opening_data=false;
         fails++;
+        IP=null;
         // if(fails > 4)canConnect = false;
         return;
     }
@@ -164,6 +167,7 @@ function init_data_socket(){
         fails++;
         open_data = false;
         opening_data=false;
+        IP=null;
         // if(fails > 4)canConnect = false;
         // init_data_socket()//re open the socket
     };
@@ -343,6 +347,7 @@ function send(data, method) {
             socket = new WebSocket(server.replace("${IP}", IP));
         }catch(err){
             fails++;
+            IP=null;
             // if(fails > 4)canConnect = false;
             // requestData(" ");
             return;
@@ -371,6 +376,7 @@ function send(data, method) {
             //     $('#loading-message').removeClass("hidden").addClass("show");
             //     $('#loading-message-box').html("Attempting to establish a secure connection to the Eien.no Chat Servers");
             // }
+            IP=null;
             socket = null;
             open = false;
             // fails++;

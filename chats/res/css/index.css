@@ -1338,6 +1338,7 @@ body{
     left: 50%;
     margin-left: -150px;
     word-wrap: break-word;
+    z-index: 10000;
 }
 
 .profile-pic{
