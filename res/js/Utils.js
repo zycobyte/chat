@@ -67,15 +67,14 @@ async function init_socket_connecter() {
     }, 100);
 }
 setInterval(function () {//Get a server IP
-    IP="client-server-01.eiennochat.uk";
-    return;
+//     return;
     if (!open || !open_data) {
-        // IP=localhost?"localhost":"eiennochat.uk";
-        // if(pageLoadData == 1){
-        //     onLoad();
-        //     pageLoadData++;
-        // }
-        // return;
+    IP="client-server-01.eiennochat.uk";
+        if(pageLoadData == 1){
+            onLoad();
+            pageLoadData++;
+        }
+        return;
         if(gettingIP) return;
         let s;
         if (fails > 0 || !IP) {
