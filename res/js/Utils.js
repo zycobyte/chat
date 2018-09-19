@@ -3,7 +3,7 @@ pre = (localhost?"/Website":"");
 let server = (localhost?"ws://${IP}:2089":"wss://${IP}:2096")+"/eiennosocket/data";
 let dataserver = (localhost?"ws://${IP}:2090":"wss://${IP}:2087")+"/datasocket/data";
 let handlerAddress = (localhost?"ws://www.handler.eiennochat.uk:2089":"wss://handler.eiennochat.uk:2096")+"/eiennosocket/clientConnect";
-let IP = "client-server-01.eiennochat.uk";
+let IP = null;
 
 allowStorage = (typeof(Storage) !== "undefined");
 messages = 0;
