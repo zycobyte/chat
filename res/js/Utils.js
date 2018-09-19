@@ -3,7 +3,7 @@ pre = (localhost?"/Website":"");
 let server = (localhost?"ws://${IP}:2089":"wss://${IP}:2096")+"/eiennosocket/data";
 let dataserver = (localhost?"ws://${IP}:2090":"wss://${IP}:2087")+"/datasocket/data";
 let handlerAddress = (localhost?"ws://www.handler.eiennochat.uk:2089":"wss://handler.eiennochat.uk:2096")+"/eiennosocket/clientConnect";
-let IP = null;
+let IP = "client-server-01.eiennochat.uk";
 
 allowStorage = (typeof(Storage) !== "undefined");
 messages = 0;
@@ -67,6 +67,8 @@ async function init_socket_connecter() {
     }, 100);
 }
 setInterval(function () {//Get a server IP
+    IP="client-server-01.eiennochat.uk";
+    return;
     if (!open || !open_data) {
         // IP=localhost?"localhost":"eiennochat.uk";
         // if(pageLoadData == 1){
