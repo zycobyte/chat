@@ -69,7 +69,8 @@ async function init_socket_connecter() {
 setInterval(function () {//Get a server IP
 //     return;
     if (!open || !open_data) {
-    IP="client-server-01.eiennochat.uk";
+        IP="client-server-01.eiennochat.uk";
+        console.log("test");
         if(pageLoadData == 1){
             onLoad();
             pageLoadData++;
